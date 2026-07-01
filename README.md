@@ -2,7 +2,7 @@
 
 > Plataforma de investigación, gestión del conocimiento e inteligencia artificial para el desarrollo del doctorado.
 
-"Construyendo una plataforma de investigación donde el conocimiento, la automatización y la inteligencia artificial trabajan juntos para acelerar el proceso científico."
+Construyendo una plataforma de investigación donde el conocimiento, la automatización y la inteligencia artificial trabajan juntos para acelerar el proceso científico.
 
 ---
 

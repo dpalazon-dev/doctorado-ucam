@@ -38,6 +38,29 @@ The platform is organized into three categories:
 
 ---
 
+# Domains and Entities
+
+A domain is an area of responsibility.
+
+An entity is a concrete concept that lives inside a domain.
+
+The two should not be confused. A domain typically owns one or more entities, which are defined in the Domain Model.
+
+| Domain    | Primary Entities |
+|-----------|------------------|
+| Knowledge | Knowledge        |
+| Documents | Document         |
+| Projects  | Project          |
+| People    | Person           |
+| Planning  | Task, Activity   |
+| Resources | Resource         |
+
+The Research domain owns no entity of its own. It is an emergent process (see Domain Model → Research).
+
+Cross-cutting domains (Intelligence, Context, Search & Retrieval, Memory) own no entities. They operate over the entities owned by other domains.
+
+---
+
 # Core Domains
 
 Core Domains represent the intellectual heart of the Research Operating System.

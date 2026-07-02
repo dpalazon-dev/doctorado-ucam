@@ -55,19 +55,63 @@ El sistema crecerá de forma incremental sin comprometer su mantenibilidad.
 
 # Estructura del repositorio
 
+Actualmente el repositorio contiene la documentación de arquitectura del proyecto en su fase de diseño. La estructura real es plana:
+
 ```
 Doctorado_UCAM/
 
-├── architecture/      # Diseño de la plataforma
-├── requirements/      # Casos de uso y requisitos
-├── research/          # Trabajo investigador
-├── knowledge/         # Base de conocimiento
-├── writing/           # Tesis y publicaciones
-├── ai/                # Agentes, prompts y herramientas IA
-├── automation/        # Automatizaciones y pipelines
-├── platform/          # Código fuente e infraestructura
-└── docs/              # Documentación general
+├── README.md
+├── VISION.md
+├── SYSTEM_PRINCIPLES.md
+├── SYSTEM_MODEL.md
+├── RESEARCHER_OPERATIONAL_MODEL.md
+├── SYSTEM_RESPONSIBILITIES.md
+├── DOMAIN_MAP.md
+├── DOMAIN_MODEL.md
+├── KNOWLEDGE_MODEL.md
+└── SYSTEM_CAPABILITIES.md
 ```
+
+La estructura modular por directorios (architecture/, platform/, ai/…) se introducirá cuando comience la fase de implementación.
+
+---
+
+# Architecture Documents
+
+Los documentos de arquitectura trabajan a distintos niveles conceptuales y deben leerse en el siguiente orden. Cada uno depende conceptualmente del anterior:
+
+```
+Vision
+    ↓
+Principles
+    ↓
+System Model
+    ↓
+Operational Model
+    ↓
+Responsibilities
+    ↓
+Domain Map
+    ↓
+Domain Model
+    ↓
+Knowledge Model
+    ↓
+System Capabilities
+    ↓
+Use Cases
+```
+
+1. [Vision](VISION.md)
+2. [Principles](SYSTEM_PRINCIPLES.md)
+3. [System Model](SYSTEM_MODEL.md)
+4. [Operational Model](RESEARCHER_OPERATIONAL_MODEL.md)
+5. [Responsibilities](SYSTEM_RESPONSIBILITIES.md)
+6. [Domain Map](DOMAIN_MAP.md)
+7. [Domain Model](DOMAIN_MODEL.md)
+8. [Knowledge Model](KNOWLEDGE_MODEL.md)
+9. [System Capabilities](SYSTEM_CAPABILITIES.md)
+10. Use Cases *(pendiente)*
 
 ---
 
@@ -92,10 +136,7 @@ Cada dominio evolucionará de forma independiente siguiendo una arquitectura mod
 
 ## Fase 1 · Diseño
 
-- [ ] Definir visión del sistema
-- [ ] Definir arquitectura
 - [ ] Definir casos de uso
-- [ ] Definir modelo de dominio
 
 ## Fase 2 · Plataforma
 

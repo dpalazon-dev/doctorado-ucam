@@ -28,9 +28,9 @@ Specialized objects should emerge from these entities rather than becoming indep
 
 ---
 
-# Fundamental Entities
+# Core Entities
 
-The current version of Doctorado_UCAM is built around seven fundamental entities.
+The current version of Doctorado_UCAM is built around seven core entities.
 
 ```
                    Project
@@ -76,7 +76,6 @@ Examples include:
 - Administrative documents
 - Regulations
 - Emails
-- Datasets
 
 A Document may generate Knowledge but is not itself Knowledge.
 
@@ -106,6 +105,8 @@ Represents what the system knows.
 Knowledge is independent of the documents from which it originates.
 
 It captures meaning rather than storage.
+
+The full knowledge lifecycle — how knowledge is born, evolves and is represented — is defined in the Knowledge Model.
 
 Knowledge may emerge from:
 
@@ -324,6 +325,34 @@ Resources are consumed rather than interpreted.
 
 ---
 
+# Derived Types
+
+Core Entities are intentionally minimal.
+
+Most real-world concepts are not new entities. They are specializations of an existing Core Entity.
+
+These specializations are called Derived Types.
+
+| Derived Type     | Base Entity | Notes                                |
+|------------------|-------------|--------------------------------------|
+| Paper            | Document    | A scientific article                 |
+| Book             | Document    | A monograph or textbook              |
+| Bibliography     | Document    | A curated collection of references   |
+| Research Journal | Document    | A chronological research log         |
+| Meeting          | Activity    | Work that occurred with other People |
+| Dataset          | Resource    | Data consumed to perform work        |
+
+Deriving from a Base Entity means a Derived Type inherits its responsibilities and relationships.
+
+Because of this:
+
+- Research Journal does not compete with Document. It is a Document.
+- Bibliography does not compete with Document. It is a Document.
+
+New Derived Types can be added freely, as long as they specialize an existing Core Entity rather than introducing a new root concept.
+
+---
+
 # Relationship Philosophy
 
 The platform is intentionally highly connected.
@@ -352,15 +381,15 @@ The objective is contextual continuity.
 
 # Emergent Concepts
 
-Several important concepts are intentionally **not** represented as fundamental entities.
+Several important concepts are intentionally **not** represented as core entities.
 
 They emerge from combinations of the entities defined above.
 
 ## Context
 
-Context is the current operational interpretation of the complete system state.
+Context is not an entity. It emerges from the relationships between entities.
 
-It emerges from the relationships between entities.
+See System Model → Context.
 
 ---
 
@@ -374,17 +403,17 @@ Research is an operational process emerging from Projects, Knowledge, Activities
 
 ## Intelligence
 
-Intelligence is not stored.
+Intelligence is not an entity. It is a capability operating over the complete domain.
 
-It is a capability operating over the complete domain.
+See Domain Map → Intelligence and System Capabilities → Reason.
 
 ---
 
 ## Memory
 
-Memory is the long-term persistence of relationships and historical state.
+Memory is not an entity. It is a system capability that persists relationships and historical state.
 
-It is a system capability rather than a domain entity.
+See Domain Map → Memory.
 
 ---
 

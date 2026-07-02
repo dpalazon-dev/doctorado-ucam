@@ -111,7 +111,7 @@ Use Cases
 7. [Domain Model](DOMAIN_MODEL.md)
 8. [Knowledge Model](KNOWLEDGE_MODEL.md)
 9. [System Capabilities](SYSTEM_CAPABILITIES.md)
-10. Use Cases *(pendiente)*
+10. [Use Cases](USE_CASES.md)
 
 ---
 
@@ -133,10 +133,6 @@ Cada dominio evolucionará de forma independiente siguiendo una arquitectura mod
 ---
 
 # Hoja de ruta
-
-## Fase 1 · Diseño
-
-- [ ] Definir casos de uso
 
 ## Fase 2 · Plataforma
 

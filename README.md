@@ -33,6 +33,7 @@ Este repositorio constituye la fuente principal de documentación, arquitectura 
 ## El conocimiento es el activo principal
 
 Toda la información debe poder localizarse, reutilizarse y relacionarse.
+Guardar información por sí misma no sirve de nada si no tenemos un sistema para operar sobre ella.
 
 ## La automatización debe ahorrar tiempo
 

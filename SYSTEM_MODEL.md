@@ -12,6 +12,30 @@ Every architectural decision should be consistent with this model.
 
 ---
 
+# Conceptual Layers
+
+Doctorado_UCAM is described at three distinct conceptual levels.
+
+Each level answers a different question and lives in a different document.
+
+```
+System Model      → what the system is made of
+      ↓
+Domain Map        → what areas of responsibility compose it
+      ↓
+Domain Model      → what concrete concepts exist within it
+```
+
+The System Model is the most abstract level. It defines assets, capabilities and interfaces.
+
+The Domain Map partitions the system into coherent domains of responsibility.
+
+The Domain Model defines the concrete entities that live inside those domains.
+
+Each document works at a single level and should not redefine concepts owned by another.
+
+---
+
 # The Research Operating System
 
 Doctorado_UCAM is a personal Research Operating System (Research OS).
@@ -61,16 +85,21 @@ They define **what exists** inside the system.
 
 Assets evolve over time and collectively describe the current state of the research activity.
 
-Current asset categories include:
+## Core Assets
+
+The current core asset categories are:
 
 - Knowledge
 - Projects
 - Tasks
-- Documentation
-- Research Journal
-- Bibliography
+- Documents
+- People
 - Resources
 - Configuration
+
+Specialized types such as Documentation, Bibliography and Research Journal are not independent assets.
+
+They are specializations of the Document domain (see Domain Model → Derived Types).
 
 These categories are expected to evolve as the platform matures.
 
@@ -139,20 +168,20 @@ The system should treat tasks as first-class operational entities.
 
 ---
 
-## Documentation
+## Documents
 
-Documentation represents structured information intentionally created for communication.
+Documents represent persistent digital artifacts managed by the platform.
 
-Examples include:
+They store information but do not necessarily represent knowledge.
 
-- Architecture
-- Specifications
-- ADRs
-- Meeting notes
-- Technical documentation
-- Thesis chapters
+Specialized document types include:
 
-Documentation differs from knowledge in that it communicates decisions rather than simply storing information.
+- Documentation (architecture, specifications, ADRs, thesis chapters)
+- Bibliography
+- Research Journal
+- Papers, books and other imported artifacts
+
+These specializations are defined in the Domain Model as Derived Types rather than as independent assets.
 
 ---
 

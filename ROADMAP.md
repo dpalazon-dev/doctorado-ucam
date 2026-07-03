@@ -17,25 +17,27 @@ It does not add models. It sequences the work that carries a frozen conceptual f
 | Conceptual | Vision, Principles, System Model, Operational Model, Responsibilities, Domain Map, Domain Model, Knowledge Model, System Capabilities, Use Cases | Mature |
 | Cognitive Architecture | AI Architecture, Memory Model, Context Model, Event Model | Complete |
 | Logical | Logical Domain Model | Frozen · v1.0 |
-| **Domain breadth** | Derived Types + Use Cases across all operational domains | **Incomplete** |
-| **Interaction model** | System interaction modalities | **Not started** |
+| **Domain breadth** | Derived Types + Use Cases across all operational domains | **Closed** |
+| **Interaction model** | System interaction modalities | **Complete** |
 | **System design** | Software Architecture and below | **Not started** |
 
-Two gaps remain.
+One gap remains: **execution**.
 
-The first is **breadth**: the domain currently over-represents research.
+Breadth is closed. Every operational level now has Derived Types and worked Use Cases — [USE_CASES.md](USE_CASES.md) carries 52 across twelve groups, and [DOMAIN_VERTICALS.md](DOMAIN_VERTICALS.md) accounts for every one of them. The [Interaction Model](INTERACTION_MODEL.md) is also complete.
 
-The second is **execution**: although the cognitive architecture is complete, the runtime architecture of the system has not yet been designed.
+What remains is the runtime architecture: although the cognitive architecture is complete, the system that executes it has not yet been designed.
 
 ---
 
-# The Gap: Breadth
+# The Breadth Gap — Closed
 
 A researcher is not only a researcher.
 
-The Vision and the Operational Model always said so — the Operational Model names Research, Project Management, Knowledge Management, Communication, Teaching and Institutional Responsibilities as parallel domains. But the Derived Types and the Use Cases drifted, over weeks of modelling the cognitive core, into a research-only view.
+The Vision and the Operational Model always said so — the Operational Model names Research, Project Management, Knowledge Management, Communication, Teaching and Institutional Responsibilities as parallel domains. The Derived Types and the Use Cases drifted, for a time, into a research-only view.
 
-The Domain Model is not wrong. Its breadth is simply unfinished.
+That gap is now closed. Teaching, Administration and Organization each carry a full set of Derived Types and worked Use Cases — Teaching alone has more of them (7) than Research's own dedicated group (4). Personal and Daily Work remain intentionally thin: not an oversight but the point, since personal life needs almost nothing the platform doesn't already provide, and daily coordination is largely Planning and Communication wearing no vertical-specific clothing.
+
+One level named in earlier drafts of this document — **Doctorate** — never became a use-case group of its own. Producing a thesis chapter is Research (Writing); everything institutional around it — progress reports, procedures, training credits, committee decisions, deadlines — is Administration. Both already existed by the time this was first written; the level is retired, not missing.
 
 ## The Six Levels
 
@@ -43,12 +45,12 @@ The researcher's operational reality spans six levels.
 
 | Level | Operational reality | Example concerns | State |
 |-------|---------------------|------------------|-------|
-| 1 | **Personal life** | calendar, health, travel, personal tasks | Absent |
+| 1 | **Personal life** | calendar, health, travel, personal tasks | Minimal · by design |
 | 2 | **Daily work** | meetings, email, decisions, documents | Thin |
-| 3 | **Doctorate** | thesis, bibliography, hypotheses, chapters | Developed |
-| 4 | **Teaching** | courses, lectures, students, exams | Absent |
+| 3 | **Administration** | institutional procedures, progress reports, training, deadlines | Developed |
+| 4 | **Teaching** | courses, lectures, students, exams | Developed |
 | 5 | **Research** | projects, publications, grants, reviews | Developed |
-| 6 | **Organization** | budget, infrastructure, licenses, compute | Thin |
+| 6 | **Organization** | budget, infrastructure, licenses, compute | Developed |
 
 ## One Domain, Many Verticals
 
@@ -122,17 +124,20 @@ No changes to the Logical Domain Model.
 
 ## Deliverables
 
-| Vertical | Work |
-|----------|------|
-| Daily Work | Meetings, communication, decision flow |
-| Teaching | Course, lecture, student, assessment |
-| Doctorate | Thesis management, milestones |
-| Personal | Personal goals and routines |
-| Organization | Resources, budgets, infrastructure |
+| Vertical | Work | Status |
+|----------|------|--------|
+| Research | Derived Types + 12 Use Cases (Knowledge, Research, Writing) | Done |
+| Teaching | Derived Types + 7 Use Cases | Done |
+| Administration | Derived Types + 5 Use Cases | Done |
+| Organization | Derived Types + 5 Use Cases | Done |
+| Daily Work | Derived Types + 7 Use Cases (Planning, Communication) | Thin · sufficient for now |
+| Personal | Derived Types + 3 Use Cases | Minimal · by design |
 
 Completion criterion:
 
 Every operational level has its Derived Types defined and representative Use Cases.
+
+This criterion is met. See [DOMAIN_VERTICALS.md](DOMAIN_VERTICALS.md) for the index and [RESEARCH_VERTICAL.md](RESEARCH_VERTICAL.md), [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md), [ADMINISTRATION_VERTICAL.md](ADMINISTRATION_VERTICAL.md) and [ORGANIZATION_VERTICAL.md](ORGANIZATION_VERTICAL.md) for the four verticals substantial enough to carry their own document. Remaining thinness in Daily Work and Personal is a scope decision, not a gap.
 
 ---
 
@@ -202,9 +207,9 @@ The system is considered validated when this cycle executes over real data with 
 | # | Document | Phase | Purpose | Status |
 |---|----------|-------|---------|--------|
 | 1 | ROADMAP.md | — | Build sequence | This document |
-| 2 | Domain verticals | A | Complete missing operational domains | Next |
-| 3 | INTERACTION_MODEL.md | B | Define every interaction modality | Pending |
-| 4 | SOFTWARE_ARCHITECTURE.md | B | Translate conceptual models into runtime architecture | Pending |
+| 2 | Domain verticals | A | Complete missing operational domains | Done |
+| 3 | INTERACTION_MODEL.md | B | Define every interaction modality | Done |
+| 4 | SOFTWARE_ARCHITECTURE.md | B | Translate conceptual models into runtime architecture | Next |
 | 5 | UML.md / Views | B | Derived implementation views | Pending |
 | 6 | IMPLEMENTATION_PLAN.md | B | Components, milestones, MVP | Pending |
 | 7 | DECISIONS.md (ADR) | B | Record architectural decisions | Pending |
@@ -220,14 +225,14 @@ DECISIONS.md also owns the promotion (or rejection) of the remaining candidate c
 
 # Milestones
 
-| Milestone | Phase | Done when |
-|-----------|-------|-----------|
-| M1 · Domain breadth | A | All six operational levels are represented |
-| M2 · Interaction model | B | Manual, assisted, conversational and autonomous interactions are defined |
-| M3 · Reference architecture | B | Software Architecture completed |
-| M4 · Implementation views | B | Logical model projected to implementation views |
-| M5 · Build plan | B | Components, epics and MVP defined |
-| M6 · Proving slice | B | End-to-end operating cycle validated |
+| Milestone | Phase | Done when | Status |
+|-----------|-------|-----------|--------|
+| M1 · Domain breadth | A | All six operational levels are represented | Achieved |
+| M2 · Interaction model | B | Manual, assisted, conversational and autonomous interactions are defined | Achieved |
+| M3 · Reference architecture | B | Software Architecture completed | Pending |
+| M4 · Implementation views | B | Logical model projected to implementation views | Pending |
+| M5 · Build plan | B | Components, epics and MVP defined | Pending |
+| M6 · Proving slice | B | End-to-end operating cycle validated | Pending |
 
 ---
 

@@ -69,7 +69,14 @@ Doctorado_UCAM/
 ├── DOMAIN_MAP.md
 ├── DOMAIN_MODEL.md
 ├── KNOWLEDGE_MODEL.md
-└── SYSTEM_CAPABILITIES.md
+├── SYSTEM_CAPABILITIES.md
+├── USE_CASES.md
+├── AI_ARCHITECTURE.md
+├── MEMORY_MODEL.md
+├── CONTEXT_MODEL.md
+├── EVENT_MODEL.md
+├── LOGICAL_DOMAIN_MODEL.md
+└── ROADMAP.md
 ```
 
 La estructura modular por directorios (architecture/, platform/, ai/…) se introducirá cuando comience la fase de implementación.
@@ -100,7 +107,17 @@ Knowledge Model
 System Capabilities
     ↓
 Use Cases
+    ↓
+AI Architecture ─┬─ Memory Model
+                 ├─ Context Model
+                 └─ Event Model
+    ↓
+Logical Domain Model
 ```
+
+Documents 11–14 form the **Cognitive Architecture**: the AI Operating Layer and the three models of the substrate it operates over — what the system remembers (Memory), what it assembles per task (Context) and what it reacts to (Events).
+
+The **Logical Domain Model** then opens the logical layer: the canonical, technology-neutral specification of the domain's structure, from which every schema, diagram and type is derived.
 
 1. [Vision](VISION.md)
 2. [Principles](SYSTEM_PRINCIPLES.md)
@@ -112,6 +129,11 @@ Use Cases
 8. [Knowledge Model](KNOWLEDGE_MODEL.md)
 9. [System Capabilities](SYSTEM_CAPABILITIES.md)
 10. [Use Cases](USE_CASES.md)
+11. [AI Architecture](AI_ARCHITECTURE.md)
+12. [Memory Model](MEMORY_MODEL.md)
+13. [Context Model](CONTEXT_MODEL.md)
+14. [Event Model](EVENT_MODEL.md)
+15. [Logical Domain Model](LOGICAL_DOMAIN_MODEL.md)
 
 ---
 
@@ -134,33 +156,15 @@ Cada dominio evolucionará de forma independiente siguiendo una arquitectura mod
 
 # Hoja de ruta
 
-## Fase 2 · Plataforma
+El plan detallado y vigente vive en **[ROADMAP.md](ROADMAP.md)**. En resumen, dos fases:
 
-- [ ] Infraestructura
-- [ ] Almacenamiento documental
-- [ ] Base de datos
-- [ ] APIs
+## Fase A · Completar el dominio
 
-## Fase 3 · IA
+Desarrollar los verticales que faltan —vida diaria, docencia, gestión del doctorado, personal y organización— mediante *Derived Types* y casos de uso, sin introducir nuevas entidades raíz. Las siete entidades del dominio ya sostienen las seis capas de la vida del investigador.
 
-- [ ] Procesamiento documental
-- [ ] Búsqueda semántica
-- [ ] Embeddings
-- [ ] Agentes especializados
+## Fase B · Construir el sistema
 
-## Fase 4 · Automatización
-
-- [ ] Ingesta de documentos
-- [ ] OCR
-- [ ] Extracción de metadatos
-- [ ] Clasificación automática
-
-## Fase 5 · Investigación Asistida
-
-- [ ] Asistente de investigación
-- [ ] Comparación de artículos
-- [ ] Revisión bibliográfica
-- [ ] Generación de conocimiento
+Materializar la arquitectura: Software Architecture, servicios, Memory/Context Engine, Knowledge Graph, Event Bus, capa MCP e interfaces, validados con una rebanada vertical de extremo a extremo.
 
 ---
 

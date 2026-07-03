@@ -64,6 +64,72 @@ A diagram that drifts from this document is wrong. This document does not drift 
 
 ---
 
+# The System at a Glance
+
+This is the single mental model of Doctorado_UCAM: the seven-entity domain at its core, and the four models of the Cognitive Architecture operating over it. Everything specified in the rest of this document is a part of this one picture.
+
+```
+┌──────────────────────── AI OPERATING LAYER ───────────────────────────┐
+│      Capture · Curate · Link · Reason · Plan · Write · Audit · Notify   │
+└─────────┬──────────────────────┬───────────────────────┬───────────────┘
+     reacts to               uses context            acts on the
+      events                      │                     domain
+          │                       │                       │
+  ┌───────▼────────┐    ┌─────────▼──────────┐            │
+  │  EVENT MODEL   │    │   CONTEXT MODEL    │            │
+  │  what changes  │    │ what is assembled  │            │
+  │                │    │                    │            │
+  │ Created Updated│    │ Context Builder    │            │
+  │ Derived Linked │    │  (derived,         │            │
+  │ + transitions  │    │   per task)        │            │
+  └───────┬────────┘    └─────────┬──────────┘            │
+          │                       │ assembled from         │
+          │             ┌─────────▼──────────┐            │
+          │             │   MEMORY MODEL     │            │
+          │             │  what persists     │            │
+          │             │                    │            │
+          │             │ world:    Semantic │            │
+          │             │           Episodic │            │
+          │             │ operating: Working │            │
+          │             │         Procedural │            │
+          │             └─────────┬──────────┘            │
+    emitted by              recalls over                  │
+   domain changes                 │                        │
+          │                       │                        │
+          ▼                       ▼                        ▼
+┌──────────────────────── DOMAIN · source of truth ─────────────────────┐
+│                                                                        │
+│  Person ─▶ Project ─▶ Task ─▶ Activity ─▶ Knowledge ◀─ Document        │
+│                        ▲          │                                    │
+│                        └─ informs ┘        Activity ─consumes─▶ Resource│
+│                                                                        │
+│                        complete graph → Block 2                       │
+└───────────────────────────────┬────────────────────────────────────────┘
+                                 │  the AI layer writes back;
+                                 │  a write is a change → a new Event
+                                 └──────────────▶  ⟳  the cycle repeats
+```
+
+**Reading the picture.**
+
+- **The Domain** is persistent — the single source of truth. Only the seven entities and their Derived Types are stored (Block 1).
+- **Memory, Context and Events** operate *over* the domain and add no truth of their own. Memory recalls over it — and world memory *is* the domain (Semantic = Knowledge, Episodic = Activities). Context is assembled per task by the Context Builder, a derived artifact that is never stored. Events are emitted by the domain's changes.
+- **The AI Operating Layer** reacts to events, uses context and acts on the domain — and its actions are themselves changes, which are new events.
+
+**The boundary that matters most** — persistent versus derived — runs horizontally across the picture. The Domain, below the line, is truth. Everything the models produce above it (context, recall results, events-as-records, artifacts) is derived and reconstructible (Block 7).
+
+**The operating cycle.**
+
+1. A change to the Domain is recorded as an **Event**.
+2. The Event triggers a responsibility in the **AI Operating Layer**.
+3. That responsibility requests **Context**; the **Context Builder** assembles it from **Memory** (recall over the Domain), recent Events and Policies.
+4. The responsibility reasons and **acts**, writing the result back to the **Domain** — within the autonomy and human-control limits of the AI Architecture.
+5. The write is a new change — a new **Event** — and the cycle continues.
+
+This one loop composes every use case: acquire or retrieve, understand, reason, produce, integrate. It is what keeps the system alive without continuous instruction from the researcher.
+
+---
+
 # Logical Type Vocabulary
 
 Attributes are specified with logical types. A logical type describes the *nature* of a value, never its storage.
@@ -85,22 +151,6 @@ Attributes are specified with logical types. A logical type describes the *natur
 | `set<T>` / `list<T>`| An unordered / ordered collection.                           |
 
 How a `degree`, a `timestamp` or a `locator` is physically represented is a decision for the Software Architecture. This document commits only to the logical nature.
-
----
-
-# The Domain Graph
-
-The seven Core Entities and their primary relationships.
-
-```
-   Person ──▶ Project ──▶ Task ──▶ Activity ──▶ Knowledge
-                             ▲                      │
-                             └──────── informs ─────┘
-
-   Document ──supports──▶ Knowledge      Activity ──consumes──▶ Resource
-```
-
-The diagram shows the primary operational flow. The complete and authoritative set of relationships is the graph specified in **Block 2**. Every cognitive model of the Cognitive Architecture — Memory, Context, Events — resolves back to this graph, the logical expression of the single-source-of-truth principle.
 
 ---
 

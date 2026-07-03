@@ -2,13 +2,19 @@
 
 ## Purpose
 
-This document defines the role of Artificial Intelligence inside Doctorado_UCAM.
+This document defines the **AI Operating Layer** of Doctorado_UCAM: the intelligence that operates the Research Operating System.
 
 It does not describe models, prompts, frameworks or providers.
 
-Instead, it defines the intelligent layer that operates the Research Operating System: what it is responsible for, what it needs in order to operate, how autonomously it may act and where human judgement remains sovereign.
+It defines the layer that captures, curates, links, reasons and produces continuously on behalf of the researcher — and, crucially, how that layer relates to the world it operates over.
 
-Every previous document describes a system that stores, relates and exposes knowledge. This document describes the layer that *keeps that system alive* — the layer that captures, curates, links, reasons and produces continuously, on behalf of the researcher.
+This document is the **hub of a four-part cognitive architecture**. It defines the actor. The substrate that actor depends on — what it remembers, what it focuses on, what it reacts to — is defined in three companion models:
+
+- **Memory Model** — what the system remembers across time.
+- **Context Model** — what the system assembles for a single task.
+- **Event Model** — what the system reacts to.
+
+This document establishes the layer and its relationship to those three. Each model is defined in its own document.
 
 It is, for the intelligent behaviour of the platform, what the Domain Model is for its structure.
 
@@ -16,7 +22,7 @@ It is, for the intelligent behaviour of the platform, what the Domain Model is f
 
 # Relationship with the Architecture
 
-The architectural documentation progresses from abstract concepts toward concrete behaviour.
+The architectural documentation progresses from abstract concepts toward concrete behaviour, and then from behaviour toward cognition.
 
 ```
 Vision
@@ -39,26 +45,31 @@ System Capabilities
     ↓
 Use Cases
     ↓
-AI Architecture        ← this document
+┌─── Cognitive Architecture ──────────────────┐
+│   AI Architecture      ← this document       │
+│   Memory Model         (forthcoming)         │
+│   Context Model        (forthcoming)         │
+│   Event Model          (forthcoming)         │
+└──────────────────────────────────────────────┘
     ↓
-Software Architecture  (future)
+Software Architecture   (future)
     ↓
-Infrastructure         (future)
+Infrastructure          (future)
 ```
 
-The documents above answer three questions.
+The documents above the cognitive cluster answer three questions.
 
 - Why the system exists.
 - What exists inside it.
 - What it is able to do.
 
-This document answers a fourth.
+The cognitive cluster answers a fourth.
 
-> Who does the operational work, and how intelligently.
+> Who does the operational work, with what memory, on what focus, in reaction to what.
 
-The prior documents describe a system that *can* be operated. This document describes the layer that *operates it*.
+The prior documents modelled the *world* — its entities, its knowledge, its use cases. They did not model the system's *cognition* at the same depth. The cognitive architecture corrects that, applying to the intelligent behaviour of the platform the same rigour the Domain Model applied to its structure: model the concepts first, decide the implementation later.
 
-It sits above the future Software Architecture, which will define how this layer is implemented, and it deliberately stops short of one concern it depends on: the organization of memory. That concern is large enough to deserve its own document. This document establishes only *what* the intelligent layer needs from memory. A future **Memory Architecture** will define *how* memory is organized and used.
+This cluster sits above the future Software Architecture, which will define how it is implemented. It defines *what* the intelligence is and needs. It does not define *how* the intelligence runs.
 
 ---
 
@@ -72,15 +83,70 @@ Doctorado_UCAM answers differently.
 
 > The researcher captures. The system organizes.
 
-The intelligent layer is not an assistant the researcher occasionally consults. It is the **librarian** of the Research Operating System. The researcher's responsibility ends at capture — dropping in a paper, a note, a meeting, an idea. Everything after that — extraction, linking, consolidation, retrieval, maintenance — is the system's responsibility.
+The intelligent layer is not an assistant the researcher occasionally consults. It is the **librarian** of the Research Operating System. The researcher's responsibility ends at capture. Everything after that — extraction, linking, consolidation, retrieval, maintenance — is the system's responsibility.
 
-This reframing is the defining innovation of the platform.
+But the deeper architectural move is this.
 
-Doctorado_UCAM is not a knowledge base that a researcher maintains.
+> Doctorado_UCAM separates the model of the world from the intelligence that operates over it.
 
-It is a system of knowledge **continuously maintained by an intelligent layer** operating over a shared domain.
+The world-model — the Domain Model and the Knowledge Model — is **authoritative and durable**. It is the truth.
 
-Everything in this document follows from that idea.
+The intelligence — the AI Operating Layer — is **active and disposable**. It reads the world, acts on it and leaves it changed, but it holds no truth of its own.
+
+Models will be replaced. Prompts will be rewritten. Agents will be redesigned. None of that touches the world-model. The intelligence is a tenant of the domain, never its owner.
+
+This separation is the defining innovation of the platform. Everything in this document follows from it.
+
+Doctorado_UCAM is not a knowledge base a researcher maintains.
+
+It is a durable model of a research world, **operated continuously by a disposable intelligence**.
+
+---
+
+# The Cognitive Architecture
+
+The intelligence does not operate in a vacuum. To act well, it needs three things: something to remember with, something to focus with, and something to react to.
+
+These are not features of the AI layer. They are distinct concerns, each large enough to be its own conceptual model, and each kept deliberately orthogonal to the others.
+
+| Concern      | Question it answers                          | Nature of the state      | Defined in       |
+|--------------|----------------------------------------------|--------------------------|------------------|
+| **Memory**   | What does the system remember over time?     | State that **persists**  | Memory Model     |
+| **Context**  | What does the system assemble for one task?  | State that is **produced** (transient) | Context Model    |
+| **Events**   | What does the system react to?               | State that **changes** (and triggers) | Event Model      |
+| **AI Layer** | Who acts?                                     | The **actor**            | this document    |
+
+Persist, produce, trigger, act.
+
+These four concerns never overlap, and that is precisely what keeps them separable. Memory is not context: memory is everything the system holds; context is the small, task-shaped slice assembled from it. Context is not events: context is what an operation runs *on*; an event is what causes an operation to *begin*. The AI layer is none of them: it is the actor that reacts to events, builds context from memory and the domain, and operates on the domain.
+
+The complete conceptual stack.
+
+```
+                        Researcher
+                            │
+                            ▼
+                 Research Operating System
+   ═══════════════════════════════════════════════════════
+     World Model            (what exists — authoritative)
+       Domain Model · Knowledge Model
+   ═══════════════════════════════════════════════════════
+     Cognitive Substrate    (what the intelligence needs)
+       Memory Model · Context Model · Event Model
+   ═══════════════════════════════════════════════════════
+     AI Operating Layer     (the intelligence that acts)
+       Capture · Curate · Link · Reason
+       Plan  · Write  · Audit · Notify
+   ═══════════════════════════════════════════════════════
+     Shared Services        (how it runs — Software Architecture, future)
+       Retrieval · Scheduling · Tool Access · Policy Enforcement
+   ═══════════════════════════════════════════════════════
+     Infrastructure         (future)
+```
+
+Notice what is missing from this diagram: a layer of *agents*.
+
+There is none. Agents are not an architectural layer. They are specialized behaviours of the AI Operating Layer. The architecture is memory, context, events and the layer that binds them — not a directory of bots.
 
 ---
 
@@ -118,19 +184,27 @@ Knowledge that is only maintained on demand is knowledge that decays.
 
 Every intelligent operation begins by constructing the context it needs.
 
-The AI never assumes it already holds the relevant state. It assembles it — deliberately, per task — from the Unified System State.
+The AI never assumes it already holds the relevant state. It assembles it — deliberately, per task — from memory and the domain.
 
-The quality of any intelligent action is bounded by the quality of the context constructed for it.
+The quality of any intelligent action is bounded by the quality of the context constructed for it. How that construction works is defined in the Context Model.
 
-### 5. The Domain Model is the single source of truth
+### 5. The world-model is the single source of truth
 
 This principle extends System Principle 6.
 
 The intelligent layer operates over the domain entities defined in the Domain Model. It never maintains a private, parallel representation of the researcher's knowledge.
 
-There is no shadow store. No document folder, index or generated wiki is ever the source of truth. Storage formats may change; the domain does not. The AI reasons over the domain, never over the storage.
+There is no shadow store. No document folder, index, vector store or generated wiki is ever the source of truth. Any such structure is a *projection* of the domain — reconstructible from it, never authoritative over it. Storage formats may change; the domain does not. The AI reasons over the domain, never over the storage.
 
-### 6. Irreversible actions require human approval
+### 6. Agents do not know the world
+
+An agent never navigates storage. It never thinks *"open this file"* or *"query that table."*
+
+It expresses a need for meaning — *"I need the Knowledge related to X"* — and the system resolves how to satisfy it.
+
+This decouples the intelligence from the representation entirely. The agent knows what it needs, not where it lives. Retrieval strategy, storage layout and indexing can change beneath it without the agent ever noticing. An intelligence that knows where things are stored is an intelligence coupled to today's implementation.
+
+### 7. Irreversible actions require human approval
 
 The AI may act autonomously on reversible operations.
 
@@ -138,7 +212,7 @@ Irreversible actions — deleting knowledge, overwriting the researcher's work, 
 
 Autonomy is earned per behaviour and bounded by reversibility. See *Autonomy Levels*.
 
-### 7. Behaviour is composed, not invented
+### 8. Behaviour is composed, not invented
 
 The intelligent layer introduces no new behaviour.
 
@@ -150,26 +224,7 @@ Everything it does is a composition of the capabilities defined in System Capabi
 
 The intelligence of Doctorado_UCAM is not a collection of independent tools bolted onto the platform.
 
-It is a single architectural layer — the **AI Operating Layer** — positioned between the conceptual foundation of the system and its software implementation.
-
-```
-                        Researcher
-                            │
-                            ▼
-                 Research Operating System
-   ═══════════════════════════════════════════════════════
-     Conceptual Foundation
-       Domain Model · Knowledge Model
-       System Capabilities · System Responsibilities
-   ═══════════════════════════════════════════════════════
-     AI Operating Layer
-       Capture · Curate · Link · Reason · Plan
-       Write  · Audit  · Monitor · Construct Context
-   ═══════════════════════════════════════════════════════
-     Software Architecture        (future)
-   ═══════════════════════════════════════════════════════
-     Infrastructure               (future)
-```
+It is a single architectural layer — the **AI Operating Layer** — positioned between the cognitive substrate (Memory, Context, Events) and the software implementation.
 
 The AI Operating Layer operates *over* the Domain Model, never *around* it.
 
@@ -179,13 +234,13 @@ This is what makes the intelligence coherent rather than fragmented: it does not
 
 ## What is an Agent
 
-The platform will eventually decompose the AI Operating Layer into specialized units. It is tempting to call these units *bots* or *assistants*. Both terms mislead.
+The platform will eventually decompose the AI Operating Layer into specialized units. It is tempting to call these units *bots* or *assistants*. Both terms mislead, and so does a third assumption — that an agent is something that knows its way around the system's storage.
 
-> An agent is a specialized responsibility of the AI Operating Layer that operates over the Domain Model to maintain, enrich or apply the system's knowledge.
+> An agent is a specialized responsibility of the AI Operating Layer that operates over the Domain Model — by requesting meaning, never by navigating storage — to maintain, enrich or apply the system's knowledge.
 
-An agent is defined by a responsibility, not by a conversation.
+An agent is defined by a responsibility, not by a conversation, and not by knowledge of where data lives.
 
-It is not a chatbot. It is not a personality. It is a coherent slice of the intelligent layer's work, scoped to a responsibility and bounded by an autonomy level.
+It is not a chatbot. It is not a personality. It is not a file-system navigator. It is a coherent slice of the intelligent layer's work, scoped to a responsibility, bounded by an autonomy level, and blind to the physical shape of the world it operates on.
 
 We do not design bots.
 
@@ -201,27 +256,25 @@ They are not commands the researcher issues. They are continuous obligations the
 
 Each responsibility is a *lens* on the intelligent layer's work. Each is realized by composing capabilities defined in System Capabilities.
 
-| Responsibility        | Purpose                                                        | Primary Capabilities         |
-|-----------------------|----------------------------------------------------------------|------------------------------|
-| **Capture**           | Bring new information into the system on the researcher's behalf | Acquire, Process             |
-| **Curate**            | Improve and maintain existing knowledge                         | Organize *(+ Curate¹)*       |
-| **Link**              | Build and strengthen relationships between entities             | Organize (Relate)            |
-| **Reason**            | Produce insight, comparison, synthesis and recommendation       | Reason                       |
-| **Plan**              | Turn intent and state into scheduled, trackable work            | Operate (Plan, Schedule)     |
-| **Write**             | Produce artifacts that communicate and document work            | Produce                      |
-| **Audit**             | Inspect the knowledge base for inconsistency and decay          | Reason, Organize *(+ Curate¹)* |
-| **Monitor**           | Observe changes in state and react to them                      | Operate (Track, Notify)      |
-| **Construct Context** | Assemble the relevant operational view for a task               | Context *(cross-cutting)*    |
+| Responsibility | Purpose                                                        | Primary Capabilities         |
+|----------------|----------------------------------------------------------------|------------------------------|
+| **Capture**    | Bring new information into the system on the researcher's behalf | Acquire, Process             |
+| **Curate**     | Improve and maintain existing knowledge                         | Organize *(+ Curate¹)*       |
+| **Link**       | Build and strengthen relationships between entities             | Organize (Relate)            |
+| **Reason**     | Produce insight, comparison, synthesis and recommendation       | Reason                       |
+| **Plan**       | Turn intent and state into scheduled, trackable work            | Operate (Plan, Schedule)     |
+| **Write**      | Produce artifacts that communicate and document work            | Produce                      |
+| **Audit**      | Inspect the knowledge base for inconsistency and decay          | Reason, Organize *(+ Curate¹)* |
+| **Notify**     | Surface what the researcher needs to know                        | Operate (Notify)             |
 
 *¹ Curate is not yet part of the Capability Model. See below.*
 
-Three of these responsibilities deserve clarification because they are easily confused.
+Two responsibilities that earlier drafts placed here have deliberately moved out of the layer, into the cognitive substrate:
 
-- **Curate** is the *act* of improving knowledge — consolidating, deduplicating, refreshing.
-- **Audit** is the *periodic inspection* that surfaces what needs curating.
-- **Monitor** is the *continuous observation* of state that reacts to individual changes as they happen.
+- **Constructing context** is not a responsibility of the AI layer — it is a concern large enough to be its own model. The layer *uses* context; the Context Model defines how it is built.
+- **Monitoring for change** is likewise not owned here — it belongs to the Event Model. The layer *reacts* to events; it does not own their detection.
 
-Audit is deep and periodic. Monitor is shallow and constant. Curate is the work both of them trigger.
+The layer acts. The substrate remembers, focuses and detects. Keeping these apart is what the cognitive architecture is for.
 
 ## Curate — A Candidate Capability
 
@@ -251,113 +304,61 @@ This document does not formalize it there — System Capabilities owns the capab
 
 ---
 
-# Memory
+# What the Layer Requires
 
-The intelligent layer cannot operate on the present moment alone.
+The AI Operating Layer depends on the three models of the cognitive substrate. This document states *what* it requires from each. The models define *how* each requirement is met.
 
-Reasoning, context construction and long-term continuity all depend on memory — the ability to recall prior state, prior decisions and prior reasoning.
+## From Memory
 
-This document establishes only *what* the intelligent layer needs from memory.
+The layer cannot operate on the present moment alone. Reasoning, context construction and long-term continuity all depend on the ability to recall prior state, prior decisions and prior reasoning.
+
+The layer requires, at minimum:
 
 - **Immediate recall** — the state relevant to the current interaction.
 - **Conversational recall** — what has been said and done within the active session.
-- **Semantic recall** — the knowledge the system holds, as defined in the Knowledge Model.
-- **Historical recall** — what happened before: past Activities, decisions and their outcomes.
+- **Semantic recall** — the knowledge the system holds (see Knowledge Model).
+- **Historical recall** — what happened before: past Activities, decisions and outcomes.
 - **Procedural recall** — how the system has learned to perform recurring work.
 
-These are requirements, not a design.
+These are requirements, not a design. How memory is structured, retained, retrieved and consolidated is defined in the **Memory Model**.
 
-*How* memory is organized — its structure, retention, retrieval and consolidation — is deliberately out of scope here. Memory is a cross-cutting concern large enough to distort this document if resolved inside it.
+## From Context
 
-> The organization of memory is deferred to a future **Memory Architecture** document.
+No intelligent operation acts on the entire system. Acting on everything is impossible at scale and counterproductive — relevance is destroyed by noise.
 
-Until then, this document assumes only that memory exists and that the intelligent layer depends on it. See Domain Map → Memory and System Responsibilities → Responsibility 7.
+The layer therefore requires that every operation run on a **constructed context**: a focused, task-shaped view assembled on demand from memory and the domain. Context is a *product*, not a copy of memory (Design Principle 4).
 
----
+The layer's only obligation is to never assume context — to always request its construction. How context is constructed, prioritized and bounded is defined in the **Context Model**.
 
-# Context Construction
-
-No intelligent operation acts on the entire system.
-
-Acting on everything is both impossible at scale and counterproductive: relevance is destroyed by noise. Instead, every intelligent operation begins by constructing the *specific* context it requires.
-
-Context is not stored. It is derived, per task, from the Unified System State (see System Model → Context).
-
-The construction follows a deliberate progression from intent to relevant state.
-
-```
-Task
-  ↓
-Intent
-  ↓
-Relevant Entities
-  ↓
-Relationships
-  ↓
-Recent Activity
-  ↓
-Relevant Knowledge
-  ↓
-External Sources
-  ↓
-Context
-```
-
-The intelligent layer does not read the whole system.
-
-It *selects*.
-
-Given a task, it infers intent, identifies the entities the task concerns, follows their relationships, incorporates recent activity, retrieves the knowledge that bears on it and — only when necessary — reaches for external sources. The result is a context: a focused, task-shaped view of the operational state.
-
-As the volume of knowledge grows across years, this selection problem becomes the central engineering challenge of the platform. It is not solved by a single retrieval strategy. Different tasks require different construction strategies, and the strategies themselves will evolve. This document fixes the *principle* — context is constructed, never assumed — and leaves the strategies to the Software Architecture and to future evolution.
-
----
-
-# Event-Driven Behaviour
-
-The intelligent layer does not wait to be asked.
+## From Events
 
 A system whose intelligence activates only on request is a search box. A system whose intelligence activates on *change* is an operating layer.
 
-Every meaningful change in the operational state is an event. Events drive the intelligent layer's continuous work.
+The layer is therefore **reactive**: it acts in response to changes in the domain, not only in response to the researcher. This is what makes *Knowledge evolution is continuous* (Principle 3) operationally real rather than aspirational.
 
-A single capture illustrates the pattern.
-
-```
-New Document
-     ↓
-Extract Knowledge
-     ↓
-Link Entities
-     ↓
-Detect Project
-     ↓
-Suggest Task
-```
-
-The researcher drops a paper into the system — a single act of capture. From that one event, the intelligent layer extracts knowledge, links it to existing concepts and people, infers which project it belongs to, and proposes the next task. None of this was requested. All of it follows from the event.
-
-This is how the librarian works while the researcher thinks.
-
-Event-driven behaviour is what makes *Knowledge evolution is continuous* (Design Principle 3) operationally real rather than aspirational.
+The layer requires a stream of domain events to react to. The event taxonomy, the triggers and the reactive flows are defined in the **Event Model**.
 
 ---
 
 # Agent Coordination
 
-The AI Operating Layer is not a single agent. Nor is it a set of independent agents acting in isolation.
+The AI Operating Layer is not a single agent. Nor is it a chain of agents calling one another.
 
-It is a set of coordinated responsibilities.
+The naïve design — agent A invokes agent B invokes agent C — is explicitly rejected. It produces inconsistent context, duplicated work, runaway cost and brittle coupling. The moment one agent must know how to call the next, the intelligence is coupled to its own decomposition.
 
-When an event enters the system, the responsibilities engage in sequence, each consuming the output of the previous and each writing to the same shared domain.
+Coordination happens **through shared state and events**, never through direct calls.
 
 ```
-Capture → Extract → Curate → Link → Audit → Notify
+Shared State (the Domain)
+        +
+Events (changes to it)
+        +
+Specialized Workers (the responsibilities)
 ```
 
-There is no private hand-off between agents, because there is no private state. Coordination happens *through the domain*: one responsibility writes an entity or relationship, and the next responsibility acts on the domain as it now stands.
+A worker reacts to an event, reads context built from shared state, does its work, and writes the result back to the domain. That write is itself a change — a new event — which another worker may react to in turn. No worker hands off to another. No worker holds the state. The domain holds the state; events announce that it changed; workers react.
 
-This is a direct consequence of Design Principle 5. Because the Domain Model is the single source of truth, coordination requires no separate message-passing substrate. The domain is the medium of coordination.
+This is a direct consequence of Design Principle 5. Because the domain is the single source of truth, coordination needs no separate message-passing substrate between agents. The domain is the medium of coordination, and the Event Model is its nervous system.
 
 Agents coordinate by operating on shared state, not by talking to each other.
 
@@ -458,16 +459,21 @@ This is what allows the system to improve continuously without allowing it to co
 
 This document intentionally stops at the boundary of implementation.
 
-It defines *what* the intelligent layer is, *what* it is responsible for, *what* it needs and *how far* it may act on its own. It does not define how any of this is built.
+It defines *what* the intelligent layer is, *what* it is responsible for, *what* it requires from the cognitive substrate and *how far* it may act on its own. It does not define how any of this is built.
 
-Later work will define:
+The cognitive substrate is defined in three companion models, to be written next:
 
-- **Memory Architecture** — how memory is organized, retained, retrieved and consolidated.
-- **Context strategies** — the concrete methods by which context is constructed for different classes of task as knowledge scales.
+- **Memory Model** — the types of memory, how they persist, evolve and relate to the domain.
+- **Context Model** — how context is constructed, prioritized and bounded for each task.
+- **Event Model** — the domain-event taxonomy, triggers and reactive flows that keep the system alive.
+
+Later work will also define:
+
 - **The formal status of Curate** — its promotion, or not, into System Capabilities.
 - **The formal status of Artifact** — its promotion, or not, into the Domain Model.
+- **The status of Policy** — governance, access control and the constraints that bound autonomy, as a cross-cutting concern rather than a standalone model.
 - **Agent decomposition** — the specific responsibilities carved out as agents, and their coordination.
-- **Software Architecture** — the services, models and pipelines that implement this layer.
+- **Software Architecture** — the Shared Services (retrieval, scheduling, tool access, policy enforcement) and the systems that implement this layer.
 
 The conceptual commitments made here are expected to remain stable.
 

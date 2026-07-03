@@ -1,5 +1,7 @@
 # Logical Domain Model
 
+> **Status: Stable · v1.0.** This model changes only when the *domain* changes — never for implementation, AI, storage or tooling. Additions (an attribute, an enum, a Derived Type) are welcome; structural churn is not.
+
 ## Purpose
 
 This document is the canonical logical specification of Doctorado_UCAM.
@@ -154,6 +156,30 @@ How a `degree`, a `timestamp` or a `locator` is physically represented is a deci
 
 ---
 
+# Block 0 · Value Objects
+
+A **value object** is a domain concept identified by its values, not by an identity of its own. Value objects are immutable and always live inside an aggregate (Block 5); they are never referenced independently.
+
+Where an attribute holds a single logical value (a `degree`, a `date`, an `ordinal`, an `enum`), it is simply an attribute — not a value object. Value objects are the *composite* concepts below.
+
+| Value Object        | Composition                                                                              | Used by             |
+|---------------------|------------------------------------------------------------------------------------------|---------------------|
+| `Provenance`        | source, means, moment                                                                     | Document, Knowledge |
+| `Version`           | ordinal, timestamp, author (`→ Person`), note                                             | Document            |
+| `Metadata`          | a set of descriptive fields                                                               | Document            |
+| `KnowledgeRelation` | relation type `enum(supports\|contradicts\|refines\|depends on)`, target (`→ Knowledge`)  | Knowledge           |
+| `Objective`         | statement, target measure                                                                 | Project             |
+| `Deliverable`       | description, due `date`, status                                                           | Project             |
+| `Milestone`         | label, `date`                                                                             | Project             |
+| `FundingAllocation` | amount (`money`), source (`→ Resource`), period (`time span`)                             | Project             |
+| `Membership`        | member (`→ Person`), role, period (`time span`)                                           | Project             |
+| `ContactInfo`       | a set of contact points                                                                   | Person              |
+| `ResourceUse`       | resource (`→ Resource`), quantity                                                         | Activity            |
+
+A value object may reference an aggregate root by identity — a `Membership` references a `Person` — but it never has identity itself. Everything else an entity carries is a plain attribute of a type from the vocabulary above.
+
+---
+
 # Block 1 · Core Entities
 
 Each Core Entity is an aggregate root (Block 5). Its attributes are specified below. `reference → X` attributes restate relationships (Block 2) and are shown here only where they are intrinsic to the entity.
@@ -282,37 +308,7 @@ Anything consumed or required to perform work (Domain Model → Resource).
 
 ## The Research Spine
 
-Three Derived Types specialize the Core Entities into the operational spine of scientific work (Domain Model → The Research Spine). Each **inherits** all attributes of its base entity and adds its own.
-
-### Hypothesis · specializes Knowledge
-
-| Added attribute | Type                          | Notes                                    |
-|-----------------|-------------------------------|------------------------------------------|
-| `statement`     | `text`                        | The proposed explanation                 |
-| `assumptions`   | `set<text>`                   |                                          |
-| `tested_by`     | `set<reference → Experiment>` |                                          |
-| `resolved_by`   | `set<reference → Evidence>`   |                                          |
-
-A Hypothesis replaces the generic Knowledge lifecycle with its own (Block 3).
-
-### Experiment · specializes Activity
-
-| Added attribute | Type                         | Notes                                     |
-|-----------------|------------------------------|-------------------------------------------|
-| `tests`         | `reference → Hypothesis` (1) | Exactly one (Block 6)                     |
-| `design`        | `text`                       | Objectives, protocol, expected observations |
-| `produced`      | `set<reference → Evidence>`  | Narrows Activity's `produced`             |
-
-An Experiment replaces the generic Activity lifecycle with its own (Block 3).
-
-### Evidence · specializes Knowledge
-
-| Added attribute | Type                                 | Notes                          |
-|-----------------|--------------------------------------|--------------------------------|
-| `polarity`      | `enum(supports\|falsifies\|inconclusive)` |                          |
-| `about`         | `reference → Hypothesis` (1)         |                                |
-| `produced_by`   | `reference → Experiment` (1)         |                                |
-| `strength`      | `degree`                             |                                |
+Three Derived Types — **Hypothesis**, **Experiment** and **Evidence** — specialize the Core Entities into the operational spine of scientific work. They are specializations, not roots, and are specified separately in *The Research Extension*.
 
 ## Other Derived Types in use
 
@@ -460,17 +456,28 @@ Two cardinalities carry design intent worth stating explicitly.
 
 # Block 5 · Aggregates
 
-Applying Domain-Driven Design, each Core Entity is an **aggregate root**. Aggregates are kept deliberately small: a root contains its **value objects**, and refers to other roots **by identity** rather than containing them.
+This model uses the Domain-Driven Design building blocks, kept deliberately distinct.
 
-| Aggregate root | Contains (value objects)                          | References (by identity)              |
-|----------------|---------------------------------------------------|---------------------------------------|
+- **Entity** — a concept with its own `identifier` and a lifecycle (the seven of Block 1, and the Research Extension).
+- **Value Object** — a concept identified by its values, immutable, with no identity of its own (Block 0).
+- **Aggregate** — an Entity together with the Value Objects it owns, treated as a single unit of consistency.
+- **Aggregate Root** — the Entity that guards an aggregate's invariants and is its only entry point.
+
+*Repository* and *Domain Service* — the two remaining DDD building blocks — describe how aggregates are stored and how cross-aggregate operations are coordinated. Those are implementation concerns and belong to the Software Architecture, not here.
+
+Each Core Entity is an aggregate root. Aggregates are kept small: a root **contains** its value objects and **references** other roots by identity rather than containing them.
+
+| Aggregate root | Contains (value objects)                                        | References (by identity)          |
+|----------------|-----------------------------------------------------------------|-----------------------------------|
 | **Project**    | Objective, Deliverable, Milestone, FundingAllocation, Membership | Task, Document, Knowledge, Person |
-| **Knowledge**  | Provenance, Confidence, KnowledgeRelation         | Document, Activity, Project           |
-| **Document**   | Provenance, Version, Metadata                     | Person (authors), Project             |
-| **Person**     | Role, ContactInfo, Affiliation                    | Project, Activity, Document           |
-| **Task**       | Priority, Status, DueDate                         | Project, Knowledge, Activity          |
-| **Activity**   | ActivityType, TimeSpan, ResourceUse               | Person, Resource, Task, Knowledge     |
-| **Resource**   | Capacity, Cost, Availability                      | —                                     |
+| **Knowledge**  | Provenance, KnowledgeRelation                                   | Document, Activity, Project        |
+| **Document**   | Provenance, Version, Metadata                                  | Person, Project                    |
+| **Person**     | ContactInfo                                                     | Project, Activity, Document        |
+| **Task**       | —                                                               | Project, Knowledge, Activity       |
+| **Activity**   | ResourceUse                                                     | Person, Resource, Task, Knowledge  |
+| **Resource**   | —                                                               | Activity                           |
+
+Simple attributes (a Task's `priority` and `status`, a Resource's `capacity` and `cost`) are not value objects; they are plain typed attributes of the root.
 
 This yields the model's most important structural consequence.
 
@@ -539,61 +546,53 @@ An **Artifact** is the boundary case. When a generated artifact must persist —
 
 # Block 8 · Logical Views
 
-Focused projections of the one specification. Each view is a lens, not a new model.
+A logical view is a projection of this specification for a particular concern — the knowledge graph, a project's structure, the research spine, the intelligence loop.
 
-## Knowledge View
+These views are drawn where they are used, not duplicated here. The whole-system view is *The System at a Glance* above; the domain graph is Block 2; the intelligence loop belongs to the AI Architecture; the memory, context and event perspectives belong to their respective models.
 
-How meaning connects to its sources and to itself.
+> See the corresponding architectural documents.
 
-```
-        Document ──supports──▶ Knowledge ◀──relates to──▶ Knowledge
-                                   ▲
-                                produced by
-                                   │
-                                Activity
-```
+This keeps the document to a single responsibility — the structure of the domain — and lets each other document own the view it is best placed to draw.
 
-## Project View
+---
 
-How a project organizes work into history and knowledge.
+# The Research Extension
 
-```
-   Person ──participates in──▶ Project ──organizes──▶ Task
-                                  │                     │
-                              organizes              becomes
-                                  ▼                     ▼
-                              Document              Activity ──produces──▶ Knowledge
-```
+The Research Spine is not part of the Core. It is a **specialization layer** over three Core Entities, formalized because it recurs across the scientific use cases (Domain Model → The Research Spine). Each type inherits every attribute and relationship of its base entity and adds its own.
 
-## Research View · the Spine
+## Hypothesis · specializes Knowledge
 
-How science advances from proposition to resolution.
+| Added attribute | Type                          | Notes                    |
+|-----------------|-------------------------------|--------------------------|
+| `statement`     | `text`                        | The proposed explanation |
+| `assumptions`   | `set<text>`                   |                          |
+| `tested_by`     | `set<reference → Experiment>` |                          |
+| `resolved_by`   | `set<reference → Evidence>`   |                          |
 
-```
-   Hypothesis ──tested by──▶ Experiment ──produces──▶ Evidence
-       ▲                          │                       │
-       │                       consumes                   │
-       │                          ▼                        │
-       └──────────── resolves ── Resource ◀───────────────┘
-```
+Lifecycle: `captured → developing → experimenting → evidenced | falsified | unresolved` — replacing the generic Knowledge lifecycle (Block 3).
 
-```
-   captured → developing → experimenting → evidenced | falsified | unresolved
-```
+## Experiment · specializes Activity
 
-## AI View
+| Added attribute | Type                         | Notes                                       |
+|-----------------|------------------------------|---------------------------------------------|
+| `tests`         | `reference → Hypothesis` (1) | Exactly one (Block 6)                       |
+| `design`        | `text`                       | Objectives, protocol, expected observations |
+| `produced`      | `set<reference → Evidence>`  | Narrows Activity's `produced`               |
 
-How the intelligence operates over the domain and returns to it.
+Lifecycle: `planned → running → analysed | aborted` — replacing the generic Activity lifecycle (Block 3).
 
-```
-   DOMAIN ──▶ Memory (recall) ──▶ Context (build) ──▶ AI Operating Layer
-     ▲                                                       │
-     │                                                    produces
-     │                                                       ▼
-     └──── Events ◀──── Knowledge candidate · Artifact · Task
-```
+## Evidence · specializes Knowledge
 
-Every view resolves back to the same seven entities. That they can all be drawn from one specification is the proof that the specification is coherent.
+| Added attribute | Type                                      | Notes |
+|-----------------|-------------------------------------------|-------|
+| `polarity`      | `enum(supports\|falsifies\|inconclusive)` |       |
+| `about`         | `reference → Hypothesis` (1)              |       |
+| `produced_by`   | `reference → Experiment` (1)              |       |
+| `strength`      | `degree`                                  |       |
+
+Evidence keeps the generic Knowledge lifecycle.
+
+The Spine's relationships (`tests`, `resolves`, `produces`), cardinalities and invariants extend the same graph the Core Entities form, and are specified inline in Blocks 2, 4 and 6.
 
 ---
 

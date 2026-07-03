@@ -907,6 +907,8 @@ Guided reconstruction of the provenance and history of scientific work.
 
 These use cases are what separate a Research Operating System from a document store: they do not merely retrieve items, they reconstruct how a scientific decision was reached. All of them are read-only.
 
+They span six axes: provenance (backward), decisions, recall, impact (forward), evolution (temporal) and consistency. Forward tracing (UC-T04) additionally assumes that relationships in the knowledge graph are navigable in both directions — an implication the Domain Model must honour.
+
 ### UC-T01 · Reconstruct Provenance
 
 **Intention.** Understand why a given hypothesis, conclusion or piece of knowledge exists — the chain of reasoning and evidence that produced it.
@@ -990,6 +992,91 @@ These use cases are what separate a Research Operating System from a document st
 **Domain Entities.** Knowledge · Activity · Knowledge (Hypothesis) · Document
 
 **Related Use Cases.** UC-K04, UC-K05, UC-X01
+
+---
+
+### UC-T04 · Trace Impact
+
+**Intention.** Given an entity, find everything downstream that depends on it, so the researcher knows what is affected if it changes, is retracted or is falsified.
+
+**Context.** Provenance (UC-T01) answers why something exists by looking backward; impact is its inverse. When a piece of evidence is retracted, a paper turns out to be flawed, or a hypothesis is falsified, the researcher must know which conclusions, drafts and experiments rest on it. This forward propagation is a safety behaviour a document store cannot provide.
+
+**Operational Flow.**
+1. Retrieve the target entity and its outgoing relationships. → *Retrieve*
+2. Traverse the knowledge graph forward through `Linked` / `Derived` edges to every dependent entity: knowledge, conclusions, drafts, experiments. → *Retrieve → Reason*
+3. Reason about the nature and severity of each dependency. → *Reason*
+4. Produce an impact map of what would be affected. → *Produce*
+
+**Expected Outcome.** A forward impact map exists, listing every entity that depends on the target and how, so a change or retraction can be assessed and propagated deliberately rather than discovered by accident.
+
+**State Changes.**
+- *Created* — none.
+- *Updated* — none.
+- *Derived* — Knowledge (impact map of downstream dependencies).
+- *Linked* — none.
+- *Read-only: impact analysis reads existing relationships and mutates no persistent state.*
+
+**Capabilities.** Retrieve · Reason · Produce
+
+**Domain Entities.** Knowledge · Knowledge (Evidence) · Knowledge (Hypothesis) · Document · Activity (Experiment)
+
+**Related Use Cases.** UC-T01, UC-R03, UC-W02
+
+---
+
+### UC-T05 · Trace Evolution
+
+**Intention.** Reconstruct how a hypothesis, concept or understanding has changed over time — its successive formulations, state transitions and the events that drove them.
+
+**Context.** Provenance and decision history are structural: they span entities at a point in time. Evolution is temporal, following a single entity across time. Returning to a hypothesis after months, the researcher needs to see not only its current state but how it got there. This exercises the Memory capability and the lifecycle states made explicit in the Domain Model.
+
+**Operational Flow.**
+1. Retrieve the target entity and its historical states and versions. → *Retrieve*
+2. Reason to order the changes chronologically and attach the events that caused them. → *Reason (Synthesize)*
+3. Produce a timeline of the entity's evolution. → *Produce*
+
+**Expected Outcome.** A chronological account exists of how the entity was formulated, revised and transitioned between states, with each change linked to the activity or evidence that caused it.
+
+**State Changes.**
+- *Created* — none.
+- *Updated* — none.
+- *Derived* — Knowledge (evolution timeline of the entity).
+- *Linked* — none.
+- *Read-only: the timeline is a transient reconstruction over historical state.*
+
+**Capabilities.** Retrieve · Reason · Produce
+
+**Domain Entities.** Knowledge (Hypothesis) · Knowledge (Concept) · Activity
+
+**Related Use Cases.** UC-R03, UC-K02, UC-X03
+
+---
+
+### UC-T06 · Detect Contradictions
+
+**Intention.** Given a hypothesis, claim or body of knowledge, surface where the evidence or sources contradict it or each other.
+
+**Context.** Retrieval and derivation assume coherence, but a growing knowledge base inevitably accumulates tensions: evidence that conflicts, sources that disagree, conclusions that no longer hold. Surfacing these is cross-sectional consistency checking, and it is one of the behaviours that most distinguishes a Research Operating System from a document store. It feeds hypothesis validation and scientific writing.
+
+**Operational Flow.**
+1. Retrieve the target and the related body of evidence and knowledge. → *Retrieve*
+2. Reason across it to detect conflicts, disagreements and unresolved tensions. → *Reason (Compare, Critique)*
+3. Produce a report of the contradictions with their conflicting sources. → *Produce*
+
+**Expected Outcome.** A set of detected contradictions exists, each linking the conflicting evidence or sources, enabling the researcher to resolve tensions deliberately rather than overlook them.
+
+**State Changes.**
+- *Created* — none.
+- *Updated* — none.
+- *Derived* — Knowledge (report of contradictions and their conflicting sources).
+- *Linked* — none.
+- *Read-only: detection reads existing evidence and mutates no persistent state.*
+
+**Capabilities.** Retrieve · Reason · Produce
+
+**Domain Entities.** Knowledge · Knowledge (Evidence) · Knowledge (Hypothesis) · Document
+
+**Related Use Cases.** UC-R03, UC-W02, UC-K05
 
 ---
 

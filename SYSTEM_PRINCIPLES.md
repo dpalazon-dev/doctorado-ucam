@@ -1,6 +1,6 @@
 # System Principles
 
-These principles define the permanent architectural foundations of Doctorado_UCAM.
+These principles define the permanent architectural foundations of ResearchOS.
 
 They are intentionally independent from any technology, framework or implementation.
 
@@ -10,13 +10,13 @@ Every architectural decision, feature, workflow or interface should reinforce th
 
 # 1. One System
 
-Doctorado_UCAM is a single operational system.
+ResearchOS is a single operational system.
 
-It may internally consist of multiple services, agents, databases or automation pipelines, but the researcher should perceive and interact with a single coherent environment.
+It may internally consist of multiple domains, entities, models, use cases, but the researcher should perceive and interact with a single coherent environment.
 
 No feature should behave as an isolated tool.
 
-Every capability belongs to the same operational model.
+Every capability belongs to the same core operational model.
 
 ---
 
@@ -106,7 +106,7 @@ Everything else should be considered a candidate for automation.
 
 # 8. The System Evolves Incrementally
 
-Doctorado_UCAM is expected to evolve continuously.
+ResearchOS is expected to evolve continuously.
 
 New capabilities should integrate naturally into the existing operational model rather than introducing disconnected subsystems.
 

@@ -144,6 +144,8 @@ The catalogue is organised around the operational domains of the Research Operat
 
 Knowledge acquisition, creation, refinement and retrieval.
 
+Part of the Research vertical — see [RESEARCH_VERTICAL.md](RESEARCH_VERTICAL.md).
+
 ### UC-K01 · Capture a Hypothesis
 
 **Intention.** Record a newly generated hypothesis the moment it appears, before the surrounding reasoning is lost, and have it situated within existing knowledge.
@@ -293,6 +295,8 @@ Knowledge acquisition, creation, refinement and retrieval.
 
 Activities directly related to scientific investigation.
 
+Part of the Research vertical — see [RESEARCH_VERTICAL.md](RESEARCH_VERTICAL.md).
+
 ### UC-R01 · Design an Experiment
 
 **Intention.** Turn one or more mature hypotheses into an executable experimental design.
@@ -410,6 +414,8 @@ Activities directly related to scientific investigation.
 # Writing
 
 Support scientific communication.
+
+Part of the Research vertical — see [RESEARCH_VERTICAL.md](RESEARCH_VERTICAL.md).
 
 ### UC-W01 · Draft Scientific Content
 
@@ -789,6 +795,8 @@ Maintain operational knowledge about collaborators.
 
 Prepare, deliver and evaluate university teaching. Teaching reuses the same knowledge, documents and people as research rather than forming an isolated workflow: courses draw on the researcher's own knowledge, and student work feeds back as evaluated understanding.
 
+See [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md) for Derived Types and cross-vertical relationships.
+
 ### UC-TE01 · Prepare a Course
 
 **Intention.** Set up a university course (*asignatura*) as an organized initiative — objectives, teaching guide, session plan and assessment scheme — reusing existing knowledge rather than starting from a blank syllabus.
@@ -1086,6 +1094,8 @@ UC-TE01 · UC-TE02 · UC-TE03 · UC-TE04 · UC-TE06 · UC-R04
 
 The institutional obligations that surround the doctorate without directly advancing it: annual progress reports, committee and supervisor approvals, mandatory training credits, bureaucratic procedures and the deadlines that govern them. This work produces no scientific knowledge, yet failing it can halt the thesis. Its friction is administrative overload — forms, portals, regulations and hard dates scattered across institutional platforms and email — the very friction the Operational Model names among the researcher's recurring costs. These use cases treat that overload as operational state to be tracked, reasoned over and discharged, so attention returns to research. They lean on the same spine as the rest of the catalogue — Documents, Tasks, Activities and Decisions — specialized here as institutional Reports, Procedures and Administrative Processes.
 
+See [ADMINISTRATION_VERTICAL.md](ADMINISTRATION_VERTICAL.md) for Derived Types and cross-vertical relationships.
+
 ### UC-AD01 · Prepare the Annual Doctoral Progress Report
 
 **Intention.** Assemble the year's research progress and doctoral activities into the formal report the institution requires for annual evaluation.
@@ -1232,6 +1242,8 @@ The institutional obligations that surround the doctorate without directly advan
 # Organization
 
 The shared infrastructure research runs on — compute and GPUs, datasets, software licenses, cloud and API credits, and the budgets and grants that pay for them. Where the research use cases *consume* Resources, these use cases *manage* them, exercising the Resource entity's capacity, cost and availability and the invariant that consumption never exceeds capacity. This is the operational counterpart to scientific work: the layer that provisions experiments, tracks spend and arbitrates finite capacity across competing projects.
+
+See [ORGANIZATION_VERTICAL.md](ORGANIZATION_VERTICAL.md) for Derived Types and cross-vertical relationships.
 
 ### UC-OR01 · Register a Research Resource
 

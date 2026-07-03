@@ -1,10 +1,11 @@
 # Domain Verticals
 
-> This document completes the breadth of the domain.
+> This document is the index of every vertical in the domain.
 >
 > The Domain Model defines the universal concepts.
 > This document defines how those concepts specialize across the operational
-> realities of the researcher.
+> realities of the researcher — inline for the two that stay thin by design,
+> by reference for the four substantial enough to carry their own document.
 >
 > No new Core Entities are introduced.
 > Every vertical is expressed exclusively through Derived Types and Use Cases.
@@ -28,8 +29,6 @@ This document defines those specializations.
 # One Domain
 
 ```
-
-```
              Seven Core Entities
 ```
 
@@ -42,36 +41,36 @@ Person
 Resource
 
 ```
-
 remain identical everywhere.
 
 Only the vocabulary changes.
-
 ```
 
 Research
 Teaching
-Doctorate
-Projects
 Administration
+Organization
 Personal
+Daily Work
 
 ```
-
 are different views over the same domain.
+```
 
 ---
 
 # Vertical Overview
 
-| Vertical | Objective |
-|----------|-----------|
-| Personal | Personal organization and life management |
-| Daily Work | Daily operational execution |
-| Doctorate | Thesis management |
-| Research | Scientific work |
-| Teaching | Academic teaching |
-| Organization | Infrastructure and institutional management |
+| Vertical | Objective | Status | Detail |
+|----------|-----------|--------|--------|
+| Personal | Personal organization and life management | Minimal · by design | inline below |
+| Daily Work | Daily operational execution | Thin | inline below |
+| Administration | Institutional obligations of the doctorate | Developed | [ADMINISTRATION_VERTICAL.md](ADMINISTRATION_VERTICAL.md) |
+| Research | Scientific work | Developed | [RESEARCH_VERTICAL.md](RESEARCH_VERTICAL.md) |
+| Teaching | Academic teaching | Developed | [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md) |
+| Organization | Infrastructure and institutional management | Developed | [ORGANIZATION_VERTICAL.md](ORGANIZATION_VERTICAL.md) |
+
+Two further groups of Use Cases in [USE_CASES.md](USE_CASES.md) do not appear above because they are not verticals: **People**, **Context** and **Traceability** operate identically regardless of which vertical produced the entity they touch. They are infrastructure — the behavioural expression of the Context, Search & Retrieval and Memory domains already named in [DOMAIN_MAP.md](DOMAIN_MAP.md) — not specializations of it.
 
 ---
 
@@ -79,217 +78,98 @@ are different views over the same domain.
 
 Represents the individual's own life outside institutional work.
 
+Personal life is the lightest vertical by design. It introduces almost nothing new: a personal task is a Task, a reminder is a Task, an appointment is a Task with a time, a personal contact is a Person, a jotting is a Note (Document), and a personal goal is a Project. No personal-specific machinery exists, and none is planned — the same capabilities that serve research serve errands and goals unchanged.
+
 ## Typical Projects
 
 - Personal Goal
-- Trip
-- Health Plan
 
 ## Typical Documents
 
-- Personal Notes
-- Receipts
-- Travel Documents
+- Note
 
-## Typical Activities
+Personal introduces no specialization of Activity or Knowledge — commitments and reflections reuse Task, Activity and Knowledge unspecialized.
 
-- Exercise
-- Personal Review
-- Planning
+## Use Cases
 
-## Typical Knowledge
+| Use Case | Intention |
+|----------|-----------|
+| UC-PL01 · Capture a Personal Note or Reminder | Record a personal item with near-zero friction and route it correctly |
+| UC-PL02 · Schedule a Personal Appointment | Register a time-bound commitment and reconcile it against existing obligations |
+| UC-PL03 · Track a Personal Goal | Define a personal goal and review its progress over time |
 
-- Reflection
-- Habit
-- Personal Insight
-
-## Representative Use Cases
-
-- Personal planning
-- Habit tracking
-- Weekly review
+See [USE_CASES.md](USE_CASES.md) → Personal.
 
 ---
 
 # Vertical 2 — Daily Work
 
-Represents operational execution.
+Represents operational execution: meetings, email, decisions, documents.
 
-## Projects
-
-- Administrative Process
-
-## Documents
+## Typical Documents
 
 - Email
 - Meeting Minutes
 - Decision Log
 
-## Activities
+## Typical Activities
 
 - Meeting
 - Phone Call
-- Coding
-- Writing
 
-## Knowledge
+## Typical Knowledge
 
 - Decision
-- Operational Note
 
-Representative Use Cases
+Daily Work introduces no Project of its own — it attaches to whatever project the work serves. (Administrative Process, sketched here in earlier drafts, is now owned by [ADMINISTRATION_VERTICAL.md](ADMINISTRATION_VERTICAL.md).)
 
-- Process email
-- Record meeting
-- Track decisions
+## Use Cases
+
+| Use Case | Intention |
+|----------|-----------|
+| UC-P01 · Manage Research Tasks | Create, prioritise and review tasks, kept consistent with their projects |
+| UC-P02 · Plan Research Activities | Prepare short- and medium-term plans aligned with milestones |
+| UC-P03 · Review Research Progress | Summarise completed work, blockers and evolution over a period |
+| UC-C01 · Process Incoming Email | Extract operational content from incoming email instead of triaging by hand |
+| UC-C02 · Prepare Communication | Generate context-aware drafts for approval |
+| UC-C03 · Prepare a Meeting | Assemble every piece of relevant context before an interaction |
+| UC-C04 · Record an Interaction | Transform conversations, meetings or calls into structured knowledge |
+
+See [USE_CASES.md](USE_CASES.md) → Planning, Communication.
 
 ---
 
-# Vertical 3 — Doctorate
+# Vertical 3 — Administration
 
-Represents management of the doctoral journey itself.
+The institutional obligations that surround the doctorate without directly advancing it: annual progress reports, committee decisions, mandatory training credits, bureaucratic procedures and the deadlines that govern them.
 
-This is different from research.
+Not part of the original six-vertical sketch — it emerged directly from the Use Case catalogue and is formalized here for the first time. Together with Writing (see [RESEARCH_VERTICAL.md](RESEARCH_VERTICAL.md)), it absorbs what this document used to call **Doctorate**: producing a chapter is Writing; everything institutional around the thesis is this vertical.
 
-Research produces science.
-
-Doctorate produces a thesis.
-
-## Projects
-
-- Doctoral Thesis
-
-## Documents
-
-- Thesis Chapter
-- Draft
-- Bibliography
-- Supervisor Feedback
-
-## Activities
-
-- Thesis Writing
-- Literature Review
-- Supervisor Meeting
-
-## Knowledge
-
-- Chapter Insight
-- Thesis Decision
-
-Representative Use Cases
-
-- Produce chapter
-- Prepare defense
-- Track thesis milestones
+Full specification: [ADMINISTRATION_VERTICAL.md](ADMINISTRATION_VERTICAL.md).
 
 ---
 
 # Vertical 4 — Research
 
-Represents scientific production.
+Scientific production: hypotheses, experiments, evidence, publications.
 
-## Projects
-
-- Research Project
-- Grant
-
-## Documents
-
-- Paper
-- Review
-- Dataset
-- Protocol
-
-## Activities
-
-- Experiment
-- Reading
-- Analysis
-
-## Knowledge
-
-- Hypothesis
-- Evidence
-- Methodology
-- Insight
-
-Representative Use Cases
-
-- Validate hypothesis
-- Produce publication
-- Literature synthesis
+Full specification: [RESEARCH_VERTICAL.md](RESEARCH_VERTICAL.md).
 
 ---
 
 # Vertical 5 — Teaching
 
-Represents academic teaching.
+Academic teaching: courses, lectures, assessment, supervision.
 
-## Projects
-
-- Course
-- Subject
-
-## Documents
-
-- Lecture
-- Slides
-- Exam
-- Rubric
-
-## Activities
-
-- Lecture
-- Tutoring
-- Exam Correction
-
-## Knowledge
-
-- Teaching Material
-- Student Feedback
-
-Representative Use Cases
-
-- Prepare lecture
-- Evaluate students
-- Publish grades
+Full specification: [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md).
 
 ---
 
 # Vertical 6 — Organization
 
-Represents institutional and infrastructure management.
+Infrastructure and institutional resource management: compute, datasets, licenses, budgets.
 
-## Projects
-
-- Infrastructure Upgrade
-- Budget Allocation
-
-## Documents
-
-- License
-- Contract
-- Budget
-
-## Activities
-
-- Procurement
-- Maintenance
-
-## Resources
-
-- GPU
-- Server
-- API
-- License
-- Dataset
-
-Representative Use Cases
-
-- Allocate resources
-- Renew licenses
-- Monitor costs
+Full specification: [ORGANIZATION_VERTICAL.md](ORGANIZATION_VERTICAL.md).
 
 ---
 
@@ -345,9 +225,9 @@ Research
 Publication
 │
 ▼
-Doctorate
+Administration
 │
-Thesis Chapter
+Progress Report
 │
 ▼
 Teaching
@@ -384,14 +264,4 @@ This allows knowledge discovered in one operational context to become immediatel
 
 # Completion Criteria
 
-This document is complete when every vertical defines:
-
-- representative Projects
-- representative Documents
-- representative Activities
-- representative Knowledge
-- representative Use Cases
-
-without introducing new Core Entities.
-
-El siguiente documento ya sería **`SOFTWARE_ARCHITECTURE.md`**, que es donde empieza realmente el diseño de cómo construir ResearcherOS. Ahí es donde empezaremos a hablar de UI, Backend, Knowledge Graph, agentes, MCP, memoria, eventos, motores, etc., y cómo todas las piezas encajan en una arquitectura coherente.
+Met. Every vertical defines Derived Types and Use Cases without introducing new Core Entities — four with enough substance to carry their own document ([RESEARCH_VERTICAL.md](RESEARCH_VERTICAL.md), [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md), [ADMINISTRATION_VERTICAL.md](ADMINISTRATION_VERTICAL.md), [ORGANIZATION_VERTICAL.md](ORGANIZATION_VERTICAL.md)), two — Personal and Daily Work — thin by design rather than by omission.

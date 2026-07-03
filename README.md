@@ -71,11 +71,17 @@ Doctorado_UCAM/
 ├── KNOWLEDGE_MODEL.md
 ├── SYSTEM_CAPABILITIES.md
 ├── USE_CASES.md
+├── DOMAIN_VERTICALS.md
+├── RESEARCH_VERTICAL.md
+├── TEACHING_VERTICAL.md
+├── ADMINISTRATION_VERTICAL.md
+├── ORGANIZATION_VERTICAL.md
 ├── AI_ARCHITECTURE.md
 ├── MEMORY_MODEL.md
 ├── CONTEXT_MODEL.md
 ├── EVENT_MODEL.md
 ├── LOGICAL_DOMAIN_MODEL.md
+├── INTERACTION_MODEL.md
 └── ROADMAP.md
 ```
 
@@ -113,11 +119,15 @@ AI Architecture ─┬─ Memory Model
                  └─ Event Model
     ↓
 Logical Domain Model
+    ↓
+Interaction Model
 ```
 
 Documents 11–14 form the **Cognitive Architecture**: the AI Operating Layer and the three models of the substrate it operates over — what the system remembers (Memory), what it assembles per task (Context) and what it reacts to (Events).
 
 The **Logical Domain Model** then opens the logical layer: the canonical, technology-neutral specification of the domain's structure, from which every schema, diagram and type is derived.
+
+The **Interaction Model** closes the conceptual layer: how the researcher and the system collaborate, independent of any interface technology. It is the last document before Phase B's Software Architecture.
 
 1. [Vision](VISION.md)
 2. [Principles](SYSTEM_PRINCIPLES.md)
@@ -134,6 +144,21 @@ The **Logical Domain Model** then opens the logical layer: the canonical, techno
 13. [Context Model](CONTEXT_MODEL.md)
 14. [Event Model](EVENT_MODEL.md)
 15. [Logical Domain Model](LOGICAL_DOMAIN_MODEL.md)
+16. [Interaction Model](INTERACTION_MODEL.md)
+
+---
+
+# Domain Verticals
+
+The seven Core Entities specialize into six operational verticals. Four are substantial enough to carry their own document; two stay deliberately thin inside the index.
+
+- [Domain Verticals](DOMAIN_VERTICALS.md) — index of all six
+- [Research Vertical](RESEARCH_VERTICAL.md)
+- [Teaching Vertical](TEACHING_VERTICAL.md)
+- [Administration Vertical](ADMINISTRATION_VERTICAL.md)
+- [Organization Vertical](ORGANIZATION_VERTICAL.md)
+
+Personal and Daily Work are documented inline within [DOMAIN_VERTICALS.md](DOMAIN_VERTICALS.md).
 
 ---
 
@@ -158,9 +183,9 @@ Cada dominio evolucionará de forma independiente siguiendo una arquitectura mod
 
 El plan detallado y vigente vive en **[ROADMAP.md](ROADMAP.md)**. En resumen, dos fases:
 
-## Fase A · Completar el dominio
+## Fase A · Completar el dominio — Completada
 
-Desarrollar los verticales que faltan —vida diaria, docencia, gestión del doctorado, personal y organización— mediante *Derived Types* y casos de uso, sin introducir nuevas entidades raíz. Las siete entidades del dominio ya sostienen las seis capas de la vida del investigador.
+Las seis verticales operativas —personal, vida diaria, investigación, docencia, administración y organización— ya cuentan con *Derived Types* y casos de uso, sin introducir nuevas entidades raíz. Las siete entidades del dominio sostienen las seis capas de la vida del investigador. Detalle en [ROADMAP.md](ROADMAP.md) y [DOMAIN_VERTICALS.md](DOMAIN_VERTICALS.md).
 
 ## Fase B · Construir el sistema
 
@@ -170,7 +195,7 @@ Materializar la arquitectura: Software Architecture, servicios, Memory/Context E
 
 # Estado del proyecto
 
-Actualmente el proyecto se encuentra en la fase de definición arquitectónica y modelado del dominio.
+El proyecto ha completado la definición arquitectónica y el modelado del dominio, y se dispone a iniciar la fase de diseño del sistema (Software Architecture).
 
 El objetivo inicial es establecer una base sólida sobre la que construir una plataforma de investigación sostenible, extensible y orientada al conocimiento.
 

@@ -12,15 +12,20 @@ It does not add models. It sequences the work that carries a frozen conceptual f
 
 # Where We Stand
 
-| Layer                     | Documents                                                        | State        |
-|---------------------------|------------------------------------------------------------------|--------------|
-| Conceptual                | Vision, Principles, System Model, Operational Model, Responsibilities, Domain Map, Domain Model, Knowledge Model, System Capabilities, Use Cases | Mature |
-| Cognitive Architecture    | AI Architecture, Memory Model, Context Model, Event Model         | Complete     |
-| Logical                   | Logical Domain Model                                             | Frozen · v1.0|
-| **Domain breadth**        | Derived Types + Use Cases across all operational domains          | **Incomplete** |
-| **System design**         | Software Architecture and below                                  | **Not started** |
+| Layer | Documents | State |
+|--------|-----------|-------|
+| Conceptual | Vision, Principles, System Model, Operational Model, Responsibilities, Domain Map, Domain Model, Knowledge Model, System Capabilities, Use Cases | Mature |
+| Cognitive Architecture | AI Architecture, Memory Model, Context Model, Event Model | Complete |
+| Logical | Logical Domain Model | Frozen · v1.0 |
+| **Domain breadth** | Derived Types + Use Cases across all operational domains | **Incomplete** |
+| **Interaction model** | System interaction modalities | **Not started** |
+| **System design** | Software Architecture and below | **Not started** |
 
-Two gaps remain, and they define the next two phases: the domain has **collapsed to research**, and the **system has not been designed**.
+Two gaps remain.
+
+The first is **breadth**: the domain currently over-represents research.
+
+The second is **execution**: although the cognitive architecture is complete, the runtime architecture of the system has not yet been designed.
 
 ---
 
@@ -34,131 +39,205 @@ The Domain Model is not wrong. Its breadth is simply unfinished.
 
 ## The Six Levels
 
-The researcher's operational reality spans six levels. Only the third and fifth are currently developed.
+The researcher's operational reality spans six levels.
 
-| Level | Operational reality      | Example concerns                                            | State       |
-|-------|--------------------------|------------------------------------------------------------|-------------|
-| 1     | **Personal life**        | calendar, personal tasks, health, travel, notes            | Absent      |
-| 2     | **Daily work**           | email, meetings, documents, calls, decisions               | Thin        |
-| 3     | **Doctorate**            | hypotheses, papers, experiments, bibliography, chapters     | Developed   |
-| 4     | **Teaching**             | courses, lectures, practicals, tutoring, students, exams, rubrics | Absent |
-| 5     | **Research**             | competitive projects, publications, reviews, congresses, grants | Developed |
-| 6     | **Organization**         | resources, budget, licenses, GPUs, datasets, infrastructure | Thin       |
+| Level | Operational reality | Example concerns | State |
+|-------|---------------------|------------------|-------|
+| 1 | **Personal life** | calendar, health, travel, personal tasks | Absent |
+| 2 | **Daily work** | meetings, email, decisions, documents | Thin |
+| 3 | **Doctorate** | thesis, bibliography, hypotheses, chapters | Developed |
+| 4 | **Teaching** | courses, lectures, students, exams | Absent |
+| 5 | **Research** | projects, publications, grants, reviews | Developed |
+| 6 | **Organization** | budget, infrastructure, licenses, compute | Thin |
 
 ## One Domain, Many Verticals
 
-The critical insight: **no new root entities are needed.** The seven Core Entities already support all six levels. What differs per level is the *Derived Types* — the specializations of those seven roots.
+No additional root entities are required.
+
+The seven Core Entities already describe every operational level. What changes are the Derived Types.
 
 ```
-Project ── Doctoral Thesis · Research Project · Teaching Course · Grant
-           Administrative Process · Personal Goal
+Project
+ ├── Doctoral Thesis
+ ├── Research Project
+ ├── Teaching Course
+ ├── Grant
+ ├── Administrative Process
+ └── Personal Goal
 
-Document ─ Paper · Thesis Chapter · Lecture · Exam · Rubric · Presentation
-           Email · Meeting Minutes · Publication · Review
+Document
+ ├── Paper
+ ├── Chapter
+ ├── Lecture
+ ├── Exam
+ ├── Rubric
+ ├── Presentation
+ ├── Email
+ └── Minutes
 
-Activity ─ Reading · Writing · Experiment · Teaching · Meeting · Coding
-           Review · Thinking · Administration
+Activity
+ ├── Reading
+ ├── Writing
+ ├── Teaching
+ ├── Experiment
+ ├── Meeting
+ ├── Coding
+ └── Administration
 
-Person ─── Supervisor · Collaborator · Student · Reviewer · Coordinator
-
-Resource ─ GPU · Dataset · License · Budget · Compute · Software
-
-Knowledge ─ Concept · Hypothesis · Evidence · Decision · Insight · Methodology
+Knowledge
+ ├── Concept
+ ├── Hypothesis
+ ├── Evidence
+ ├── Decision
+ └── Insight
 ```
 
-Completing the domain means developing these verticals — Derived Types and their Use Cases — **without touching the seven roots or the frozen Logical Domain Model.** The model was built for exactly this.
+Completing the domain means completing these verticals without changing the seven Core Entities or the frozen Logical Domain Model.
 
 ---
 
 # Two Phases
 
 ```
-Phase A — Complete the Domain      breadth · the verticals
-      ↓
-Phase B — Build the System         depth · the implementation
+Phase A — Complete the Domain
+        ↓
+Phase B — Build the System
 ```
 
-Phase A finishes *what the system is and does* across the researcher's whole life. Phase B builds *how it runs*.
+---
 
-## Phase A — Complete the Domain
+# Phase A — Complete the Domain
 
-**Objective.** Develop the missing operational verticals so the domain covers the full six levels, not only research.
+## Objective
 
-**Approach.** Derived Types and Use Cases only. No new root entities. No changes to the frozen Logical Domain Model.
+Complete the operational coverage of the system.
 
-**Deliverables.**
+## Approach
 
-| Vertical                | Work                                                                 |
-|-------------------------|----------------------------------------------------------------------|
-| Daily Work & Communication | Use Cases for email, meetings, decisions, document flow            |
-| Teaching                | Derived Types (Course, Lecture, Exam, Rubric, Student) + Use Cases   |
-| Doctorate management    | Derived Types for thesis/administrative process + milestone tracking |
-| Personal & Organization | Derived Types (Personal Goal, Budget, License) + light Use Cases     |
+Only Derived Types and Use Cases.
 
-These extend `DOMAIN_MODEL.md` (Derived Types) and `USE_CASES.md` (new catalogues), and may be consolidated in a `DOMAIN_VERTICALS.md` if the volume warrants it.
+No new root entities.
 
-**Completion criterion.** Every one of the six levels has at least its Derived Types named and one representative use case, so the system's scope visibly matches the Vision.
+No changes to the Logical Domain Model.
 
-## Phase B — Build the System
+## Deliverables
 
-**Objective.** Materialize the architecture — the point at which technology finally enters.
+| Vertical | Work |
+|----------|------|
+| Daily Work | Meetings, communication, decision flow |
+| Teaching | Course, lecture, student, assessment |
+| Doctorate | Thesis management, milestones |
+| Personal | Personal goals and routines |
+| Organization | Resources, budgets, infrastructure |
 
-**The stack.**
+Completion criterion:
+
+Every operational level has its Derived Types defined and representative Use Cases.
+
+---
+
+# Phase B — Build the System
+
+## Objective
+
+Turn the conceptual architecture into executable software.
+
+## Architectural progression
 
 ```
-AI Architecture            (done)
-      ↓
-Software Architecture      services · persistence · boundaries
-      ↓
-Memory Engine · Context Engine · Knowledge Graph · Event Bus
-      ↓
-MCP Layer                  tool/interface surface for the intelligence
-      ↓
-Interfaces                 dashboard · conversation · editors
+Conceptual Models
+        ↓
+Interaction Model
+        ↓
+Software Architecture
+        ↓
+Application Services
+        ↓
+Cognitive Runtime
+(Memory · Context · Events · Knowledge)
+        ↓
+Infrastructure
+(Graph · Database · MCP · LLMs · Storage)
+        ↓
+Interfaces
+(Dashboard · Editors · Chat · Automation)
 ```
 
-**Deliverables.** The design and planning documents below, then a first working slice.
+The Interaction Model is completed before Software Architecture because the way users interact with the system determines the architecture that follows.
 
-**The proving milestone.** A thin **vertical slice, end to end**: ingest documents → extract and link knowledge → answer a research question with provenance. Validated as the deep-research report proposed — retrieval relevance ≥ 85%, measurable reduction in manual effort, reproducible answers across document order.
+Conversation is one interaction modality among several.
 
-**MVP.** The smallest slice that runs the operating cycle (change → event → context → act → change) over real data in one vertical.
+## Deliverables
+
+Design the runtime architecture and implement a first vertical slice.
+
+## Proving milestone
+
+A complete operating cycle running end-to-end:
+
+```
+Domain change
+        ↓
+Domain Event
+        ↓
+Memory update
+        ↓
+Context rebuild
+        ↓
+Agent reasoning
+        ↓
+Recommendation / Action
+        ↓
+User accepts or rejects
+        ↓
+Domain updated
+```
+
+The system is considered validated when this cycle executes over real data with traceability and reproducible results.
 
 ---
 
 # Document Plan
 
-The documents that carry the project from here, in priority order.
+| # | Document | Phase | Purpose | Status |
+|---|----------|-------|---------|--------|
+| 1 | ROADMAP.md | — | Build sequence | This document |
+| 2 | Domain verticals | A | Complete missing operational domains | Next |
+| 3 | INTERACTION_MODEL.md | B | Define every interaction modality | Pending |
+| 4 | SOFTWARE_ARCHITECTURE.md | B | Translate conceptual models into runtime architecture | Pending |
+| 5 | UML.md / Views | B | Derived implementation views | Pending |
+| 6 | IMPLEMENTATION_PLAN.md | B | Components, milestones, MVP | Pending |
+| 7 | DECISIONS.md (ADR) | B | Record architectural decisions | Pending |
 
-| # | Document                  | Phase | Purpose                                                           | Status   |
-|---|---------------------------|-------|------------------------------------------------------------------|----------|
-| 1 | `ROADMAP.md`              | —     | What gets built, in what order, why                              | This doc |
-| 2 | Domain verticals          | A     | Derived Types + Use Cases for the missing levels                 | Next     |
-| 3 | `SOFTWARE_ARCHITECTURE.md`| B     | How the conceptual and logical models are materialized           | Pending  |
-| 4 | `UML.md` / views          | B     | Implementation views derived from the Logical Domain Model       | Pending  |
-| 5 | `IMPLEMENTATION_PLAN.md`  | B     | Epics, components, milestones, MVP                               | Pending  |
-| 6 | `DECISIONS.md` (ADR)      | B     | Architectural decisions, recorded as they are taken              | Pending  |
+DECISIONS.md also owns the promotion (or rejection) of the remaining candidate concepts:
 
-`DECISIONS.md` also resolves the four concepts left pending by the Logical Domain Model — **Curate** (capability), **Artifact**, **Decision** and **Event** — each promoted, or not, by a recorded decision.
+- Decision
+- Artifact
+- Event
+- Curate
 
 ---
 
 # Milestones
 
-| Milestone | Phase | Done when                                                                     |
-|-----------|-------|-------------------------------------------------------------------------------|
-| M1 · Domain breadth | A | All six levels have Derived Types and at least one use case each             |
-| M2 · Reference architecture | B | `SOFTWARE_ARCHITECTURE.md` defines services, persistence and boundaries |
-| M3 · Implementation views | B | Logical model projected to schema, graph and types                        |
-| M4 · Build plan | B | Epics, components and MVP scoped in `IMPLEMENTATION_PLAN.md`                   |
-| M5 · Proving slice | B | The end-to-end vertical slice runs and meets its validation criteria         |
+| Milestone | Phase | Done when |
+|-----------|-------|-----------|
+| M1 · Domain breadth | A | All six operational levels are represented |
+| M2 · Interaction model | B | Manual, assisted, conversational and autonomous interactions are defined |
+| M3 · Reference architecture | B | Software Architecture completed |
+| M4 · Implementation views | B | Logical model projected to implementation views |
+| M5 · Build plan | B | Components, epics and MVP defined |
+| M6 · Proving slice | B | End-to-end operating cycle validated |
 
 ---
 
 # Working Principles for This Stage
 
-- **No new root entities.** Breadth comes from Derived Types, never from new roots.
-- **Frozen stays frozen.** The Logical Domain Model and the conceptual layer do not change for implementation, AI or storage reasons.
-- **Technology enters at Software Architecture.** Not before. Concrete products are chosen in ADRs.
-- **Decisions are recorded.** Every significant architectural choice becomes an ADR in `DECISIONS.md`.
-- **Thin slice first.** Prove the whole cycle on one vertical before broadening — depth over surface area.
-- **The plan lands the models; it does not add more.** From here, value comes from building, not from modelling.
+- **No new root entities.** Breadth comes from Derived Types.
+- **Frozen stays frozen.** The conceptual and logical models remain implementation-independent.
+- **Interaction precedes implementation.** The system's interaction model defines how software is structured.
+- **Technology enters only at Software Architecture.**
+- **Conversation is not the system.** It is one interaction modality among several.
+- **Architectural decisions are recorded.** Significant technical decisions become ADRs.
+- **Thin slice first.** Prove one complete operating cycle before broadening.
+- **The objective is execution.** The conceptual architecture is considered complete; value now comes from building.

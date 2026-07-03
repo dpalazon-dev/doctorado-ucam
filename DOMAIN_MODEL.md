@@ -333,14 +333,17 @@ Most real-world concepts are not new entities. They are specializations of an ex
 
 These specializations are called Derived Types.
 
-| Derived Type     | Base Entity | Notes                                |
-|------------------|-------------|--------------------------------------|
-| Paper            | Document    | A scientific article                 |
-| Book             | Document    | A monograph or textbook              |
-| Bibliography     | Document    | A curated collection of references   |
-| Research Journal | Document    | A chronological research log         |
-| Meeting          | Activity    | Work that occurred with other People |
-| Dataset          | Resource    | Data consumed to perform work        |
+| Derived Type     | Base Entity | Notes                                                                        |
+|------------------|-------------|------------------------------------------------------------------------------|
+| Paper            | Document    | A scientific article                                                         |
+| Book             | Document    | A monograph or textbook                                                      |
+| Bibliography     | Document    | A curated collection of references                                           |
+| Research Journal | Document    | A chronological research log                                                 |
+| Meeting          | Activity    | Work that occurred with other People                                         |
+| Dataset          | Resource    | Data consumed to perform work                                                |
+| Hypothesis       | Knowledge   | A proposed explanation with a lifecycle (captured → experimenting → evidenced / falsified) |
+| Experiment       | Activity    | Structured work that tests a Hypothesis, consumes Resources and produces Evidence |
+| Evidence         | Knowledge   | The interpreted result of an Experiment that supports or falsifies a Hypothesis |
 
 Deriving from a Base Entity means a Derived Type inherits its responsibilities and relationships.
 
@@ -350,6 +353,28 @@ Because of this:
 - Bibliography does not compete with Document. It is a Document.
 
 New Derived Types can be added freely, as long as they specialize an existing Core Entity rather than introducing a new root concept.
+
+## The Research Spine
+
+Three Derived Types form the operational spine of scientific work.
+
+A **Hypothesis** (Knowledge) is proposed, tested by an **Experiment** (Activity), which produces **Evidence** (Knowledge) that in turn resolves the Hypothesis.
+
+```
+Hypothesis ──tested by──▶ Experiment ──produces──▶ Evidence
+     ▲                                                 │
+     └──────────────────── resolves ───────────────────┘
+```
+
+The Hypothesis carries an explicit operational lifecycle:
+
+```
+captured ──▶ … ──▶ experimenting ──▶ evidenced | falsified
+```
+
+Intermediate states are defined by the researcher.
+
+This spine is why the three concepts were promoted from recurring use-case concepts into formal Derived Types: they satisfy the Domain Consistency principle by appearing across many use cases rather than in isolation.
 
 ---
 

@@ -738,6 +738,6 @@ New features should emerge by improving existing use cases before introducing ne
 
 Likewise, new concepts should appear in the Domain Model only after repeated observation across multiple use cases.
 
-Across this catalogue, **Hypothesis**, **Experiment** and **Evidence** already recur as operative concepts and are therefore the immediate candidates for promotion into the Domain Model as Derived Types.
+Across this catalogue, **Hypothesis**, **Experiment** and **Evidence** recur as operative concepts; following the Domain Consistency principle, they have been promoted into the Domain Model as Derived Types.
 
 This keeps the architecture grounded in real research practice while allowing the platform to evolve incrementally.

@@ -69,7 +69,9 @@ Doctorado_UCAM/
 ├── DOMAIN_MAP.md
 ├── DOMAIN_MODEL.md
 ├── KNOWLEDGE_MODEL.md
-└── SYSTEM_CAPABILITIES.md
+├── SYSTEM_CAPABILITIES.md
+├── USE_CASES.md
+└── AI_ARCHITECTURE.md
 ```
 
 La estructura modular por directorios (architecture/, platform/, ai/…) se introducirá cuando comience la fase de implementación.
@@ -100,6 +102,8 @@ Knowledge Model
 System Capabilities
     ↓
 Use Cases
+    ↓
+AI Architecture
 ```
 
 1. [Vision](VISION.md)
@@ -112,6 +116,7 @@ Use Cases
 8. [Knowledge Model](KNOWLEDGE_MODEL.md)
 9. [System Capabilities](SYSTEM_CAPABILITIES.md)
 10. [Use Cases](USE_CASES.md)
+11. [AI Architecture](AI_ARCHITECTURE.md)
 
 ---
 

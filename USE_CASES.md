@@ -98,6 +98,8 @@ Produce
 Operate
 ```
 
+Almost every use case realises the same underlying shape — acquire or retrieve information, understand it, reason over it, produce a result and integrate it into the operational state. This recurrence is intentional: it is the signature of a coherent architecture.
+
 ### Domain Consistency
 
 Every use case manipulates existing domain entities.
@@ -115,12 +117,20 @@ Every use case follows the same structure.
 - **Intention** — the operational goal expressed by the researcher.
 - **Context** — the situation and preconditions in which it occurs.
 - **Operational Flow** — the composition of capabilities that produces the outcome.
-- **Expected Outcome** — the meaningful change in operational state.
+- **Expected Outcome** — the meaningful change in operational state, described narratively.
+- **State Changes** — the precise mutation of the operational state, grouped as *Created*, *Updated*, *Derived* and *Linked*, with lifecycle transitions made explicit. This section is the direct bridge from behaviour to the Domain Model and to future system events. Read-only use cases declare no persistent change.
 - **Capabilities** — the capabilities exercised.
 - **Domain Entities** — the entities read or written.
 - **Related Use Cases** — neighbouring situations in the catalogue.
 
 Entities written as `Entity (Specialization)` denote a specialization not yet formalized in the Domain Model.
+
+Within State Changes:
+
+- **Created** — new entities brought into existence.
+- **Updated** — existing entities whose attributes or lifecycle state change.
+- **Derived** — knowledge produced by interpretation or reasoning over other entities.
+- **Linked** — new relationships established between entities.
 
 ---
 
@@ -149,6 +159,12 @@ Knowledge acquisition, creation, refinement and retrieval.
 
 **Expected Outcome.** A hypothesis exists as connected knowledge in an initial state, positioned in the knowledge graph, with gaps made explicit and, where needed, search strategies queued. No reasoning has been lost.
 
+**State Changes.**
+- *Created* — Knowledge (Hypothesis), initial state `captured`.
+- *Updated* — none.
+- *Derived* — Resource (search strategies), only when internal context is insufficient.
+- *Linked* — Hypothesis ↔ related Knowledge and Concepts; Hypothesis → Knowledge Graph.
+
 **Capabilities.** Acquire · Retrieve · Reason · Produce · Organize
 
 **Domain Entities.** Knowledge (Hypothesis) · Document · Resource
@@ -172,6 +188,12 @@ Knowledge acquisition, creation, refinement and retrieval.
 
 **Expected Outcome.** The hypothesis advances from an initial intuition to a mature formulation with explicit assumptions, supporting knowledge and readiness for experimental design.
 
+**State Changes.**
+- *Created* — Knowledge (Concept), when new concepts crystallize during dialogue.
+- *Updated* — Knowledge (Hypothesis): formulation and assumptions; lifecycle state `captured → developing`.
+- *Derived* — Knowledge (rationale, open questions).
+- *Linked* — Hypothesis ↔ Concepts and processed literature (new backlinks).
+
 **Capabilities.** Retrieve · Understand · Reason · Organize
 
 **Domain Entities.** Knowledge (Hypothesis) · Knowledge (Concept) · Document
@@ -193,6 +215,12 @@ Knowledge acquisition, creation, refinement and retrieval.
 4. Organize it into the knowledge graph, relating it to existing concepts, projects and hypotheses. → *Organize*
 
 **Expected Outcome.** A document exists with preserved provenance, and the knowledge it carries is connected and retrievable. The literature is now operable across other use cases.
+
+**State Changes.**
+- *Created* — Document (Paper), initial state `pending`.
+- *Updated* — Bibliography.
+- *Derived* — Knowledge (Concepts) extracted from the document.
+- *Linked* — Paper ↔ Project, Hypothesis and Knowledge Graph.
 
 **Capabilities.** Acquire · Process · Understand · Organize
 
@@ -217,6 +245,12 @@ Knowledge acquisition, creation, refinement and retrieval.
 
 **Expected Outcome.** The researcher holds a structured, evolving understanding of the topic, with concepts and open questions connected in the graph, ready to seed hypotheses.
 
+**State Changes.**
+- *Created* — Knowledge (Topic Map), Knowledge (Concept).
+- *Updated* — Knowledge (Topic Map) across successive iterations.
+- *Derived* — Knowledge (concept relationships, open questions).
+- *Linked* — Concepts ↔ Documents ↔ Project within the Knowledge Graph.
+
 **Capabilities.** Retrieve · Reason · Understand · Produce · Organize
 
 **Domain Entities.** Knowledge (Concept) · Document · Project
@@ -239,6 +273,13 @@ Knowledge acquisition, creation, refinement and retrieval.
 5. Present the answer with explicit provenance and confidence. → *Produce*
 
 **Expected Outcome.** The researcher receives a grounded answer traceable to its supporting knowledge, or an explicit statement of what evidence is missing and how to obtain it. The system never fabricates conclusions.
+
+**State Changes.**
+- *Created* — none.
+- *Updated* — none.
+- *Derived* — Knowledge (grounded answer, or explicit evidence gap).
+- *Linked* — Answer ↔ supporting Knowledge, Evidence and Documents.
+- *Read-only: the answer mutates no persistent state unless the researcher chooses to keep it.*
 
 **Capabilities.** Understand · Retrieve · Reason · Produce
 
@@ -267,6 +308,12 @@ Activities directly related to scientific investigation.
 
 **Expected Outcome.** An experiment exists with objectives, required resources, expected observations and measurable outcomes, linked to the hypothesis it tests, which now carries an experimenting state.
 
+**State Changes.**
+- *Created* — Activity (Experiment), initial state `designed`; Document (experimental design).
+- *Updated* — Knowledge (Hypothesis): lifecycle state `developing → experimenting`.
+- *Derived* — Resource requirements identified for the experiment.
+- *Linked* — Experiment ↔ Hypothesis, Resource and Project.
+
 **Capabilities.** Retrieve · Reason · Produce · Organize · Operate
 
 **Domain Entities.** Knowledge (Hypothesis) · Activity (Experiment) · Resource · Project
@@ -290,6 +337,12 @@ Activities directly related to scientific investigation.
 
 **Expected Outcome.** Interpreted evidence exists, connected to its experiment and hypothesis, ready to inform validation and scientific writing.
 
+**State Changes.**
+- *Created* — Knowledge (Evidence).
+- *Updated* — Activity (Experiment): lifecycle state `running → analysed`.
+- *Derived* — Knowledge (Evidence, readable analysis) from raw observations.
+- *Linked* — Evidence ↔ Experiment ↔ Hypothesis; Evidence → Knowledge Graph.
+
 **Capabilities.** Retrieve · Process · Understand · Reason · Produce · Organize
 
 **Domain Entities.** Activity (Experiment) · Knowledge (Evidence) · Knowledge (Hypothesis)
@@ -312,6 +365,12 @@ Activities directly related to scientific investigation.
 
 **Expected Outcome.** The hypothesis carries a resolved state — evidenced, falsified or unresolved — fully traceable to the evidence that justified it. Nothing is overwritten silently.
 
+**State Changes.**
+- *Created* — none.
+- *Updated* — Knowledge (Hypothesis): lifecycle state `experimenting → evidenced | falsified | unresolved`.
+- *Derived* — Knowledge (validation rationale linking decision to evidence).
+- *Linked* — Hypothesis ↔ the specific Evidence that justified the decision.
+
 **Capabilities.** Retrieve · Reason · Organize · Operate
 
 **Domain Entities.** Knowledge (Hypothesis) · Knowledge (Evidence) · Activity (Experiment)
@@ -333,6 +392,12 @@ Activities directly related to scientific investigation.
 4. Register the strategies so their future results can be acquired and connected. → *Organize*
 
 **Expected Outcome.** A set of high-quality search strategies exists, tied to the gap that motivated them, ready to drive external discovery and subsequent acquisition.
+
+**State Changes.**
+- *Created* — Resource (search strategies).
+- *Updated* — none.
+- *Derived* — Knowledge (explicit statement of the evidence gap).
+- *Linked* — Search strategies ↔ Hypothesis or Knowledge gap that motivated them.
 
 **Capabilities.** Retrieve · Reason · Produce · Organize
 
@@ -360,6 +425,12 @@ Support scientific communication.
 
 **Expected Outcome.** A structured scientific draft exists, grounded in and traceable to the system's knowledge, ready for review.
 
+**State Changes.**
+- *Created* — Document (Chapter / Draft).
+- *Updated* — none.
+- *Derived* — Document (structured draft) composed from existing knowledge.
+- *Linked* — Draft ↔ Knowledge, Evidence and Bibliography.
+
 **Capabilities.** Retrieve · Reason · Produce · Organize
 
 **Domain Entities.** Document (Chapter) · Knowledge · Knowledge (Evidence) · Bibliography
@@ -382,6 +453,12 @@ Support scientific communication.
 
 **Expected Outcome.** A review exists identifying strengths, gaps in evidence, inconsistencies and unsupported or unverifiable claims, enabling targeted revision.
 
+**State Changes.**
+- *Created* — Document (Review).
+- *Updated* — none.
+- *Derived* — Knowledge (findings: evidence gaps, inconsistencies, unverifiable claims).
+- *Linked* — Review ↔ Document, Evidence and Bibliography.
+
 **Capabilities.** Retrieve · Understand · Reason · Produce
 
 **Domain Entities.** Document · Knowledge (Evidence) · Bibliography
@@ -403,6 +480,12 @@ Support scientific communication.
 4. Relate the references to the document. → *Organize*
 
 **Expected Outcome.** Accurate, verifiable references exist, bound to the claims they support and to real sources in the system.
+
+**State Changes.**
+- *Created* — Bibliography (citations / entries).
+- *Updated* — Document (draft): citations inserted.
+- *Derived* — none.
+- *Linked* — References ↔ Document claims ↔ source Documents.
 
 **Capabilities.** Retrieve · Reason · Produce · Organize
 
@@ -430,6 +513,12 @@ Coordinate research execution.
 
 **Expected Outcome.** Tasks are maintained as first-class entities, prioritised in line with research objectives and consistently linked to their projects.
 
+**State Changes.**
+- *Created* — Task, when new.
+- *Updated* — Task: priority and lifecycle state.
+- *Derived* — none.
+- *Linked* — Task ↔ Project, objectives and related Knowledge.
+
 **Capabilities.** Acquire · Organize · Reason · Operate
 
 **Domain Entities.** Task · Project · Knowledge
@@ -452,6 +541,12 @@ Coordinate research execution.
 
 **Expected Outcome.** A coherent plan exists linking upcoming activities to project milestones, ready to guide execution and review.
 
+**State Changes.**
+- *Created* — Document (Plan); Task(s).
+- *Updated* — Task(s): scheduling; Project.
+- *Derived* — Knowledge (prioritisation and dependencies).
+- *Linked* — Plan ↔ Project milestones ↔ Tasks.
+
 **Capabilities.** Retrieve · Reason · Produce · Operate
 
 **Domain Entities.** Project · Task · Activity
@@ -473,6 +568,12 @@ Coordinate research execution.
 4. Register it as part of the operational record. → *Operate (Review)*
 
 **Expected Outcome.** A progress review exists covering completed work, pending activities, blockers and research evolution, usable for self-direction and reporting.
+
+**State Changes.**
+- *Created* — Document (Progress Review / Research Journal entry).
+- *Updated* — none.
+- *Derived* — Knowledge (progress synthesis: advances, blockers, evolution).
+- *Linked* — Review ↔ Project, Task and Activity.
 
 **Capabilities.** Retrieve · Reason · Produce · Operate
 
@@ -501,6 +602,12 @@ Capture operational information generated through interactions.
 
 **Expected Outcome.** Incoming email is reduced to structured, connected operational elements and proposed actions, with nothing important left buried.
 
+**State Changes.**
+- *Created* — Task, Person, Document (draft response), as extracted.
+- *Updated* — Person or Project, when the message references an existing one.
+- *Derived* — Knowledge (extracted research ideas); message classification.
+- *Linked* — Extracted elements ↔ Project, Person and Task.
+
 **Capabilities.** Acquire · Process · Understand · Reason · Produce · Organize
 
 **Domain Entities.** Knowledge · Task · Person · Project · Document
@@ -521,6 +628,12 @@ Capture operational information generated through interactions.
 3. Produce a context-aware draft for researcher approval. → *Produce (Communicate)*
 
 **Expected Outcome.** A grounded draft exists, ready for the researcher to review, edit and send. The system never sends autonomously without approval.
+
+**State Changes.**
+- *Created* — Document (Draft communication), pending approval.
+- *Updated* — none.
+- *Derived* — Document (context-aware draft) assembled from existing context.
+- *Linked* — Draft ↔ Person, Project and prior Documents.
 
 **Capabilities.** Retrieve · Understand · Produce
 
@@ -544,6 +657,12 @@ Capture operational information generated through interactions.
 
 **Expected Outcome.** A meeting briefing exists gathering all relevant context and distinguishing the confirmed from the open, ready to make the interaction productive.
 
+**State Changes.**
+- *Created* — Document (Meeting briefing).
+- *Updated* — none.
+- *Derived* — Knowledge (briefing: confirmed context vs open questions).
+- *Linked* — Briefing ↔ Person, Project, Document and Task.
+
 **Capabilities.** Retrieve · Reason · Produce
 
 **Domain Entities.** Person · Activity (Meeting) · Document · Task · Project · Knowledge
@@ -565,6 +684,12 @@ Capture operational information generated through interactions.
 4. Relate them to the corresponding people, projects, tasks and knowledge. → *Organize*
 
 **Expected Outcome.** The interaction persists as an Activity, with extracted decisions, tasks, knowledge and people updates connected to the operational state.
+
+**State Changes.**
+- *Created* — Activity (Meeting); Task(s); Knowledge (decisions).
+- *Updated* — Person and Project, from updates surfaced in the interaction.
+- *Derived* — Knowledge (decisions, action items) extracted from the conversation.
+- *Linked* — Interaction ↔ Person, Project, Task and Knowledge.
 
 **Capabilities.** Acquire · Understand · Reason · Produce · Organize
 
@@ -591,6 +716,12 @@ Maintain operational knowledge about collaborators.
 
 **Expected Outcome.** A single authoritative Person record exists, with roles, affiliations and relationships, ready to anchor interactions and collaborations.
 
+**State Changes.**
+- *Created* — Person, when new.
+- *Updated* — Person: roles, affiliations and relationships, when already present.
+- *Derived* — none.
+- *Linked* — Person ↔ Project and other People (relationships).
+
 **Capabilities.** Acquire · Retrieve · Organize
 
 **Domain Entities.** Person · Project · Knowledge
@@ -612,6 +743,13 @@ Maintain operational knowledge about collaborators.
 
 **Expected Outcome.** A complete, current operational profile of the person is available, spanning projects, interactions, documents, knowledge, responsibilities and history.
 
+**State Changes.**
+- *Created* — none.
+- *Updated* — none.
+- *Derived* — Knowledge (consolidated profile of the collaborator).
+- *Linked* — none.
+- *Read-only: the profile is a transient synthesis and mutates no persistent state.*
+
 **Capabilities.** Retrieve · Reason · Produce
 
 **Domain Entities.** Person · Project · Activity · Document · Knowledge · Task
@@ -632,6 +770,13 @@ Maintain operational knowledge about collaborators.
 3. Produce an overview of collaboration dynamics. → *Produce*
 
 **Expected Outcome.** The researcher understands how key collaborations have evolved and which relationships are most significant to the research ecosystem.
+
+**State Changes.**
+- *Created* — none.
+- *Updated* — none.
+- *Derived* — Knowledge (collaboration dynamics and significant relationships).
+- *Linked* — none.
+- *Read-only: the overview is a transient synthesis and mutates no persistent state.*
 
 **Capabilities.** Retrieve · Reason · Produce
 
@@ -658,6 +803,13 @@ Preserve continuity across research sessions.
 
 **Expected Outcome.** The researcher is presented with a coherent reconstruction of their working context, minimising switching cost and enabling immediate continuation.
 
+**State Changes.**
+- *Created* — none.
+- *Updated* — none.
+- *Derived* — Context (resumable summary of the working state).
+- *Linked* — none.
+- *Read-only: reconstruction mutates no persistent state.*
+
 **Capabilities.** Retrieve · Reason · Produce
 
 **Domain Entities.** Project · Task · Activity · Knowledge (Hypothesis)
@@ -679,6 +831,12 @@ Preserve continuity across research sessions.
 
 **Expected Outcome.** The suspended activity's state is preserved for later resumption, and the researcher enters the new activity with its context loaded.
 
+**State Changes.**
+- *Created* — Context (checkpoint of the suspended activity).
+- *Updated* — Activity: state `active → suspended`; target Activity: state `→ active`.
+- *Derived* — none.
+- *Linked* — Checkpoint ↔ Activity and Project.
+
 **Capabilities.** Acquire · Organize · Retrieve · Reason
 
 **Domain Entities.** Project · Task · Activity · Context
@@ -699,6 +857,13 @@ Preserve continuity across research sessions.
 3. Produce the overview. → *Produce*
 
 **Expected Outcome.** A global, current overview of the research programme exists across projects, hypotheses, experiments, tasks, knowledge and deadlines, supporting direction-setting.
+
+**State Changes.**
+- *Created* — none.
+- *Updated* — none.
+- *Derived* — Knowledge (programme-level overview).
+- *Linked* — none.
+- *Read-only: the overview is a transient synthesis and mutates no persistent state.*
 
 **Capabilities.** Retrieve · Reason · Produce
 
@@ -722,6 +887,12 @@ Preserve continuity across research sessions.
 
 **Expected Outcome.** The session's output is fully integrated into the operational state, and a summary exists to seed the next session. Nothing produced is left unconsolidated.
 
+**State Changes.**
+- *Created* — Document (Session summary / Research Journal entry).
+- *Updated* — Knowledge, Document and Task produced during the session, consolidated into the operational state.
+- *Derived* — Knowledge (session summary).
+- *Linked* — Session ↔ every entity produced during it.
+
 **Capabilities.** Retrieve · Understand · Organize · Produce
 
 **Domain Entities.** Knowledge · Document · Task · Activity · Context
@@ -739,5 +910,7 @@ New features should emerge by improving existing use cases before introducing ne
 Likewise, new concepts should appear in the Domain Model only after repeated observation across multiple use cases.
 
 Across this catalogue, **Hypothesis**, **Experiment** and **Evidence** recur as operative concepts; following the Domain Consistency principle, they have been promoted into the Domain Model as Derived Types.
+
+**Interaction** (currently modelled as a specialization of Activity) is under observation: its centrality in UC-C03 and UC-C04, connecting People, Projects, Knowledge and Tasks, may justify promoting it to a first-class concept in the future. It is not promoted yet.
 
 This keeps the architecture grounded in real research practice while allowing the platform to evolve incrementally.

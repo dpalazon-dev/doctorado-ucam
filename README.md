@@ -72,7 +72,8 @@ Doctorado_UCAM/
 ├── SYSTEM_CAPABILITIES.md
 ├── USE_CASES.md
 ├── AI_ARCHITECTURE.md
-└── MEMORY_MODEL.md
+├── MEMORY_MODEL.md
+└── CONTEXT_MODEL.md
 ```
 
 La estructura modular por directorios (architecture/, platform/, ai/…) se introducirá cuando comience la fase de implementación.
@@ -105,7 +106,7 @@ System Capabilities
 Use Cases
     ↓
 AI Architecture ─┬─ Memory Model
-                 ├─ Context Model   (forthcoming)
+                 ├─ Context Model
                  └─ Event Model     (forthcoming)
 ```
 
@@ -123,6 +124,7 @@ The last four documents form the **Cognitive Architecture**: the AI Operating La
 10. [Use Cases](USE_CASES.md)
 11. [AI Architecture](AI_ARCHITECTURE.md)
 12. [Memory Model](MEMORY_MODEL.md)
+13. [Context Model](CONTEXT_MODEL.md)
 
 ---
 

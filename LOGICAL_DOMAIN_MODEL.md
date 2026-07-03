@@ -4,15 +4,13 @@
 
 This document is the canonical logical specification of Doctorado_UCAM.
 
-The Domain Model introduced the concepts that exist. This document specifies them precisely: their attributes, their states, their relationships, their cardinalities and their invariants.
+The Domain Model introduced the concepts that exist. This document specifies them precisely: their attributes, their types, their relationships, their cardinalities, their lifecycles and their invariants.
 
 It is the bridge between the conceptual domain and its implementation. Where the Domain Model says *a Project exists*, this document says *a Project has these attributes, these states, these relationships and these constraints*.
 
 It is a **logical** model, not a physical one. It defines structure, not storage. It names no database, no language and no framework. Those belong to the Software Architecture.
 
 It owns one thing: the exact structure of the domain.
-
-This first version establishes the overview — the master view, the boundaries and the specification format. The detailed specification of each entity is developed from that overview, block by block.
 
 ---
 
@@ -30,9 +28,9 @@ Software Architecture how it is built and stored     (physical)
 
 Each level refines the one above without contradicting it.
 
-The Domain Model is deliberately minimal and stable — seven Core Entities and a handful of Derived Types. This document does not add concepts. It gives the existing concepts the structural precision an implementation will require, while remaining independent of any particular implementation.
+The Domain Model is deliberately minimal and stable — seven Core Entities and a handful of Derived Types. This document does not add concepts. It gives the existing concepts the structural precision an implementation requires, while remaining independent of any particular implementation.
 
-If a future need cannot be expressed by specifying an existing entity, it is a signal to revisit the Domain Model — not to invent structure here.
+If a future need cannot be expressed by specifying an existing entity, that is a signal to revisit the Domain Model — not to invent structure here.
 
 ---
 
@@ -57,7 +55,7 @@ A UML diagram is a view of this model. A relational schema is a view. A knowledg
 
 None of them is the source. This document is the source; they are derived from it.
 
-This is the same discipline the whole architecture follows — the domain is the truth, and storage is a projection — now applied to the specification itself. It carries two obligations:
+This is the same discipline the whole architecture follows — the domain is the truth, storage is a projection — now applied to the specification itself. It carries two obligations.
 
 - The model must be **precise enough** to derive each of those views: attributes with types, explicit cardinalities, defined state machines, stated invariants.
 - The model must be **neutral enough** to derive *all* of them: nothing here may assume a relational store, a graph store or any particular language.
@@ -66,11 +64,31 @@ A diagram that drifts from this document is wrong. This document does not drift 
 
 ---
 
-# The Master View
+# Logical Type Vocabulary
 
-The overview has two halves: the graph of the domain itself, and the way the four models of the cognitive architecture operate over it.
+Attributes are specified with logical types. A logical type describes the *nature* of a value, never its storage.
 
-## The Domain Graph
+| Type                | Meaning                                                        |
+|---------------------|---------------------------------------------------------------|
+| `identifier`        | A globally unique identity.                                   |
+| `text`              | Free text of any length.                                      |
+| `enum(a\|b\|c)`     | Exactly one value from a fixed set.                           |
+| `timestamp`         | A single instant in time.                                     |
+| `time span`         | A start and an end instant.                                   |
+| `date`              | A calendar day.                                               |
+| `degree`            | A normalized value in the interval [0, 1].                    |
+| `ordinal`           | A ranked value (e.g. priority).                               |
+| `quantity`          | A magnitude with a unit.                                      |
+| `money`             | An amount with a currency.                                    |
+| `locator`           | A logical reference to where content resides, not a path.    |
+| `reference → X`     | An identity link to another entity, navigable both ways.     |
+| `set<T>` / `list<T>`| An unordered / ordered collection.                           |
+
+How a `degree`, a `timestamp` or a `locator` is physically represented is a decision for the Software Architecture. This document commits only to the logical nature.
+
+---
+
+# The Domain Graph
 
 The seven Core Entities and their primary relationships.
 
@@ -82,111 +100,467 @@ The seven Core Entities and their primary relationships.
    Document ──supports──▶ Knowledge      Activity ──consumes──▶ Resource
 ```
 
-The diagram shows the primary operational flow. The complete and authoritative set of relationships is the list below — the logical graph, independent of any drawing.
-
-- Person — *participates in* → Project
-- Person — *performs* → Activity
-- Project — *organizes* → Task
-- Project — *organizes* → Document
-- Project — *references* → Knowledge
-- Task — *becomes* → Activity
-- Task — *produces* → Knowledge
-- Activity — *produces* → Knowledge
-- Activity — *consumes* → Resource
-- Document — *supports* → Knowledge
-- Knowledge — *informs* → Task
-
-These relationships restate, at logical precision, the Relationship Philosophy of the Domain Model. The Research Spine (Hypothesis → Experiment → Evidence) specializes this graph through Derived Types and is specified with them.
-
-## The System of Models
-
-The domain does not stand alone. The four models of the Cognitive Architecture operate over it — and only over it.
-
-```
-                          AI OPERATING LAYER
-           Capture · Curate · Link · Reason · Plan · Write · Audit · Notify
-                 │             │             │              │
-             operates on    recalls      assembles      reacts to
-                 │             │             │              │
-                 ▼             ▼             ▼              ▼
-   ┌───────────────┐   ┌─────────────┐ ┌────────────┐ ┌────────────┐
-   │    DOMAIN     │   │   MEMORY    │ │  CONTEXT   │ │   EVENTS    │
-   │  persistent   │◀──│ recall over │ │ assembled  │ │ emitted by  │
-   │  the entity   │   │ the domain  │ │ from the   │ │ the domain's│
-   │    graph      │   │             │ │   domain   │ │  changes    │
-   └───────────────┘   └─────────────┘ └────────────┘ └────────────┘
-```
-
-Every cognitive model resolves back to the domain. Memory recalls over it. Context is assembled from it. Events are emitted by its changes. The AI Operating Layer operates on it. The domain is the one surface they all share — the logical expression of the single-source-of-truth principle.
+The diagram shows the primary operational flow. The complete and authoritative set of relationships is the graph specified in **Block 2**. Every cognitive model of the Cognitive Architecture — Memory, Context, Events — resolves back to this graph, the logical expression of the single-source-of-truth principle.
 
 ---
 
-# Persistent and Derived
+# Block 1 · Core Entities
 
-A single line runs through the whole logical model, and drawing it correctly is the point of this overview.
+Each Core Entity is an aggregate root (Block 5). Its attributes are specified below. `reference → X` attributes restate relationships (Block 2) and are shown here only where they are intrinsic to the entity.
 
-```
-   PERSISTENT (the source of truth)        DERIVED (produced, never stored as truth)
-   ─────────────────────────────────       ────────────────────────────────────────
-   The Core Entities:                       Context           (Context Model)
-     Project · Knowledge · Document          Recall results    (Memory Model)
-     Person · Task · Activity · Resource     Generated Artifacts (AI Architecture)
-```
+## Document
 
-Only the Core Entities are persistent. They are what the system stores and what it holds true.
+A persistent digital artifact. Stores information; is not itself Knowledge (Domain Model → Document).
 
-Everything the Cognitive Architecture produces on top of them — a constructed context, the result of a recall, a generated report — is **derived**. It is computed from the domain when needed and is never a source of truth. If it is ever cached, the cache is a projection, reconstructible from the domain.
+| Attribute      | Type                                                             | Notes                                          |
+|----------------|------------------------------------------------------------------|------------------------------------------------|
+| `id`           | `identifier`                                                     |                                                |
+| `title`        | `text`                                                           |                                                |
+| `kind`         | `enum(Paper\|Book\|Article\|Report\|Regulation\|Email\|Presentation\|Spreadsheet\|Image\|Note\|…)` | Derived-Type discriminator      |
+| `medium`       | `enum(text\|document\|tabular\|image\|slide\|message)`           | Logical medium, not file format                |
+| `provenance`   | `Provenance`                                                     | Origin: source, means, moment (value object)   |
+| `content`      | `locator`                                                        | Logical pointer to preserved content           |
+| `authors`      | `set<reference → Person>`                                        |                                                |
+| `versions`     | `list<Version>`                                                  | Version history (value objects)                |
+| `state`        | `enum` (Block 3)                                                 |                                                |
+| `registered_at`| `timestamp`                                                     |                                                |
+| `updated_at`   | `timestamp`                                                      |                                                |
 
-This distinction is why the logical model can specify the domain exhaustively and leave the cognitive products unspecified as stored structures: they have no persistent structure to specify. They are functions of the domain, not additions to it.
+## Knowledge
 
-*(Events sit at this boundary: a domain change, recorded. Whether an Event becomes a persisted, first-class record is one of the open promotions below.)*
+What the system knows. Meaning, independent of any Document (Knowledge Model).
+
+| Attribute     | Type                                                              | Notes                                             |
+|---------------|------------------------------------------------------------------|---------------------------------------------------|
+| `id`          | `identifier`                                                     |                                                   |
+| `title`       | `text`                                                           |                                                   |
+| `summary`     | `text`                                                           |                                                   |
+| `body`        | `text`                                                           | The meaning itself                                |
+| `kind`        | `enum(Concept\|Insight\|Note\|Methodology\|Skill\|Observation\|Hypothesis\|Evidence\|Decision\|…)` | Derived-Type discriminator |
+| `confidence`  | `degree`                                                         | How strongly the knowledge is held                |
+| `provenance`  | `set<Provenance>`                                                | Accumulates as knowledge is reused                |
+| `relations`   | `set<KnowledgeRelation>`                                         | Typed edges to other Knowledge (value objects)    |
+| `sources`     | `set<reference → Document \| Activity>`                          | What it emerged from                              |
+| `state`       | `enum` (Block 3)                                                 |                                                   |
+| `created_at`  | `timestamp`                                                     |                                                   |
+| `updated_at`  | `timestamp`                                                     |                                                   |
+
+## Project
+
+An organized initiative with defined objectives. Coordinates work; does not own Knowledge (Domain Model → Project).
+
+| Attribute      | Type                                          | Notes                              |
+|----------------|-----------------------------------------------|------------------------------------|
+| `id`           | `identifier`                                  |                                    |
+| `title`        | `text`                                        |                                    |
+| `description`  | `text`                                        |                                    |
+| `objectives`   | `set<Objective>`                              | At least one required (Block 6)    |
+| `deliverables` | `set<Deliverable>`                            |                                    |
+| `milestones`   | `list<Milestone>`                             |                                    |
+| `period`       | `time span`                                   | Start → deadline                   |
+| `funding`      | `set<FundingAllocation>`                      | References Resource                |
+| `members`      | `set<Membership>`                             | Person + Role (value object)       |
+| `state`        | `enum` (Block 3)                              |                                    |
+| `created_at`   | `timestamp`                                   |                                    |
+| `updated_at`   | `timestamp`                                   |                                    |
+
+## Person
+
+A human actor in the operational environment (Domain Model → Person).
+
+| Attribute     | Type                                                          | Notes                                  |
+|---------------|--------------------------------------------------------------|----------------------------------------|
+| `id`          | `identifier`                                                |                                        |
+| `name`        | `text`                                                      |                                        |
+| `roles`       | `set<enum(Supervisor\|Collaborator\|Student\|Reviewer\|Coordinator\|Author)>` | Contextual, may vary per Project |
+| `affiliation` | `text`                                                     | Organization is not yet an entity      |
+| `contact`     | `ContactInfo`                                              | Value object                           |
+| `created_at`  | `timestamp`                                               |                                        |
+| `updated_at`  | `timestamp`                                                |                                        |
+
+Future generalization to **Actor** (Domain Model) would let organizations become first-class.
+
+## Task
+
+Intended work. Exists before execution; expresses commitment, not action (Domain Model → Task).
+
+| Attribute      | Type                          | Notes                                    |
+|----------------|-------------------------------|------------------------------------------|
+| `id`           | `identifier`                  |                                          |
+| `title`        | `text`                        |                                          |
+| `description`  | `text`                        |                                          |
+| `status`       | `enum` (Block 3)              |                                          |
+| `priority`     | `ordinal`                     |                                          |
+| `due_date`     | `date`                        |                                          |
+| `project`      | `reference → Project` (0..1)  | Not every Task belongs to a Project      |
+| `informed_by`  | `set<reference → Knowledge>`  |                                          |
+| `created_at`   | `timestamp`                   |                                          |
+| `completed_at` | `timestamp`                   | Set on transition to Done                |
+
+## Activity
+
+Work that has occurred or is occurring. The operational history (Domain Model → Activity).
+
+| Attribute     | Type                                        | Notes                                         |
+|---------------|---------------------------------------------|-----------------------------------------------|
+| `id`          | `identifier`                                |                                               |
+| `kind`        | `enum(Reading\|Writing\|Thinking\|Meeting\|Teaching\|Experimenting\|Reviewing\|Discussing)` | Derived-Type discriminator |
+| `description` | `text`                                      |                                               |
+| `occurred`    | `time span`                                 | When it happened or began                     |
+| `state`       | `enum` (Block 3)                            |                                               |
+| `performers`  | `set<reference → Person>`                   | At least one (Block 6)                         |
+| `consumed`    | `set<ResourceUse>`                          | Resource + quantity (value object)            |
+| `realizes`    | `reference → Task` (0..1)                   | The Task it came from, if any                 |
+| `produced`    | `set<reference → Knowledge \| Document>`    | Its outputs                                   |
+| `created_at`  | `timestamp`                                 |                                               |
+
+## Resource
+
+Anything consumed or required to perform work (Domain Model → Resource).
+
+| Attribute      | Type                                                        | Notes                    |
+|----------------|------------------------------------------------------------|--------------------------|
+| `id`           | `identifier`                                              |                          |
+| `name`         | `text`                                                    |                          |
+| `kind`         | `enum(API\|Software\|Equipment\|Compute\|GPU\|Dataset\|License\|Funding)` | Derived-Type discriminator |
+| `capacity`     | `quantity`                                                | Available amount         |
+| `cost`         | `money`                                                   |                          |
+| `provider`     | `text`                                                    |                          |
+| `availability` | `enum` (Block 3)                                          |                          |
+| `created_at`   | `timestamp`                                               |                          |
+| `updated_at`   | `timestamp`                                               |                          |
+
+## The Research Spine
+
+Three Derived Types specialize the Core Entities into the operational spine of scientific work (Domain Model → The Research Spine). Each **inherits** all attributes of its base entity and adds its own.
+
+### Hypothesis · specializes Knowledge
+
+| Added attribute | Type                          | Notes                                    |
+|-----------------|-------------------------------|------------------------------------------|
+| `statement`     | `text`                        | The proposed explanation                 |
+| `assumptions`   | `set<text>`                   |                                          |
+| `tested_by`     | `set<reference → Experiment>` |                                          |
+| `resolved_by`   | `set<reference → Evidence>`   |                                          |
+
+A Hypothesis replaces the generic Knowledge lifecycle with its own (Block 3).
+
+### Experiment · specializes Activity
+
+| Added attribute | Type                         | Notes                                     |
+|-----------------|------------------------------|-------------------------------------------|
+| `tests`         | `reference → Hypothesis` (1) | Exactly one (Block 6)                     |
+| `design`        | `text`                       | Objectives, protocol, expected observations |
+| `produced`      | `set<reference → Evidence>`  | Narrows Activity's `produced`             |
+
+An Experiment replaces the generic Activity lifecycle with its own (Block 3).
+
+### Evidence · specializes Knowledge
+
+| Added attribute | Type                                 | Notes                          |
+|-----------------|--------------------------------------|--------------------------------|
+| `polarity`      | `enum(supports\|falsifies\|inconclusive)` |                          |
+| `about`         | `reference → Hypothesis` (1)         |                                |
+| `produced_by`   | `reference → Experiment` (1)         |                                |
+| `strength`      | `degree`                             |                                |
+
+## Other Derived Types in use
+
+The Use Cases already exercise further specializations through the `Entity (Specialization)` notation: **Decision** and **Draft** and **Chapter** (Document), **Meeting** (Activity), **Bibliography** and **Research Journal** (Document). These inherit their base entity's structure. Those recurring enough to warrant formal promotion are tracked under *Scope and Boundaries*; **Decision** is currently modelled as `Knowledge (Decision)`.
 
 ---
 
-# What This Document Will Specify
+# Block 2 · Relationships
 
-From this overview, the model is developed in eight blocks. Each block sharpens one aspect of the entities above.
+The complete logical graph. Every edge is directed, named, and navigable in both directions (Block 6). "Inverse" names the reverse traversal.
 
-1. **Core Entities** — each entity's attributes, with logical types.
-2. **Relationships** — the logical graph above, each edge given direction and meaning.
-3. **Entity Lifecycle** — the state machine of each entity that has one.
-4. **Cardinalities** — how many of each entity may relate to another.
-5. **Aggregates** — the aggregate roots (in the DDD sense) and what belongs to each.
-6. **Domain Constraints** — the invariants that must always hold.
-7. **Derived Objects** — what is computed rather than stored (Context, recall, artifacts), specified as derivations, not records.
-8. **Logical Views** — focused diagrams over the model (a Knowledge view, a Project view, an AI view), each a projection of the one specification.
+| From      | Relationship        | To        | Inverse            | Cardinality |
+|-----------|---------------------|-----------|--------------------|-------------|
+| Person    | participates in     | Project   | has member         | N : N       |
+| Person    | performs            | Activity  | performed by       | N : N       |
+| Person    | authors             | Document  | authored by        | N : N       |
+| Project   | organizes           | Task      | belongs to         | 1 : N       |
+| Project   | organizes           | Document  | supports project   | N : N       |
+| Project   | references          | Knowledge | referenced by      | N : N       |
+| Task      | becomes             | Activity  | realizes           | 1 : N       |
+| Task      | produces            | Knowledge | produced by        | N : N       |
+| Task      | informed by         | Knowledge | informs            | N : N       |
+| Activity  | produces            | Knowledge | produced by        | N : N       |
+| Activity  | produces            | Document  | produced by        | N : N       |
+| Activity  | consumes            | Resource  | consumed by        | N : N       |
+| Document  | supports            | Knowledge | supported by       | N : N       |
+| Knowledge | relates to          | Knowledge | relates to         | N : N       |
 
-To calibrate the intended precision, here is the target format applied to one entity — illustrative, to be finalized in the Core Entities and Lifecycle blocks.
+The **Research Spine** adds specialized edges over this graph:
+
+| From       | Relationship  | To         | Cardinality |
+|------------|---------------|------------|-------------|
+| Experiment | tests         | Hypothesis | N : 1       |
+| Experiment | produces      | Evidence   | 1 : N       |
+| Evidence   | resolves      | Hypothesis | N : 1       |
+
+`Knowledge relates to Knowledge` is the edge set that forms the knowledge graph. Each such edge is a `KnowledgeRelation` value object carrying its own type (e.g. *supports*, *contradicts*, *refines*, *depends on*).
+
+---
+
+# Block 3 · Entity Lifecycles
+
+An entity with a lifecycle carries a `state`. Transitions are constrained: only the moves shown are legal. Every transition records its cause (Block 6).
+
+## Knowledge
 
 ```
-Knowledge
-  attributes
-    id           identifier
-    title        text
-    summary      text
-    confidence   degree
-    state        enum  (see lifecycle)
-    provenance   origin reference
-    created_at   timestamp
-    updated_at   timestamp
-  lifecycle
-    Draft ──▶ Candidate ──▶ Validated ──▶ Deprecated ──▶ Archived
-  invariants
-    a Validated Knowledge must retain its provenance
-    Knowledge is never deleted; it is Deprecated or Archived
+Draft ──▶ Candidate ──▶ Validated ──▶ Deprecated ──▶ Archived
+              │              ▲
+          (rejected)   (revalidated on new evidence)
+              ▼
+          Discarded
 ```
 
-The types shown (`text`, `degree`, `enum`, `timestamp`) are logical, not physical. How a `degree` or a `timestamp` is stored is a decision for the Software Architecture.
+Validation is the researcher's act (AI Architecture → The Improvement Loop). New evidence may move Validated back to Deprecated; nothing is deleted.
+
+## Hypothesis · specialized Knowledge lifecycle
+
+```
+captured ──▶ developing ──▶ experimenting ──▶ evidenced
+                                           ──▶ falsified
+                                           ──▶ unresolved
+```
+
+Canonical, as exercised by the Use Cases (UC-R01 … UC-R04). It replaces the generic Knowledge lifecycle for Hypotheses.
+
+## Task
+
+```
+Proposed ──▶ Todo ──▶ In Progress ──▶ Done
+                          ▲   │
+                          └ Blocked
+   (any active state) ──▶ Cancelled
+```
+
+## Project
+
+```
+Proposed ──▶ Active ──▶ Completed ──▶ Archived
+               ▲  │
+               └ On Hold
+   (Active | On Hold) ──▶ Cancelled
+```
+
+## Document
+
+```
+Registered ──▶ Processed ──▶ Available ──▶ Superseded ──▶ Archived
+```
+
+A new version moves the prior one to Superseded; superseded versions are retained (Block 6).
+
+## Activity
+
+```
+Active ⇄ Suspended ──▶ Completed
+```
+
+An Activity may be suspended and resumed (UC-C05). Many Activities are recorded directly as Completed. A Completed Activity is immutable (Block 6).
+
+## Experiment · specialized Activity lifecycle
+
+```
+Planned ──▶ Running ──▶ Analysed
+                    ──▶ Aborted
+```
+
+## Resource
+
+```
+Available ⇄ In Use ──▶ Depleted
+                   ──▶ Expired
+```
+
+---
+
+# Block 4 · Cardinalities
+
+The cardinality of each relationship, read as *"one From relates to how many To, and one To to how many From."*
+
+| Relationship                         | From → To | To → From |
+|--------------------------------------|-----------|-----------|
+| Person — participates in — Project   | 0..N      | 0..N      |
+| Person — performs — Activity         | 0..N      | 1..N      |
+| Person — authors — Document          | 0..N      | 0..N      |
+| Project — organizes — Task           | 0..N      | 0..1      |
+| Project — organizes — Document       | 0..N      | 0..N      |
+| Project — references — Knowledge     | 0..N      | 0..N      |
+| Task — becomes — Activity            | 0..N      | 0..1      |
+| Task — produces — Knowledge          | 0..N      | 0..N      |
+| Activity — produces — Knowledge      | 0..N      | 0..N      |
+| Activity — consumes — Resource       | 0..N      | 0..N      |
+| Document — supports — Knowledge      | 0..N      | 0..N      |
+| Knowledge — relates to — Knowledge   | 0..N      | 0..N      |
+| Experiment — tests — Hypothesis      | 1..1      | 0..N      |
+| Evidence — resolves — Hypothesis     | 1..1      | 0..N      |
+| Experiment — produces — Evidence     | 0..N      | 1..1      |
+
+Two cardinalities carry design intent worth stating explicitly.
+
+- An Activity has **at least one** performer (`1..N`): work is always done by someone.
+- A Task belongs to **at most one** Project (`0..1`): tasks may be personal, administrative or cross-cutting, not only research (System Model → Tasks).
+
+---
+
+# Block 5 · Aggregates
+
+Applying Domain-Driven Design, each Core Entity is an **aggregate root**. Aggregates are kept deliberately small: a root contains its **value objects**, and refers to other roots **by identity** rather than containing them.
+
+| Aggregate root | Contains (value objects)                          | References (by identity)              |
+|----------------|---------------------------------------------------|---------------------------------------|
+| **Project**    | Objective, Deliverable, Milestone, FundingAllocation, Membership | Task, Document, Knowledge, Person |
+| **Knowledge**  | Provenance, Confidence, KnowledgeRelation         | Document, Activity, Project           |
+| **Document**   | Provenance, Version, Metadata                     | Person (authors), Project             |
+| **Person**     | Role, ContactInfo, Affiliation                    | Project, Activity, Document           |
+| **Task**       | Priority, Status, DueDate                         | Project, Knowledge, Activity          |
+| **Activity**   | ActivityType, TimeSpan, ResourceUse               | Person, Resource, Task, Knowledge     |
+| **Resource**   | Capacity, Cost, Availability                      | —                                     |
+
+This yields the model's most important structural consequence.
+
+Because aggregates are small and reference one another by identity, a change confined to one aggregate is **immediately consistent**, while consistency *across* aggregates is **eventual** — achieved through domain Events (Event Model), not through large transactions.
+
+```
+within an aggregate   →  immediate consistency
+across aggregates      →  eventual consistency, via Events
+```
+
+The logical model and the Event Model meet here: aggregate boundaries are exactly the boundaries across which the system coordinates by reacting to change rather than by locking state.
+
+---
+
+# Block 6 · Domain Constraints
+
+Invariants that must always hold. They are the rules a projection — schema, type or API — must enforce.
+
+## Global invariants
+
+- **Bidirectional navigability.** Every relationship is navigable in both directions. Provenance traces backward and impact traces forward over the same edges (Use Cases → Traceability, UC-T04).
+- **No silent overwrite.** No entity is destructively overwritten. Superseded state is retained with its provenance, so prior reasoning stays recoverable (Knowledge Model; UC-R04).
+- **Caused transitions.** Every lifecycle transition records its cause — the Activity or Evidence that drove it — making evolution reconstructible (UC-T05).
+- **Knowledge is shared, never owned.** Knowledge is reusable across Projects; no Project owns Knowledge exclusively (System Principle 6).
+- **Derived objects are not truth.** Every derived object is reconstructible from persistent entities and is never a source of truth (Block 7).
+
+## Per-entity invariants
+
+- **Knowledge** — `confidence` ∈ [0, 1]; a Validated Knowledge must retain provenance; Knowledge is never deleted, only Deprecated or Archived.
+- **Document** — provenance is immutable and preserved across every version; a superseded version is retained, never discarded.
+- **Task** — has exactly one `status`; a Done Task has a `completed_at`; references at most one Project.
+- **Activity** — has at least one performer; `occurred` never lies in the future; once Completed it is append-only (immutable history).
+- **Project** — has at least one objective; `period.end` ≥ `period.start`.
+- **Resource** — total quantity consumed across Activities never exceeds `capacity`.
+- **Hypothesis** — an evidenced or falsified Hypothesis references at least one Evidence; transitions follow the specialized order.
+- **Experiment** — tests exactly one Hypothesis; only a Running or Analysed Experiment may yield Evidence.
+- **Evidence** — references exactly one Hypothesis and exactly one Experiment; `polarity` is always set.
+
+---
+
+# Block 7 · Derived Objects
+
+Not everything the system produces is persistent. Much of what the Cognitive Architecture generates is **derived**: computed from the domain when needed, never stored as truth.
+
+| Derived object        | Derived from                                   | Nature                | Defined in        |
+|-----------------------|------------------------------------------------|-----------------------|-------------------|
+| **Context**           | task + intent, over Memory · Domain · Events · Policies | Transient       | Context Model     |
+| **Recall result**     | a query, over Memory                           | Transient             | Memory Model      |
+| **Traceability view** | the knowledge graph (provenance, impact, decision history, evolution) | Transient synthesis, read-only | Use Cases → Traceability |
+| **Artifact**          | reasoning, over the domain                     | Produced output       | AI Architecture   |
+
+A derived object has **no persistent structure to specify** in this model, because it is a function of the persistent entities, not an addition to them. This is why Block 1 specifies the seven entities exhaustively and stops there.
+
+The **persistent / derived** line, stated precisely:
+
+```
+   PERSISTENT (source of truth)          DERIVED (function of the domain)
+   ─────────────────────────────         ───────────────────────────────
+   Project · Knowledge · Document        Context · Recall result
+   Person · Task · Activity · Resource   Traceability view · Artifact
+```
+
+An **Artifact** is the boundary case. When a generated artifact must persist — a saved report, an accepted draft — it is stored as a `Document` with explicit provenance, and only enters Knowledge through the human-gated Improvement Loop (AI Architecture). It becomes persistent by *becoming a Document*, not by being a fourth kind of stored thing.
+
+---
+
+# Block 8 · Logical Views
+
+Focused projections of the one specification. Each view is a lens, not a new model.
+
+## Knowledge View
+
+How meaning connects to its sources and to itself.
+
+```
+        Document ──supports──▶ Knowledge ◀──relates to──▶ Knowledge
+                                   ▲
+                                produced by
+                                   │
+                                Activity
+```
+
+## Project View
+
+How a project organizes work into history and knowledge.
+
+```
+   Person ──participates in──▶ Project ──organizes──▶ Task
+                                  │                     │
+                              organizes              becomes
+                                  ▼                     ▼
+                              Document              Activity ──produces──▶ Knowledge
+```
+
+## Research View · the Spine
+
+How science advances from proposition to resolution.
+
+```
+   Hypothesis ──tested by──▶ Experiment ──produces──▶ Evidence
+       ▲                          │                       │
+       │                       consumes                   │
+       │                          ▼                        │
+       └──────────── resolves ── Resource ◀───────────────┘
+```
+
+```
+   captured → developing → experimenting → evidenced | falsified | unresolved
+```
+
+## AI View
+
+How the intelligence operates over the domain and returns to it.
+
+```
+   DOMAIN ──▶ Memory (recall) ──▶ Context (build) ──▶ AI Operating Layer
+     ▲                                                       │
+     │                                                    produces
+     │                                                       ▼
+     └──── Events ◀──── Knowledge candidate · Artifact · Task
+```
+
+Every view resolves back to the same seven entities. That they can all be drawn from one specification is the proof that the specification is coherent.
 
 ---
 
 # Scope and Boundaries
 
-**In scope.** The seven Core Entities and the formalized Derived Types (the Research Spine: Hypothesis, Experiment, Evidence), specified to logical precision.
+**In scope.** The seven Core Entities and the formalized Research Spine (Hypothesis, Experiment, Evidence), specified to logical precision.
 
-**Pending.** Four concepts surfaced by the cognitive architecture are candidates for the Domain Model but are not yet promoted: **Curate** (a capability), **Artifact**, **Decision** and **Event**. They are specified here only once promotion is decided — deliberately, through a recorded decision. Until then they are named as pending, never half-specified.
+**Pending promotion.** Four concepts surfaced by the architecture are candidates for the Domain Model but are not yet promoted, and so are not fully specified here:
 
-**Out of scope.** Everything physical: storage, indexing, database choice, language, service boundaries. Those belong to the Software Architecture, which will treat this model as its specification.
+- **Decision** — currently modelled as `Knowledge (Decision)`; produced in UC-R03 and UC-C04, consumed across Traceability (Use Cases).
+- **Artifact** — the generated product (AI Architecture); until promoted, a `Document` with provenance (Block 7).
+- **Event** — a recorded domain change (Event Model); its promotion to a persisted record would make the system's reactive history queryable.
+- **Curate** — a candidate *capability*, not an entity (System Capabilities pending).
+
+Each awaits a deliberate, recorded decision before being specified. Until then they are named, never half-specified.
+
+**Out of scope.** Everything physical: storage, indexing, database choice, language, service boundaries. Those belong to the Software Architecture, which treats this model as its specification.
 
 ---
 
@@ -197,17 +571,19 @@ To avoid duplication, this document does not redefine shared concepts.
 - What the entities *are* — Domain Model
 - What Knowledge *means* and how it evolves — Knowledge Model
 - The behaviour that operates on the entities — System Capabilities; AI Architecture
-- The cognitive products that derive from the entities — Memory Model; Context Model; Event Model
-- The state changes that behaviour produces — Use Cases → State Changes
+- The cognitive products derived from the entities — Memory Model; Context Model; Event Model
+- The state changes behaviour produces, and the Traceability the graph must support — Use Cases
 
 The Logical Domain Model owns one thing: the exact structure of the domain, from which every schema, diagram and type is derived.
 
 ---
 
-# How This Document Grows
+# Evolution Strategy
 
-This document is built from its overview outward.
+This specification refines as the entities are exercised, but along stable lines.
 
-The master view fixed here is the single mental model of the system's structure. Each subsequent block develops one part of it — attributes, cardinalities, states, invariants — without ever contradicting the whole.
+- Attributes and states may be added; the seven roots and their meanings should not change.
+- Candidate concepts enter only through promotion, recorded as a decision.
+- Every physical realization — relational, graph, document, type — is derived from this document and re-derived when it changes.
 
-This order is deliberate. A consistent overview, developed inward, keeps one representation of the system. It is the structural answer to the same requirement that shaped every document before it: coherence over convenience.
+The model is expected to grow in precision while remaining, in its shape, as stable as the Domain Model it specifies.

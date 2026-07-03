@@ -74,7 +74,8 @@ Doctorado_UCAM/
 ├── AI_ARCHITECTURE.md
 ├── MEMORY_MODEL.md
 ├── CONTEXT_MODEL.md
-└── EVENT_MODEL.md
+├── EVENT_MODEL.md
+└── LOGICAL_DOMAIN_MODEL.md
 ```
 
 La estructura modular por directorios (architecture/, platform/, ai/…) se introducirá cuando comience la fase de implementación.
@@ -109,9 +110,13 @@ Use Cases
 AI Architecture ─┬─ Memory Model
                  ├─ Context Model
                  └─ Event Model
+    ↓
+Logical Domain Model
 ```
 
-The last four documents form the **Cognitive Architecture**: the AI Operating Layer and the three models of the substrate it operates over — what the system remembers (Memory), what it assembles per task (Context) and what it reacts to (Events).
+Documents 11–14 form the **Cognitive Architecture**: the AI Operating Layer and the three models of the substrate it operates over — what the system remembers (Memory), what it assembles per task (Context) and what it reacts to (Events).
+
+The **Logical Domain Model** then opens the logical layer: the canonical, technology-neutral specification of the domain's structure, from which every schema, diagram and type is derived.
 
 1. [Vision](VISION.md)
 2. [Principles](SYSTEM_PRINCIPLES.md)
@@ -127,6 +132,7 @@ The last four documents form the **Cognitive Architecture**: the AI Operating La
 12. [Memory Model](MEMORY_MODEL.md)
 13. [Context Model](CONTEXT_MODEL.md)
 14. [Event Model](EVENT_MODEL.md)
+15. [Logical Domain Model](LOGICAL_DOMAIN_MODEL.md)
 
 ---
 

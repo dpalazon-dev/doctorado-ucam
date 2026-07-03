@@ -73,7 +73,8 @@ Doctorado_UCAM/
 ├── USE_CASES.md
 ├── AI_ARCHITECTURE.md
 ├── MEMORY_MODEL.md
-└── CONTEXT_MODEL.md
+├── CONTEXT_MODEL.md
+└── EVENT_MODEL.md
 ```
 
 La estructura modular por directorios (architecture/, platform/, ai/…) se introducirá cuando comience la fase de implementación.
@@ -107,7 +108,7 @@ Use Cases
     ↓
 AI Architecture ─┬─ Memory Model
                  ├─ Context Model
-                 └─ Event Model     (forthcoming)
+                 └─ Event Model
 ```
 
 The last four documents form the **Cognitive Architecture**: the AI Operating Layer and the three models of the substrate it operates over — what the system remembers (Memory), what it assembles per task (Context) and what it reacts to (Events).
@@ -125,6 +126,7 @@ The last four documents form the **Cognitive Architecture**: the AI Operating La
 11. [AI Architecture](AI_ARCHITECTURE.md)
 12. [Memory Model](MEMORY_MODEL.md)
 13. [Context Model](CONTEXT_MODEL.md)
+14. [Event Model](EVENT_MODEL.md)
 
 ---
 

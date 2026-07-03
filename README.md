@@ -75,7 +75,8 @@ Doctorado_UCAM/
 ├── MEMORY_MODEL.md
 ├── CONTEXT_MODEL.md
 ├── EVENT_MODEL.md
-└── LOGICAL_DOMAIN_MODEL.md
+├── LOGICAL_DOMAIN_MODEL.md
+└── ROADMAP.md
 ```
 
 La estructura modular por directorios (architecture/, platform/, ai/…) se introducirá cuando comience la fase de implementación.
@@ -155,33 +156,15 @@ Cada dominio evolucionará de forma independiente siguiendo una arquitectura mod
 
 # Hoja de ruta
 
-## Fase 2 · Plataforma
+El plan detallado y vigente vive en **[ROADMAP.md](ROADMAP.md)**. En resumen, dos fases:
 
-- [ ] Infraestructura
-- [ ] Almacenamiento documental
-- [ ] Base de datos
-- [ ] APIs
+## Fase A · Completar el dominio
 
-## Fase 3 · IA
+Desarrollar los verticales que faltan —vida diaria, docencia, gestión del doctorado, personal y organización— mediante *Derived Types* y casos de uso, sin introducir nuevas entidades raíz. Las siete entidades del dominio ya sostienen las seis capas de la vida del investigador.
 
-- [ ] Procesamiento documental
-- [ ] Búsqueda semántica
-- [ ] Embeddings
-- [ ] Agentes especializados
+## Fase B · Construir el sistema
 
-## Fase 4 · Automatización
-
-- [ ] Ingesta de documentos
-- [ ] OCR
-- [ ] Extracción de metadatos
-- [ ] Clasificación automática
-
-## Fase 5 · Investigación Asistida
-
-- [ ] Asistente de investigación
-- [ ] Comparación de artículos
-- [ ] Revisión bibliográfica
-- [ ] Generación de conocimiento
+Materializar la arquitectura: Software Architecture, servicios, Memory/Context Engine, Knowledge Graph, Event Bus, capa MCP e interfaces, validados con una rebanada vertical de extremo a extremo.
 
 ---
 

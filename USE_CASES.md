@@ -785,6 +785,687 @@ Maintain operational knowledge about collaborators.
 **Related Use Cases.** UC-PE02, UC-C04, UC-P03
 
 ---
+# Teaching
+
+Prepare, deliver and evaluate university teaching. Teaching reuses the same knowledge, documents and people as research rather than forming an isolated workflow: courses draw on the researcher's own knowledge, and student work feeds back as evaluated understanding.
+
+### UC-TE01 · Prepare a Course
+
+**Intention.** Set up a university course (*asignatura*) as an organized initiative — objectives, teaching guide, session plan and assessment scheme — reusing existing knowledge rather than starting from a blank syllabus.
+
+**Context.** A course recurs each academic year and must align its learning outcomes with a calendar, an official teaching guide (*guía docente*) and an assessment scheme under the institution's rules. Much of its content already exists as the researcher's own knowledge, documents and prior editions; the work is to organise it into a teachable structure.
+
+**Operational Flow.**
+1. Acquire the course's framing: degree, credits, competencies, calendar and institutional rules. → *Acquire (Register)*
+2. Retrieve existing knowledge, documents and prior editions relevant to the course's topics. → *Retrieve*
+3. Reason from learning outcomes to a coherent session plan and assessment scheme. → *Reason (Synthesize, Recommend)*
+4. Produce the teaching guide and the course structure. → *Produce (Write, Generate)*
+5. Register the course, lay out its sessions along the calendar and schedule preparation. → *Organize → Operate (Plan, Schedule)*
+
+**Expected Outcome.** A course exists as a Project with objectives, a planned sequence of sessions and an assessment scheme, linked to the knowledge and documents it draws on, ready to drive preparation and evaluation across the term.
+
+**State Changes.**
+- *Created* — Project (Course), initial state `planned`; Document (Teaching Guide); Activity (Teaching Session) entries `planned` along the calendar; Task(s) for session preparation and assessment.
+- *Updated* — none.
+- *Derived* — Knowledge (mapping from learning outcomes to sessions and assessments).
+- *Linked* — Course ↔ Knowledge, Documents and prior editions; Teaching Sessions and deliverables ↔ Course calendar.
+
+**Capabilities.** Acquire · Retrieve · Reason · Produce · Organize · Operate
+
+**Domain Entities.** Project (Course) · Document (Teaching Guide) · Activity (Teaching Session) · Knowledge · Task
+
+**Related Use Cases.** UC-TE02, UC-TE03, UC-P02
+
+---
+
+### UC-TE02 · Prepare a Lecture (optional, not mandatory)
+
+**Intention.** Turn a slot in the course plan into ready-to-deliver teaching material grounded in existing knowledge and literature.
+
+**Context.** Each session needs material pitched at the cohort and consistent with the course's objectives and what earlier sessions covered. The underlying knowledge usually already exists in the system; preparation is composition and pedagogical framing rather than origination. Delivery of the prepared material is later recorded as a Teaching Session.
+
+**Operational Flow.**
+1. Retrieve the course, the session's topic and related knowledge, documents and previous lectures. → *Retrieve*
+2. Understand what earlier sessions covered and the cohort's level. → *Understand*
+3. Reason about how to sequence, pitch and structure the material for teaching. → *Reason (Synthesize, Recommend)*
+4. Produce the lecture material with worked examples and citations to its sources. → *Produce (Write, Generate, Cite)*
+5. Register the lecture against its planned session and schedule its delivery. → *Organize → Operate (Schedule)*
+
+**Expected Outcome.** A lecture exists as teaching material, grounded in and traceable to the system's knowledge, linked to its session in the course plan and ready to deliver. Its delivery is recorded as a Teaching Session through UC-C04.
+
+**State Changes.**
+- *Created* — Document (Lecture).
+- *Updated* — Activity (Teaching Session): material linked, state remains `planned` until delivered; Project (Course): session-plan progress.
+- *Derived* — Document (lecture material) composed from existing knowledge.
+- *Linked* — Lecture ↔ Course, Knowledge, Bibliography and previous Lectures; Lecture ↔ its Teaching Session.
+
+**Capabilities.** Retrieve · Understand · Reason · Produce · Organize · Operate
+
+**Domain Entities.** Project (Course) · Document (Lecture) · Activity (Teaching Session) · Knowledge · Bibliography
+
+**Related Use Cases.** UC-TE01, UC-TE03, UC-W01, UC-C04
+
+---
+
+### UC-TE03 · Design an Assessment (Optional, not mandatory)
+
+**Intention.** Create an assessment instrument — an exam or a continuous-evaluation assignment — with a rubric aligned to the course's learning outcomes.
+
+**Context.** Assessment must measure the declared learning outcomes fairly and defensibly, and under continuous evaluation (*evaluación continua*) it recurs several times per term. A rubric makes the resulting grades reproducible and justifiable to students and to the institution.
+
+**Operational Flow.**
+1. Retrieve the course, its learning outcomes and the sessions the assessment must cover. → *Retrieve*
+2. Reason from outcomes to what to assess and at what cognitive level. → *Reason (Synthesize)*
+3. Produce the assessment instrument and a rubric mapping criteria to outcomes and marks. → *Produce (Write, Generate)*
+4. Register the assessment and rubric in the course's assessment scheme and schedule it. → *Organize → Operate (Schedule)*
+
+**Expected Outcome.** An exam or assignment exists with a rubric tied to the course's learning outcomes and placed in the assessment scheme, ready to set to students and to grade against.
+
+**State Changes.**
+- *Created* — Document (Exam) or Document (Assignment); Document (Rubric).
+- *Updated* — Project (Course): assessment scheme.
+- *Derived* — Knowledge (mapping from learning outcomes to assessment criteria).
+- *Linked* — Assessment ↔ Course and learning outcomes; Rubric ↔ Assessment, criteria and marks.
+
+**Capabilities.** Retrieve · Reason · Produce · Organize · Operate
+
+**Domain Entities.** Project (Course) · Document (Exam) · Document (Assignment) · Document (Rubric) · Knowledge
+
+**Related Use Cases.** UC-TE01, UC-TE04, UC-R01
+
+---
+
+### UC-TE04 · Grade Student Work (Never, i must do it my self)
+
+**Intention.** Evaluate student submissions against a rubric, producing consistent grades with actionable feedback.
+
+**Context.** Grading is high-volume, recurring and must be consistent across a cohort and defensible on appeal. Applying a rubric uniformly and giving each student useful feedback is exactly the work the system can assist while the teacher retains judgement and authorship of the final mark.
+
+**Operational Flow.**
+1. Acquire the student submissions for the assessment. → *Acquire (Import)*
+2. Retrieve the assessment, its rubric and the learning outcomes it measures. → *Retrieve*
+3. Process and interpret each submission against the rubric's criteria. → *Process → Understand (Interpret, Classify)*
+4. Reason to a proposed mark per criterion, with justification and feedback. → *Reason (Compare, Critique, Support Decision)*
+5. Produce grades and per-student feedback for the teacher's approval. → *Produce (Write)*
+6. Record the approved evaluations and update the course's grade record. → *Organize → Operate (Track)*
+
+**Expected Outcome.** Each submission carries a justified grade traceable to the rubric and useful feedback, consolidated into the course's grade record. The system proposes; the teacher approves the final mark.
+
+**State Changes.**
+- *Created* — Knowledge (Evaluation) per submission; Document (feedback) per student.
+- *Updated* — Document (Submission): lifecycle state `submitted → graded`; Project (Course): grade record.
+- *Derived* — Knowledge (grade justification linking each mark to rubric criteria and evidence in the submission).
+- *Linked* — Evaluation ↔ Submission, Rubric, Student and Course.
+
+**Capabilities.** Acquire · Process · Understand · Reason · Produce · Organize · Operate
+
+**Domain Entities.** Document (Submission) · Document (Rubric) · Knowledge (Evaluation) · Person (Student) · Project (Course)
+
+**Related Use Cases.** UC-TE03, UC-R02, UC-W02
+
+---
+
+### UC-TE05 · Supervise a Final Project (Maybe it could happen but as a co-director with my thesis supervisor)
+
+**Intention.** Direct a student's final degree or master's project (TFG/TFM) from proposal to defence, keeping its evolving state connected to the researcher's own knowledge and projects.
+
+**Context.** Supervising a TFG/TFM is where teaching meets research: the student runs a small piece of research the supervisor must scope, steer and assess over months, through recurring meetings and draft reviews, toward a defended deliverable. It reuses the whole research machinery — knowledge, literature, writing review — applied to someone else's work.
+
+**Operational Flow.**
+1. Register the final project, the student and the milestones toward defence. → *Acquire (Register) → Organize*
+2. Retrieve knowledge, literature and prior projects relevant to the topic to scope it. → *Retrieve*
+3. Reason to a feasible scope, objective and milestone plan. → *Reason (Recommend, Support Decision)*
+4. Across supervision meetings, review the student's drafts and evidence and steer the next step. → *Understand → Reason (Critique)*
+5. Track progress against milestones, recording decisions and feedback. → *Operate (Track, Review) → Organize*
+6. At defence, produce the final evaluation against the assessment criteria. → *Reason (Support Decision) → Produce*
+
+**Expected Outcome.** The final project exists as a supervised initiative with a scoped objective, milestones and a running record of meetings, drafts, feedback and decisions, connected to the knowledge it draws on and resolved by a final evaluation at defence.
+
+**State Changes.**
+- *Created* — Project (Final Project), initial state `proposed`; Person (Student), when new; Task(s) (milestones); Knowledge (Evaluation), at defence.
+- *Updated* — Project (Final Project): lifecycle state `proposed → in progress → submitted → defended`.
+- *Derived* — Knowledge (scoping and supervision decisions, feedback on drafts).
+- *Linked* — Final Project ↔ Student, Supervisor, Knowledge, Bibliography and related research Projects; supervision Meetings ↔ Final Project.
+
+**Capabilities.** Acquire · Retrieve · Reason · Understand · Operate · Organize · Produce
+
+**Domain Entities.** Project (Final Project) · Person (Student) · Activity (Meeting) · Knowledge (Evaluation) · Task · Bibliography
+
+**Related Use Cases.** UC-TE04, UC-W02, UC-C04, UC-PE02
+
+---
+
+# UC-TE06 · Track a Course
+
+**Intention.** Monitor the ongoing delivery of a course throughout the academic term, maintaining awareness of teaching progress, student engagement, assessment status and pending work so that the course remains aligned with its objectives and schedule.
+
+**Context.** Once a course begins, the work shifts from preparation to continuous operation. Sessions are delivered, assessments are scheduled and graded, attendance varies, incidents occur and preparation for future sessions continues. Rather than reviewing many independent documents and tasks, the researcher needs a single operational view of the course that highlights progress, deviations and recommended actions.
+
+**Operational Flow.**
+
+1. Retrieve the course, its calendar, planned sessions, assessments, tasks and recent teaching activities. → *Retrieve*
+
+2. Process the current operational state of the course, including completed sessions, pending preparation, assessment progress and upcoming deadlines. → *Process*
+
+3. Reason about deviations from the teaching plan, workload, assessment timing and potential risks. → *Reason (Analyse, Recommend, Detect)*
+
+4. Produce an operational summary highlighting completed work, upcoming commitments, pending actions and recommendations. → *Produce (Summarize)*
+
+5. Organize follow-up work by creating, updating or reprioritizing preparation tasks, assessment activities and course milestones where appropriate. → *Organize*
+
+6. Continue operating the course until its completion while maintaining a complete operational history. → *Operate (Track)*
+
+---
+
+### Expected Outcome
+
+The course has an always-current operational state that reflects teaching progress, assessment completion, upcoming activities and outstanding work. Deviations from the original plan are visible, and the researcher receives recommendations that support decision-making without replacing it.
+
+---
+
+### State Changes
+
+**Created**
+
+* Task(s) for upcoming preparation or follow-up actions.
+* Activity entries recording operational reviews (optional).
+
+**Updated**
+
+* Project (Course): progress indicators and operational state.
+* Task(s): priorities, due dates and completion.
+* Activity (Teaching Session): lifecycle as sessions are delivered.
+* Assessment schedule as evaluations progress.
+
+**Derived**
+
+* Course progress metrics.
+* Teaching workload summary.
+* Student engagement indicators.
+* Operational recommendations.
+* Upcoming risks and deadlines.
+
+**Linked**
+
+* Course ↔ Teaching Sessions.
+* Course ↔ Assessments.
+* Course ↔ Tasks.
+* Course ↔ Knowledge generated during delivery.
+
+
+
+### Capabilities
+
+Retrieve · Process · Reason · Produce · Organize · Operate
+
+
+
+### Domain Entities
+
+Project (Course) · Activity (Teaching Session) · Task · Knowledge · Document (Assessment)
+
+
+
+### Related Use Cases
+
+UC-TE01 · UC-TE02 · UC-TE03 · UC-TE04
+
+---
+
+### UC-TE07 · Review a Course
+
+**Intention.** Reflect on a completed course to consolidate teaching experience into reusable knowledge, identifying what worked, what did not and what should change for future editions.
+
+**Context.** Teaching does not end when the final grades are submitted. Every edition of a course produces valuable experience: successful explanations, ineffective assessments, recurring student misconceptions, pacing issues and organizational decisions. Capturing these lessons prevents repeating mistakes and allows each new edition to begin from accumulated teaching knowledge rather than from memory alone.
+
+**Operational Flow.**
+
+1. Retrieve the completed course together with its teaching sessions, assessments, student feedback, grade distributions, operational history and teaching materials. → *Retrieve*
+
+2. Process the course's execution, identifying deviations from the original plan, recurring issues, successful practices and measurable outcomes. → *Process (Analyze, Compare)*
+
+3. Understand the causes behind successes and shortcomings by relating operational events, teaching decisions and observed outcomes. → *Understand*
+
+4. Reason about improvements for future editions, recommending changes to the syllabus, session sequence, assessment strategy, workload or teaching materials. → *Reason (Evaluate, Synthesize, Recommend)*
+
+5. Produce a Course Review summarizing lessons learned, improvement actions and recommendations for the next academic year. → *Produce (Write, Summarize)*
+
+6. Register the review, linking the resulting knowledge to the course and making it available for future course preparation. → *Acquire (Register) · Organize*
+
+### Expected Outcome
+
+The completed course generates explicit teaching knowledge that becomes part of the system's long-term memory. Future editions can reuse accumulated experience instead of relying on personal recollection, enabling continuous improvement across academic years.
+
+---
+
+### State Changes
+
+**Created**
+
+* Document (Course Review).
+* Knowledge (Teaching Insight).
+* Task(s) for improvements to implement before the next edition (optional).
+
+**Updated**
+
+* Project (Course): lifecycle `completed → archived`.
+* Knowledge: new relationships to teaching materials, assessments and operational decisions.
+
+**Derived**
+
+* Teaching effectiveness analysis.
+* Assessment quality analysis.
+* Student performance trends.
+* Improvement recommendations.
+* Best practices and recurring issues.
+
+**Linked**
+
+* Course Review ↔ Course.
+* Teaching Insight ↔ Knowledge reused during the course.
+* Teaching Insight ↔ Teaching Sessions.
+* Teaching Insight ↔ Assessments.
+* Teaching Insight ↔ Teaching Materials.
+* Teaching Insight ↔ Future Course editions.
+
+### Capabilities
+
+Retrieve · Process · Understand · Reason · Produce · Acquire · Organize
+
+### Domain Entities
+
+Project (Course) · Knowledge (Teaching Insight) · Document (Course Review) · Activity (Teaching Session) · Task
+
+### Related Use Cases
+
+UC-TE01 · UC-TE02 · UC-TE03 · UC-TE04 · UC-TE06 · UC-R04
+
+---
+
+# Administration
+
+The institutional obligations that surround the doctorate without directly advancing it: annual progress reports, committee and supervisor approvals, mandatory training credits, bureaucratic procedures and the deadlines that govern them. This work produces no scientific knowledge, yet failing it can halt the thesis. Its friction is administrative overload — forms, portals, regulations and hard dates scattered across institutional platforms and email — the very friction the Operational Model names among the researcher's recurring costs. These use cases treat that overload as operational state to be tracked, reasoned over and discharged, so attention returns to research. They lean on the same spine as the rest of the catalogue — Documents, Tasks, Activities and Decisions — specialized here as institutional Reports, Procedures and Administrative Processes.
+
+### UC-AD01 · Prepare the Annual Doctoral Progress Report
+
+**Intention.** Assemble the year's research progress and doctoral activities into the formal report the institution requires for annual evaluation.
+
+**Context.** Spanish doctoral programmes require an annual evaluation: the candidate submits a record of activities and the progress of the research plan, which the Academic Committee assesses to authorise continuation. The information already exists across the system — activities, tasks, training, publications, decisions — but is scattered across a year and must be compiled into a prescribed institutional format against a hard deadline.
+
+**Operational Flow.**
+1. Retrieve the year's activities, completed tasks, training, publications and research-plan progress. → *Retrieve*
+2. Interpret the programme's reporting requirements and the report template. → *Understand (Interpret)*
+3. Reason over the period to synthesise advances, blockers and plan evolution against the committee's evaluation criteria. → *Reason (Synthesize, Compare)*
+4. Produce the report in the required institutional format. → *Produce (Write)*
+5. Register it as the deliverable of the annual evaluation process and move it toward submission. → *Organize → Operate (Track)*
+
+**Expected Outcome.** A formal progress report exists in the prescribed format, grounded in the year's real operational record, ready for the researcher to review and submit for committee evaluation.
+
+**State Changes.**
+- *Created* — Document (Progress Report), initial state `drafting`.
+- *Updated* — Project (Administrative Process · annual evaluation): state `open → in progress`.
+- *Derived* — Knowledge (synthesis of yearly advances, blockers and plan evolution).
+- *Linked* — Progress Report ↔ Administrative Process, Activities, Tasks, Documents (publications, training records) and Project (Doctoral Thesis).
+
+**Capabilities.** Retrieve · Understand · Reason · Produce · Organize · Operate
+
+**Domain Entities.** Document (Progress Report) · Activity · Task · Project (Administrative Process) · Knowledge
+
+**Related Use Cases.** UC-P03, UC-AD03, UC-AD04, UC-X03
+
+---
+
+### UC-AD02 · Manage an Institutional Procedure
+
+**Intention.** Carry a multi-step institutional procedure — thesis deposit, ethics approval, an extension or a change of supervisor — from requirement to completion without missing a form or a deadline.
+
+**Context.** Institutional procedures are defined by regulations and executed through forms, portals and approvals over weeks. The requirements are buried in normative documents; the steps, their order, their deadlines and their required documents must be extracted and then tracked to completion. A single missed step can invalidate the whole procedure.
+
+**Operational Flow.**
+1. Acquire the triggering requirement and retrieve the governing regulation and any prior comparable procedure. → *Acquire → Retrieve*
+2. Interpret the regulation to identify the required steps, forms, documents, approvals and deadlines. → *Understand (Interpret)*
+3. Reason the requirements into an ordered set of procedures with dependencies and due dates. → *Reason (Synthesize, Prioritize)*
+4. Register the procedure as an administrative process decomposed into scheduled steps. → *Organize → Operate (Plan, Schedule)*
+5. Track progress and approvals across the steps until the process is resolved. → *Operate (Track, Notify)*
+
+**Expected Outcome.** An administrative process exists, decomposed into ordered, scheduled procedures with their required documents identified, tracked from initiation to resolution.
+
+**State Changes.**
+- *Created* — Project (Administrative Process), initial state `open`; Task (Procedure) per step; Document (forms), as required.
+- *Updated* — Task (Procedure): lifecycle `pending → in progress → completed` as steps advance.
+- *Derived* — Knowledge (the extracted step, document and deadline structure of the procedure).
+- *Linked* — Administrative Process ↔ Regulation, Procedures, Documents and Project (Doctoral Thesis).
+
+**Capabilities.** Acquire · Retrieve · Understand · Reason · Organize · Operate
+
+**Domain Entities.** Project (Administrative Process) · Task (Procedure) · Document (Regulation) · Document · Knowledge
+
+**Related Use Cases.** UC-AD05, UC-AD04, UC-R01, UC-P01
+
+---
+
+### UC-AD03 · Track Mandatory Training Activities
+
+**Intention.** Keep an accurate, evaluation-ready record of the mandatory doctoral training completed against the credits the programme requires.
+
+**Context.** Doctoral programmes require transversal and specific training — courses, seminars, workshops — recorded in the doctoral activity document and counted toward mandatory credits. Completed training is easily forgotten and its certificates scattered. The record must stay current because both the annual evaluation and the final deposit draw on it.
+
+**Operational Flow.**
+1. Acquire each completed training activity and its certificate. → *Acquire (Register)*
+2. Process the certificate to extract its metadata: title, hours, date, type. → *Process (Extract Metadata)*
+3. Classify the activity against the programme's required training categories. → *Understand (Classify)*
+4. Reason the accumulated training against the requirement to surface what remains. → *Reason (Compare)*
+5. Relate the activity and its certificate to the doctoral activity record. → *Organize (Relate)*
+
+**Expected Outcome.** The doctoral training record is current and mapped to the programme's requirements, showing completed activities, their evidence and the training still outstanding.
+
+**State Changes.**
+- *Created* — Activity (Training), with linked Document (certificate).
+- *Updated* — Project (Doctoral Thesis): accumulated training record.
+- *Derived* — Knowledge (training completed vs required; outstanding credits).
+- *Linked* — Training Activity ↔ Document (certificate), Project (Doctoral Thesis) and Regulation (training requirements).
+
+**Capabilities.** Acquire · Process · Understand · Reason · Organize
+
+**Domain Entities.** Activity (Training) · Document · Project (Doctoral Thesis) · Document (Regulation) · Knowledge
+
+**Related Use Cases.** UC-AD01, UC-AD05, UC-P03
+
+---
+
+### UC-AD04 · Record a Committee Decision
+
+**Intention.** Capture an institutional verdict — an annual evaluation result, a supervisor or committee approval, an ethics authorisation — as a traceable decision that updates the affected process and thesis state.
+
+**Context.** Doctoral progress is punctuated by binding institutional decisions: the Academic Committee's annual verdict, approval of the research plan, authorisation to deposit, an ethics resolution. They arrive through committee sessions, emails or the institutional platform and change what the researcher may do next. Left uncaptured, the reason and consequences of a verdict are lost.
+
+**Operational Flow.**
+1. Acquire the verdict from its source: committee session, resolution or notification. → *Acquire*
+2. Understand its content, conditions and consequences. → *Understand (Interpret)*
+3. Reason over its conditions and consequences and produce a structured decision recording the verdict and its rationale. → *Reason (Support Decision) → Produce*
+4. Update the affected process and thesis state and derive any obligations the verdict imposes. → *Organize → Operate*
+
+**Expected Outcome.** The verdict persists as a decision linked to the process and people that produced it, the affected states are updated, and any obligations it imposes exist as new procedures.
+
+**State Changes.**
+- *Created* — Knowledge (Decision · the verdict and its rationale); Task (Procedure), for any obligation the verdict imposes.
+- *Updated* — Project (Administrative Process): state `under evaluation → resolved`; Project (Doctoral Thesis) or Document (Progress Report), as the verdict dictates (e.g. research plan `approved`, evaluation `favourable | unfavourable`).
+- *Derived* — Knowledge (conditions and consequences of the decision).
+- *Linked* — Decision ↔ Activity (Meeting · committee session), Person (Supervisor, Coordinator), Administrative Process and Project (Doctoral Thesis).
+
+**Capabilities.** Acquire · Understand · Reason · Produce · Organize · Operate
+
+**Domain Entities.** Knowledge (Decision) · Activity (Meeting) · Person · Project (Administrative Process) · Task (Procedure)
+
+**Related Use Cases.** UC-C04, UC-T02, UC-AD01, UC-AD02
+
+---
+
+### UC-AD05 · Track Institutional Deadlines
+
+**Intention.** Surface every mandatory institutional deadline in time to act on it, so no obligation is missed.
+
+**Context.** Enrollment windows, report submission dates, evaluation calls, fee payments and procedure deadlines are dispersed across regulations, institutional notifications and email, each with a hard, non-negotiable date. Missing one can suspend enrollment or delay the thesis. The researcher needs a single, prioritised view of what is due and when, maintained continuously.
+
+**Operational Flow.**
+1. Acquire deadline-bearing information from regulations, institutional notifications and email. → *Acquire → Process (Extract Metadata)*
+2. Interpret each source to identify the obligations and their dates. → *Understand*
+3. Reason over the obligations to prioritise them against their deadlines and dependencies. → *Reason (Prioritize)*
+4. Register each obligation as a dated procedure and schedule timely reminders. → *Operate (Schedule, Notify, Track)*
+
+**Expected Outcome.** A current, prioritised view of institutional obligations exists, each carrying its deadline and reminders, so nothing mandatory is missed.
+
+**State Changes.**
+- *Created* — Task (Procedure), one per identified obligation, with its deadline.
+- *Updated* — Task (Procedure): scheduling and reminders; existing obligations reprioritised.
+- *Derived* — Knowledge (prioritised obligation calendar).
+- *Linked* — Procedures ↔ Regulation, Administrative Process and the Documents or emails that announced them.
+
+**Capabilities.** Acquire · Process · Understand · Reason · Operate
+
+**Domain Entities.** Task (Procedure) · Document (Regulation) · Document · Knowledge
+
+**Related Use Cases.** UC-C01, UC-AD02, UC-P01, UC-P02
+
+---
+
+# Organization
+
+The shared infrastructure research runs on — compute and GPUs, datasets, software licenses, cloud and API credits, and the budgets and grants that pay for them. Where the research use cases *consume* Resources, these use cases *manage* them, exercising the Resource entity's capacity, cost and availability and the invariant that consumption never exceeds capacity. This is the operational counterpart to scientific work: the layer that provisions experiments, tracks spend and arbitrates finite capacity across competing projects.
+
+### UC-OR01 · Register a Research Resource
+
+**Intention.** Bring a resource — compute, a dataset, a license, cloud credits or a budget line — under management as a single authoritative record with its capacity, cost and availability.
+
+**Context.** Research infrastructure is acquired piecemeal and tracked in scattered places: a cluster here, a credit balance there, a licence buried in an email. Contention and overspend begin with not having one authoritative record of what exists, what it costs and how much of it remains.
+
+**Operational Flow.**
+1. Acquire the resource's identifying attributes and terms — capacity, cost, provider, access. → *Acquire (Register)*
+2. Retrieve any existing representation to avoid duplicating a resource already tracked. → *Retrieve*
+3. Classify it by kind — Compute, GPU, Dataset, License or Budget. → *Understand (Classify)*
+4. Persist it as an available resource under management. → *Organize*
+
+**Expected Outcome.** A single authoritative Resource exists in an `Available` state, carrying its capacity, cost, provider and availability, ready to be provisioned, consumed and accounted for.
+
+**State Changes.**
+- *Created* — Resource (Compute / GPU / Dataset / License / Budget), initial availability `Available`.
+- *Updated* — Resource, when already tracked: capacity, cost or terms reconciled.
+- *Derived* — none.
+- *Linked* — none at registration; consumption links form as Activities draw on the Resource (UC-OR02) and funding links as Projects allocate against it (UC-OR04).
+
+**Capabilities.** Acquire · Retrieve · Understand · Organize
+
+**Domain Entities.** Resource (Compute) · Resource (Dataset) · Resource (License) · Resource (Budget)
+
+**Related Use Cases.** UC-OR02, UC-OR03, UC-PE01
+
+---
+
+### UC-OR02 · Provision Infrastructure for an Experiment
+
+**Intention.** Reserve and ready the compute, datasets and licenses an experiment requires so it can run, without exceeding capacity.
+
+**Context.** UC-R01 identifies an experiment's resource requirements but does not secure them. Before an experiment runs, its GPUs, datasets and license seats must be reserved against finite capacity and made ready; left unmanaged, experiments collide over the same scarce resources.
+
+**Operational Flow.**
+1. Retrieve the experiment's identified resource requirements and the resources able to meet them. → *Retrieve*
+2. Reason about availability against current commitments and remaining capacity, flagging contention. → *Reason (Support Decision)*
+3. Reserve the required capacity and schedule the experiment's window. → *Operate (Schedule)*
+4. Ready the environment, dataset access and licence seats for use. → *Operate*
+5. Record the reserved consumption and bring the Resources into use. → *Organize*
+
+**Expected Outcome.** The experiment holds the compute, data and licenses it needs, reserved within capacity and ready to run; consumption is recorded and contention surfaced before run time rather than at it.
+
+**State Changes.**
+- *Created* — none.
+- *Updated* — Resource: availability `Available → In Use` for the reserved capacity; Activity (Experiment): its required Resources reserved and recorded as consumed, readiness established without advancing the experiment's state.
+- *Derived* — Knowledge (allocation decision; contention flagged when demand exceeds capacity).
+- *Linked* — Experiment ↔ the Resources it will consume and the Project it serves.
+
+**Capabilities.** Retrieve · Reason · Operate · Organize
+
+**Domain Entities.** Resource (GPU) · Resource (Compute) · Resource (Dataset) · Activity (Experiment) · Project
+
+**Related Use Cases.** UC-R01, UC-OR01, UC-OR05
+
+---
+
+### UC-OR03 · Track Resource Consumption and Cost
+
+**Intention.** Keep a live account of how much of each resource — compute hours, credits, seats, budget — has been consumed against its capacity and cost, and surface exhaustion or overspend before it halts work.
+
+**Context.** Compute hours, API credits and grant money deplete continuously as activities run. Left untracked, a researcher discovers a drained credit balance, an exhausted quota or a blown budget only when work stops.
+
+**Operational Flow.**
+1. Retrieve each Resource, its capacity and cost, and the consumption recorded against it across activities. → *Retrieve*
+2. Normalise consumption into comparable totals per Resource, project and period. → *Process (Normalize)*
+3. Compare cumulative consumption and spend against capacity and budget. → *Reason (Compare)*
+4. Produce a usage-and-spend overview, flagging near-exhaustion and cost overruns. → *Produce*
+5. Notify the researcher and mark any exhausted or lapsed Resource. → *Operate (Notify, Track)*
+
+**Expected Outcome.** A current account of consumption and spend per resource and project exists, with near-exhaustion and overruns flagged and exhausted resources marked, so capacity is topped up or reallocated before it blocks work.
+
+**State Changes.**
+- *Created* — none.
+- *Updated* — Resource: availability `In Use → Depleted` when capacity is exhausted, or `→ Expired` when a licence or credit term lapses.
+- *Derived* — Knowledge (usage-and-spend overview; near-exhaustion and overrun alerts).
+- *Linked* — the overview ↔ the Resources and Projects it concerns.
+
+**Capabilities.** Retrieve · Process · Reason · Produce · Operate
+
+**Domain Entities.** Resource · Resource (License) · Project · Activity
+
+**Related Use Cases.** UC-OR02, UC-OR04, UC-P03
+
+---
+
+### UC-OR04 · Manage Budget and Grant Spending
+
+**Intention.** Allocate a grant or budget across projects and their resource needs, and keep committed and actual spend reconciled against the funds available.
+
+**Context.** A doctorate draws on grants and budgets that pay for compute, data, licences and travel. Each funding source is a finite pool; keeping every project's commitments and actual spend within it — and traceable to what the money bought — is what separates a funded programme from an overrun one. The pool is a Resource; a project's claim on it is a `FundingAllocation`, and this is where the two meet.
+
+**Operational Flow.**
+1. Retrieve the funding pool, its amount, and the projects and resources drawing on it. → *Retrieve*
+2. Reason how to distribute funds across projects and their resource needs within the pool. → *Reason (Prioritize, Support Decision)*
+3. Record each project's share as a funding allocation drawn against the pool. → *Organize*
+4. Reconcile committed and actual spend against the pool as Resources are consumed. → *Reason (Compare) → Operate (Track)*
+5. Produce the budget position and flag any project at risk of overrun. → *Produce*
+
+**Expected Outcome.** Each project carries a funding allocation drawn from the shared pool, committed and actual spend are reconciled against it, and overrun risk is visible early enough to act on.
+
+**State Changes.**
+- *Created* — none.
+- *Updated* — Project: `funding` gains a FundingAllocation earmarking the pool; Resource (Budget): capacity drawn down as spend is committed, availability `→ Depleted` when the pool is exhausted.
+- *Derived* — Knowledge (budget position; per-project overrun risk).
+- *Linked* — FundingAllocation ↔ Resource (Budget) and Project.
+
+**Capabilities.** Retrieve · Reason · Organize · Operate · Produce
+
+**Domain Entities.** Resource (Budget) · Project · Activity
+
+**Related Use Cases.** UC-OR01, UC-OR03, UC-P03
+
+---
+
+### UC-OR05 · Arbitrate Resource Contention across Projects
+
+**Intention.** When competing projects demand more of a scarce resource than it can supply, allocate its finite capacity in line with research priorities.
+
+**Context.** Shared infrastructure — a GPU cluster, a data licence with limited seats, a capped API — is finite. When several projects need it at once, first-come allocation starves high-priority work. Contention has to be arbitrated against programme priorities, not resolved by collision.
+
+**Operational Flow.**
+1. Retrieve the contended Resource, its capacity, and the competing demands from each project and experiment. → *Retrieve*
+2. Compare the demands against remaining capacity and the projects' priorities and deadlines. → *Reason (Compare, Prioritize)*
+3. Decide an allocation — shares, ordering or a schedule — within capacity. → *Reason (Support Decision)*
+4. Reserve capacity to the chosen work and queue or defer the rest. → *Operate (Schedule) → Organize*
+5. Notify the affected projects of what was granted and what was deferred. → *Operate (Notify)*
+
+**Expected Outcome.** The scarce resource's capacity is allocated across competing projects by priority and within its limit; granted work proceeds and deferred work is queued with a reason, so contention is resolved deliberately rather than by accident.
+
+**State Changes.**
+- *Created* — none.
+- *Updated* — Resource: availability `Available → In Use` for the granted share; Task(s): deferred demands `→ Blocked` pending capacity, or rescheduled.
+- *Derived* — Knowledge (allocation decision and rationale; the deferral queue).
+- *Linked* — the allocation decision ↔ the Resource and the competing Projects and Experiments.
+
+**Capabilities.** Retrieve · Reason · Operate · Organize
+
+**Domain Entities.** Resource (GPU) · Project · Activity (Experiment) · Task
+
+**Related Use Cases.** UC-OR02, UC-OR03, UC-X03
+
+---
+
+# Personal
+
+Everyday personal organisation, served by the same system rather than a separate one.
+
+Personal life is the lightest vertical by design. It introduces almost nothing new: a personal task is a Task, a reminder is a Task, an appointment is a Task with a time, a personal contact is a Person, a jotting is a Note (Document), and a personal goal is a Project. The same capabilities that capture a hypothesis, schedule research work and review progress serve errands, appointments and goals unchanged — no personal-specific machinery, no parallel calendar or to-do app. These three use cases exist only to prove the system spans the researcher's whole life; the personal layer is deliberately declared, not elaborated.
+
+### UC-PL01 · Capture a Personal Note or Reminder
+
+**Intention.** Record a personal note, reminder or errand the moment it arises, with near-zero friction, and let the system route it rather than triaging it by hand.
+
+**Context.** Personal items surface at any moment and are lost just as quickly — something to buy, a call to make, a fleeting idea. Capture must be effortless, but a raw jotting is only useful if what is actionable becomes work to do and what is reference stays findable. The same capture and organisation the system already provides for research serve personal life unchanged.
+
+**Operational Flow.**
+1. Acquire the note as free text with minimal friction. → *Acquire (Capture)*
+2. Classify it as actionable or reference. → *Understand (Classify)*
+3. When actionable, determine its due date and priority and relate it to any person, goal or project it touches. → *Reason (Prioritize, Discover Connections)*
+4. Persist the outcome — a Task when actionable, a Note otherwise — filed where it will be found. → *Organize (Relate)*
+
+**Expected Outcome.** The item is captured without breaking focus: an actionable item becomes a Task with a due date, a reference item is kept as a findable Note, each linked to whatever it concerns. Nothing is lost, and nothing required a personal-specific mechanism.
+
+**State Changes.**
+- *Created* — Task, when the item is actionable; Document (Note), when it is reference.
+- *Updated* — none.
+- *Derived* — the actionable-versus-reference classification.
+- *Linked* — Note or Task ↔ related Person, Project (Personal Goal) or Task.
+
+**Capabilities.** Acquire · Understand · Reason · Organize
+
+**Domain Entities.** Document (Note) · Task · Person · Project (Personal Goal)
+
+**Related Use Cases.** UC-K01, UC-C01, UC-PL02, UC-P01
+
+---
+
+### UC-PL02 · Schedule a Personal Appointment
+
+**Intention.** Register a time-bound personal commitment — an appointment, a health visit, a trip — and reconcile it against existing commitments without a separate calendar.
+
+**Context.** Personal life is full of scheduled commitments that compete with research time: a medical appointment, travel, a family event. A commitment made but not reconciled with everything else causes conflicts. A personal appointment is not a new kind of thing — it is a Task with a time, exactly like "meet the supervisor" — so the scheduling and planning the system already performs apply directly.
+
+**Operational Flow.**
+1. Acquire the commitment with its time, place and participants. → *Acquire*
+2. Retrieve existing tasks, appointments and deadlines in the affected window. → *Retrieve*
+3. Detect conflicts and reason about the commitment's priority against current obligations. → *Reason (Prioritize, Compare)*
+4. Register the appointment as a scheduled Task and set its reminder. → *Operate (Schedule, Notify)*
+
+**Expected Outcome.** A scheduled Task exists for the commitment, reconciled against existing obligations with any conflict surfaced and a reminder set — using the same Task and scheduling machinery as research work.
+
+**State Changes.**
+- *Created* — Task, carrying a scheduled time and a reminder.
+- *Updated* — none.
+- *Derived* — any scheduling conflicts detected against existing commitments.
+- *Linked* — Task ↔ the People involved and any Project it serves.
+
+**Capabilities.** Acquire · Retrieve · Reason · Operate
+
+**Domain Entities.** Task · Person · Project
+
+**Related Use Cases.** UC-P01, UC-P02, UC-C03, UC-PL01
+
+---
+
+### UC-PL03 · Track a Personal Goal
+
+**Intention.** Define a personal goal and review its progress over time through the tasks and activities that advance it.
+
+**Context.** Beyond research, the researcher pursues personal goals — a fitness target, learning a language, a reading habit. A goal is not a task; it is a small initiative with an objective, its own tasks and a sense of progress. That is precisely a Project, so a Personal Goal reuses the Project structure and the same progress review used for research — only lighter, with no milestones or deliverables required.
+
+**Operational Flow.**
+1. Retrieve the Personal Goal, its tasks and the activities logged against it. → *Retrieve*
+2. Reason about progress: what advanced, what stalled, and whether the goal is on track. → *Reason (Synthesize, Compare)*
+3. Produce a short progress readout. → *Produce*
+4. Adjust or schedule the next tasks and record the review. → *Operate (Track, Review, Schedule)*
+
+**Expected Outcome.** The Personal Goal carries an up-to-date sense of progress, its next tasks are set, and a light review record exists — reusing the research progress-review behaviour without its heavier apparatus.
+
+**State Changes.**
+- *Created* — Project (Personal Goal), when first defined; Task(s) for the next steps.
+- *Updated* — Project (Personal Goal): progress and lifecycle state (e.g. `active → achieved`); Task(s): scheduling.
+- *Derived* — Knowledge (progress synthesis for the goal).
+- *Linked* — Personal Goal ↔ its Tasks and Activities.
+
+**Capabilities.** Retrieve · Reason · Produce · Operate
+
+**Domain Entities.** Project (Personal Goal) · Task · Activity · Knowledge
+
+**Related Use Cases.** UC-P03, UC-P02, UC-PL01, UC-PL02
+
+---
 
 # Context
 

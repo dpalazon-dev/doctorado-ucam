@@ -901,6 +901,185 @@ Preserve continuity across research sessions.
 
 ---
 
+# Traceability
+
+Guided reconstruction of the provenance and history of scientific work.
+
+These use cases are what separate a Research Operating System from a document store: they do not merely retrieve items, they reconstruct how a scientific decision was reached. All of them are read-only.
+
+They span six axes: provenance (backward), decisions, recall, impact (forward), evolution (temporal) and consistency. Forward tracing (UC-T04) additionally assumes that relationships in the knowledge graph are navigable in both directions — an implication the Domain Model must honour.
+
+### UC-T01 · Reconstruct Provenance
+
+**Intention.** Understand why a given hypothesis, conclusion or piece of knowledge exists — the chain of reasoning and evidence that produced it.
+
+**Context.** In a Research OS, conclusions are the product of documents, hypotheses, experiments and evidence accumulated over time. Answering "why does this exist" or "how did we arrive at this" requires reconstructing a derivation path, not merely retrieving an item.
+
+**Operational Flow.**
+1. Retrieve the target: a hypothesis, conclusion or knowledge unit. → *Retrieve*
+2. Traverse its `Derived` and `Linked` history backward through the knowledge graph: evidence → experiments → hypotheses → documents. → *Retrieve → Reason*
+3. Reason to reconstruct the causal derivation chain and its decision points. → *Reason (Synthesize)*
+4. Produce a provenance view showing how the target was reached. → *Produce*
+
+**Expected Outcome.** A traceable derivation path exists, showing every entity and step that led to the target, with evidence links intact.
+
+**State Changes.**
+- *Created* — none.
+- *Updated* — none.
+- *Derived* — Knowledge (provenance view of the derivation chain).
+- *Linked* — none.
+- *Read-only: reconstruction reads existing relationships and mutates no persistent state.*
+
+**Capabilities.** Retrieve · Reason · Produce
+
+**Domain Entities.** Knowledge · Knowledge (Hypothesis) · Knowledge (Evidence) · Activity (Experiment) · Document
+
+**Related Use Cases.** UC-R03, UC-K05, UC-X03
+
+---
+
+### UC-T02 · Retrieve Decision History
+
+**Intention.** Find every decision related to a topic, entity or question, together with its rationale and context.
+
+**Context.** Research accumulates decisions — validating a hypothesis, discarding a paper, choosing a method — scattered across time and activities. The researcher needs to recover all decisions bearing on a subject, with their reasoning, rather than searching by memory.
+
+**Operational Flow.**
+1. Interpret the scope: a topic, entity or question. → *Understand*
+2. Retrieve every decision linked to that scope across projects, activities and knowledge. → *Retrieve*
+3. Reason to order and relate them: what was decided, when, why, and what superseded what. → *Reason*
+4. Produce a consolidated decision history. → *Produce*
+
+**Expected Outcome.** An ordered decision history for the scope exists, each entry carrying its rationale and links to the evidence or context that justified it.
+
+**State Changes.**
+- *Created* — none.
+- *Updated* — none.
+- *Derived* — Knowledge (decision history for the scope).
+- *Linked* — none.
+- *Read-only: the history is a transient synthesis over existing decisions.*
+
+**Capabilities.** Understand · Retrieve · Reason · Produce
+
+**Domain Entities.** Knowledge (Decision) · Activity · Project · Document
+
+**Related Use Cases.** UC-T01, UC-P03, UC-C04
+
+---
+
+### UC-T03 · Recognise Prior Work
+
+**Intention.** Surface past work relevant to the current situation — "I know I've solved this before" — so the researcher reuses rather than redoes.
+
+**Context.** Over years, researchers re-encounter problems they have already addressed. Without recall, effort is duplicated. The system should recognise similarity between the current context and prior activity, knowledge or decisions, and surface it proactively.
+
+**Operational Flow.**
+1. Retrieve and represent the current context: the problem, hypothesis or task at hand. → *Retrieve*
+2. Reason to find semantically similar prior knowledge, activities or decisions. → *Reason (Compare, Discover Connections)*
+3. Produce the matches, each with why it is relevant and where it came from. → *Produce*
+
+**Expected Outcome.** Relevant prior work is surfaced with its context, enabling reuse and preventing duplicated effort.
+
+**State Changes.**
+- *Created* — none.
+- *Updated* — none.
+- *Derived* — Knowledge (relevant prior-work matches with provenance).
+- *Linked* — none.
+- *Read-only: recognition reads existing state and mutates nothing.*
+
+**Capabilities.** Retrieve · Reason · Produce
+
+**Domain Entities.** Knowledge · Activity · Knowledge (Hypothesis) · Document
+
+**Related Use Cases.** UC-K04, UC-K05, UC-X01
+
+---
+
+### UC-T04 · Trace Impact
+
+**Intention.** Given an entity, find everything downstream that depends on it, so the researcher knows what is affected if it changes, is retracted or is falsified.
+
+**Context.** Provenance (UC-T01) answers why something exists by looking backward; impact is its inverse. When a piece of evidence is retracted, a paper turns out to be flawed, or a hypothesis is falsified, the researcher must know which conclusions, drafts and experiments rest on it. This forward propagation is a safety behaviour a document store cannot provide.
+
+**Operational Flow.**
+1. Retrieve the target entity and its outgoing relationships. → *Retrieve*
+2. Traverse the knowledge graph forward through `Linked` / `Derived` edges to every dependent entity: knowledge, conclusions, drafts, experiments. → *Retrieve → Reason*
+3. Reason about the nature and severity of each dependency. → *Reason*
+4. Produce an impact map of what would be affected. → *Produce*
+
+**Expected Outcome.** A forward impact map exists, listing every entity that depends on the target and how, so a change or retraction can be assessed and propagated deliberately rather than discovered by accident.
+
+**State Changes.**
+- *Created* — none.
+- *Updated* — none.
+- *Derived* — Knowledge (impact map of downstream dependencies).
+- *Linked* — none.
+- *Read-only: impact analysis reads existing relationships and mutates no persistent state.*
+
+**Capabilities.** Retrieve · Reason · Produce
+
+**Domain Entities.** Knowledge · Knowledge (Evidence) · Knowledge (Hypothesis) · Document · Activity (Experiment)
+
+**Related Use Cases.** UC-T01, UC-R03, UC-W02
+
+---
+
+### UC-T05 · Trace Evolution
+
+**Intention.** Reconstruct how a hypothesis, concept or understanding has changed over time — its successive formulations, state transitions and the events that drove them.
+
+**Context.** Provenance and decision history are structural: they span entities at a point in time. Evolution is temporal, following a single entity across time. Returning to a hypothesis after months, the researcher needs to see not only its current state but how it got there. This exercises the Memory capability and the lifecycle states made explicit in the Domain Model.
+
+**Operational Flow.**
+1. Retrieve the target entity and its historical states and versions. → *Retrieve*
+2. Reason to order the changes chronologically and attach the events that caused them. → *Reason (Synthesize)*
+3. Produce a timeline of the entity's evolution. → *Produce*
+
+**Expected Outcome.** A chronological account exists of how the entity was formulated, revised and transitioned between states, with each change linked to the activity or evidence that caused it.
+
+**State Changes.**
+- *Created* — none.
+- *Updated* — none.
+- *Derived* — Knowledge (evolution timeline of the entity).
+- *Linked* — none.
+- *Read-only: the timeline is a transient reconstruction over historical state.*
+
+**Capabilities.** Retrieve · Reason · Produce
+
+**Domain Entities.** Knowledge (Hypothesis) · Knowledge (Concept) · Activity
+
+**Related Use Cases.** UC-R03, UC-K02, UC-X03
+
+---
+
+### UC-T06 · Detect Contradictions
+
+**Intention.** Given a hypothesis, claim or body of knowledge, surface where the evidence or sources contradict it or each other.
+
+**Context.** Retrieval and derivation assume coherence, but a growing knowledge base inevitably accumulates tensions: evidence that conflicts, sources that disagree, conclusions that no longer hold. Surfacing these is cross-sectional consistency checking, and it is one of the behaviours that most distinguishes a Research Operating System from a document store. It feeds hypothesis validation and scientific writing.
+
+**Operational Flow.**
+1. Retrieve the target and the related body of evidence and knowledge. → *Retrieve*
+2. Reason across it to detect conflicts, disagreements and unresolved tensions. → *Reason (Compare, Critique)*
+3. Produce a report of the contradictions with their conflicting sources. → *Produce*
+
+**Expected Outcome.** A set of detected contradictions exists, each linking the conflicting evidence or sources, enabling the researcher to resolve tensions deliberately rather than overlook them.
+
+**State Changes.**
+- *Created* — none.
+- *Updated* — none.
+- *Derived* — Knowledge (report of contradictions and their conflicting sources).
+- *Linked* — none.
+- *Read-only: detection reads existing evidence and mutates no persistent state.*
+
+**Capabilities.** Retrieve · Reason · Produce
+
+**Domain Entities.** Knowledge · Knowledge (Evidence) · Knowledge (Hypothesis) · Document
+
+**Related Use Cases.** UC-R03, UC-W02, UC-K05
+
+---
+
 # Evolution
 
 This catalogue intentionally represents only the canonical operational situations of the Research Operating System.
@@ -912,5 +1091,7 @@ Likewise, new concepts should appear in the Domain Model only after repeated obs
 Across this catalogue, **Hypothesis**, **Experiment** and **Evidence** recur as operative concepts; following the Domain Consistency principle, they have been promoted into the Domain Model as Derived Types.
 
 **Interaction** (currently modelled as a specialization of Activity) is under observation: its centrality in UC-C03 and UC-C04, connecting People, Projects, Knowledge and Tasks, may justify promoting it to a first-class concept in the future. It is not promoted yet.
+
+**Decision** is a further concept under observation: it is produced in UC-R03 and UC-C04 and consumed by the Traceability use cases, so its recurrence may soon justify formalization. It is not promoted yet.
 
 This keeps the architecture grounded in real research practice while allowing the platform to evolve incrementally.

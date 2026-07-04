@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines how Knowledge exists and behaves inside Doctorado_UCAM.
+This document defines how Knowledge exists and behaves inside ResearchOS.
 
 Knowledge is the primary intellectual asset of the platform.
 

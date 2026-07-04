@@ -1,4 +1,4 @@
-# Doctorado_UCAM
+# ResearchOS
 
 > Plataforma de investigación, gestión del conocimiento e inteligencia artificial para el desarrollo del doctorado.
 
@@ -8,7 +8,7 @@ Construyendo una plataforma de investigación donde el conocimiento, la automati
 
 ## Visión
 
-Doctorado_UCAM es una plataforma diseñada para centralizar todo el conocimiento generado durante el doctorado, facilitar la investigación científica y automatizar tareas mediante inteligencia artificial.
+ResearchOS es una plataforma diseñada para centralizar todo el conocimiento generado durante el doctorado, facilitar la investigación científica y automatizar tareas mediante inteligencia artificial.
 
 El objetivo no es únicamente almacenar información, sino construir un sistema capaz de organizar, relacionar y explotar el conocimiento científico a lo largo de todo el proceso investigador.
 
@@ -58,7 +58,7 @@ El sistema crecerá de forma incremental sin comprometer su mantenibilidad.
 Actualmente el repositorio contiene la documentación de arquitectura del proyecto en su fase de diseño. La estructura real es plana:
 
 ```
-Doctorado_UCAM/
+ResearchOS/
 
 ├── README.md
 ├── VISION.md

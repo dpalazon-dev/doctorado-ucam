@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines the **AI Operating Layer** of Doctorado_UCAM: the intelligence that operates the Research Operating System.
+This document defines the **AI Operating Layer** of ResearchOS: the intelligence that operates the Research Operating System.
 
 It does not describe models, prompts, frameworks or providers.
 
@@ -79,7 +79,7 @@ Every knowledge system eventually faces the same question: who keeps it organize
 
 The conventional answer is the user. The researcher files documents, tags notes, maintains links, resolves duplicates and curates the collection. The system stores; the human organizes. Over time the organizing becomes work, the work is skipped, and the collection decays into an archive nobody trusts.
 
-Doctorado_UCAM answers differently.
+ResearchOS answers differently.
 
 > The researcher captures. The system organizes.
 
@@ -87,7 +87,7 @@ The intelligent layer is not an assistant the researcher occasionally consults. 
 
 But the deeper architectural move is this.
 
-> Doctorado_UCAM separates the model of the world from the intelligence that operates over it.
+> ResearchOS separates the model of the world from the intelligence that operates over it.
 
 The world-model — the Domain Model and the Knowledge Model — is **authoritative and durable**. It is the truth.
 
@@ -97,7 +97,7 @@ Models will be replaced. Prompts will be rewritten. Agents will be redesigned. N
 
 This separation is the defining innovation of the platform. Everything in this document follows from it.
 
-Doctorado_UCAM is not a knowledge base a researcher maintains.
+ResearchOS is not a knowledge base a researcher maintains.
 
 It is a durable model of a research world, **operated continuously by a disposable intelligence**.
 
@@ -222,7 +222,7 @@ Everything it does is a composition of the capabilities defined in System Capabi
 
 # The AI Operating Layer
 
-The intelligence of Doctorado_UCAM is not a collection of independent tools bolted onto the platform.
+The intelligence of ResearchOS is not a collection of independent tools bolted onto the platform.
 
 It is a single architectural layer — the **AI Operating Layer** — positioned between the cognitive substrate (Memory, Context, Events) and the software implementation.
 

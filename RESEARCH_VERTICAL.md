@@ -32,9 +32,10 @@ An earlier draft of the domain named a separate **Doctorate** vertical, responsi
 - Paper
 - Chapter / Draft
 - Review
-- Dataset
 - Protocol
 - Bibliography
+
+Dataset is a Resource, not a Document — see [ORGANIZATION_VERTICAL.md](ORGANIZATION_VERTICAL.md); Research consumes it, Organization owns it.
 
 ## Activities
 - Experiment

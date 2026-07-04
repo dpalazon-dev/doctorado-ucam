@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines how Doctorado_UCAM remembers.
+This document defines how ResearchOS remembers.
 
 Memory is the system's capacity to retain state and recall it across time. It is what separates a system with continuity from a model that begins every interaction blank.
 
@@ -24,7 +24,7 @@ Consistent with Domain Model → Memory, the system has no "Memory" object. Memo
 
 Its importance is easy to underestimate.
 
-The intelligence of Doctorado_UCAM depends far less on the reasoning model it uses than on the memory it can bring to bear. A powerful model with no memory is a stranger every morning. A modest model with excellent memory accumulates understanding for years.
+The intelligence of ResearchOS depends far less on the reasoning model it uses than on the memory it can bring to bear. A powerful model with no memory is a stranger every morning. A modest model with excellent memory accumulates understanding for years.
 
 Memory is what makes the librarian a librarian rather than a search box.
 
@@ -138,7 +138,7 @@ The reasoning model's own trained knowledge. That knowledge lives in a model the
 
 Many agent systems introduce a separate "user" or "persona" memory for preferences.
 
-Doctorado_UCAM does not.
+ResearchOS does not.
 
 A researcher's preferences are Knowledge about a Person (Domain Model → Person). They are recalled semantically and applied procedurally. Introducing a separate preference store would duplicate what the domain already represents and would violate the single-source-of-truth principle.
 
@@ -199,7 +199,7 @@ Most of the system's memory is not a separate store. It is the domain, recalled.
 
 This table carries the model's most important consequence.
 
-Doctorado_UCAM needs no bolted-on "memory database" at the conceptual level. Its long-term memory is the Unified System State (see System Model → Unified System State), recalled. The domain is not merely data the system stores — it is the system's memory.
+ResearchOS needs no bolted-on "memory database" at the conceptual level. Its long-term memory is the Unified System State (see System Model → Unified System State), recalled. The domain is not merely data the system stores — it is the system's memory.
 
 This is why the world-model can be authoritative and the intelligence disposable: the memory that matters was never the intelligence's to begin with.
 

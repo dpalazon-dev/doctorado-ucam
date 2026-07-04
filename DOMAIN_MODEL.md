@@ -305,7 +305,7 @@ Examples include:
 - GPUs
 - External datasets
 - Licenses
-- Funding allocations
+- Budgets and grants
 
 ### Responsibilities
 
@@ -371,6 +371,8 @@ captured ──▶ … ──▶ experimenting ──▶ evidenced | falsified
 Intermediate states are defined by the researcher.
 
 This spine is why the three concepts were promoted from recurring use-case concepts into formal Derived Types: they satisfy the Domain Consistency principle by appearing across many use cases rather than in isolation.
+
+The Teaching vertical exhibits a structural echo of this spine: a Rubric, Exam or Assignment is set, a Student produces a Submission, and grading produces an **Evaluation** (Knowledge) that resolves the mark — the same shape as Hypothesis → Experiment → Evidence, with Evaluation playing Evidence's role. This parallel is noted, not promoted; see Use Cases → Evolution.
 
 ---
 

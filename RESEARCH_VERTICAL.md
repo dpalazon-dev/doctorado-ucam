@@ -35,7 +35,7 @@ An earlier draft of the domain named a separate **Doctorate** vertical, responsi
 - Protocol
 - Bibliography
 
-Research *consumes* datasets, but a Dataset is a Resource owned by [ORGANIZATION_VERTICAL.md](ORGANIZATION_VERTICAL.md), not a Document produced here.
+Dataset is a Resource, not a Document — see [ORGANIZATION_VERTICAL.md](ORGANIZATION_VERTICAL.md); Research consumes it, Organization owns it.
 
 ## Activities
 - Experiment

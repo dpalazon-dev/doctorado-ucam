@@ -33,6 +33,12 @@ It is distinct from [ADMINISTRATION_VERTICAL.md](ADMINISTRATION_VERTICAL.md): Or
 
 Each Resource carries capacity, cost and availability (`Available → In Use → Depleted / Expired`).
 
+## Value Objects reused here
+
+- **FundingAllocation** — not a Resource itself; a Project value object (Logical Domain Model → Block 0) earmarking an amount against a Resource (Budget) for a period. UC-OR04 is where the two meet: the pool is a Resource this vertical owns, the claim on it is a FundingAllocation the Project owns.
+
+A candidate concept is under observation here, not yet promoted — see Use Cases → Evolution. **Allocation**: UC-OR02 and UC-OR05 both reserve Resource capacity ahead of actual consumption, a forward commitment neither ResourceUse nor FundingAllocation captures today.
+
 ---
 
 # Use Cases

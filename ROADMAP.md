@@ -23,7 +23,7 @@ It does not add models. It sequences the work that carries a frozen conceptual f
 
 One gap remains: **execution**.
 
-Breadth is closed. Every operational level now has Derived Types and worked Use Cases — [USE_CASES.md](USE_CASES.md) carries 52 across twelve groups, and [DOMAIN_VERTICALS.md](DOMAIN_VERTICALS.md) accounts for every one of them. The [Interaction Model](INTERACTION_MODEL.md) is also complete.
+Breadth is closed. Every operational level now has Derived Types and worked Use Cases — [USE_CASES.md](USE_CASES.md) carries 52 across twelve groups. [DOMAIN_VERTICALS.md](DOMAIN_VERTICALS.md) itemizes 39 of them by ID across the six verticals (see the Phase A Deliverables table below); the remaining 13 — People, Context and Traceability — are catalogued there as cross-cutting infrastructure, not verticals, since they operate identically regardless of which vertical produced the entity they touch. The [Interaction Model](INTERACTION_MODEL.md) is also complete.
 
 What remains is the runtime architecture: although the cognitive architecture is complete, the system that executes it has not yet been designed.
 

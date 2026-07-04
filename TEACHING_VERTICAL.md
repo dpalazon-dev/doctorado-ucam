@@ -39,7 +39,7 @@ Two use cases in this vertical carry a deliberate authorship boundary, recorded 
 
 ## Knowledge
 - Teaching Insight
-- Evaluation
+- Evaluation *(not yet formalized in the Domain Model — plays the same structural role for assessment that Evidence plays for the Research Spine; under observation, see USE_CASES.md → Evolution)*
 
 ## People
 - Student

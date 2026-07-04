@@ -12,7 +12,7 @@
 
 # Purpose
 
-ResearcherOS is not a chatbot.
+ResearchOS is not a chatbot.
 
 Neither is it a traditional desktop application.
 
@@ -344,7 +344,7 @@ The operating system never assumes authority beyond its configured autonomy.
 
 Not every intelligent behaviour has the same authority.
 
-ResearcherOS defines progressive autonomy levels.
+ResearchOS defines progressive autonomy levels.
 
 | Level | Behaviour |
 |--------|-----------|

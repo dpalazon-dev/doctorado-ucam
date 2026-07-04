@@ -223,18 +223,15 @@ Research
 │
 ▼
 Publication
-│
-▼
-Administration
-│
-Progress Report
-│
-▼
-Teaching
-│
-Lecture
+├──────────────┐
+▼              ▼
+Teaching       Administration
+│              │
+Lecture        Progress Report
 
 ```
+
+A single Publication feeds two independent branches: its knowledge is reused to prepare a Lecture in Teaching, while Administration reports on the same work in the annual Progress Report — producing only a Document, changing no upstream state.
 
 The same knowledge evolves through multiple operational contexts.
 

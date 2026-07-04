@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines the fundamental capabilities of Doctorado_UCAM.
+This document defines the fundamental capabilities of ResearchOS.
 
 A capability represents a permanent ability of the Research Operating System.
 
@@ -22,7 +22,7 @@ The Domain Model defines **what exists**.
 
 The Capability Model defines **what the system can do**.
 
-Together they form the conceptual foundation of Doctorado_UCAM.
+Together they form the conceptual foundation of ResearchOS.
 
 Capabilities are intentionally stable.
 
@@ -251,4 +251,4 @@ The Capability Model defines the verbs.
 
 Use Cases combine those verbs to manipulate the domain entities.
 
-This separation ensures that Doctorado_UCAM remains conceptually simple while allowing increasingly sophisticated behavior to emerge over time.
+This separation ensures that ResearchOS remains conceptually simple while allowing increasingly sophisticated behavior to emerge over time.

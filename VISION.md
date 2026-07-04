@@ -16,7 +16,7 @@ ResearchOS exists to eliminate this fragmentation.
 
 ## Vision
 
-ResearchOS aims to become a unified Personal Operating System for knowledge work.
+ResearchOS aims to become a unified Research Operating System for knowledge work.
 
 Not a research tool.
 

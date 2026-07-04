@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines the conceptual model of Doctorado_UCAM.
+This document defines the conceptual model of ResearchOS.
 
 It does not describe implementation details, technologies or software components.
 
@@ -14,7 +14,7 @@ Every architectural decision should be consistent with this model.
 
 # Conceptual Layers
 
-Doctorado_UCAM is described at three distinct conceptual levels.
+ResearchOS is described at three distinct conceptual levels.
 
 Each level answers a different question and lives in a different document.
 
@@ -38,7 +38,7 @@ Each document works at a single level and should not redefine concepts owned by 
 
 # The Research Operating System
 
-Doctorado_UCAM is a personal Research Operating System (Research OS).
+ResearchOS is a personal Research Operating System (Research OS).
 
 Unlike traditional research software, its purpose is not to solve isolated problems such as bibliography management, note taking or document storage.
 
@@ -92,10 +92,10 @@ The current core asset categories are:
 - Knowledge
 - Projects
 - Tasks
+- Activities
 - Documents
 - People
 - Resources
-- Configuration
 
 Specialized types such as Documentation, Bibliography and Research Journal are not independent assets.
 
@@ -300,7 +300,7 @@ The quality of the system depends directly on the quality of the context it can 
 
 # Architectural Implication
 
-Doctorado_UCAM is not designed around tools.
+ResearchOS is not designed around tools.
 
 It is designed around state.
 

@@ -14,6 +14,8 @@ El objetivo no es únicamente almacenar información, sino construir un sistema 
 
 Este repositorio constituye la fuente principal de documentación, arquitectura y desarrollo del proyecto.
 
+> **Nota sobre nomenclatura:** `Doctorado_UCAM` es el nombre del repositorio y del proyecto. El sistema en ejecución que se construye —la plataforma en sí— se denomina **ResearchOS** en la documentación conceptual.
+
 ---
 
 # Objetivos
@@ -89,7 +91,7 @@ La estructura modular por directorios (architecture/, platform/, ai/…) se intr
 
 ---
 
-# Architecture Documents
+# Documentos de arquitectura
 
 Los documentos de arquitectura trabajan a distintos niveles conceptuales y deben leerse en el siguiente orden. Cada uno depende conceptualmente del anterior:
 
@@ -123,11 +125,11 @@ Logical Domain Model
 Interaction Model
 ```
 
-Documents 11–14 form the **Cognitive Architecture**: the AI Operating Layer and the three models of the substrate it operates over — what the system remembers (Memory), what it assembles per task (Context) and what it reacts to (Events).
+Los documentos 11–14 conforman la **Arquitectura Cognitiva**: la capa operativa de IA y los tres modelos del sustrato sobre el que opera — lo que el sistema recuerda (Memory), lo que ensambla por tarea (Context) y aquello a lo que reacciona (Events).
 
-The **Logical Domain Model** then opens the logical layer: the canonical, technology-neutral specification of the domain's structure, from which every schema, diagram and type is derived.
+El **Logical Domain Model** es la especificación lógica del dominio: la definición canónica y neutral respecto a la tecnología de su estructura, de la que se derivan todos los esquemas, diagramas y tipos.
 
-The **Interaction Model** closes the conceptual layer: how the researcher and the system collaborate, independent of any interface technology. It is the last document before Phase B's Software Architecture.
+El **Interaction Model** cierra la documentación conceptual (la cadena 1–16): cómo colaboran el investigador y el sistema, con independencia de cualquier tecnología de interfaz. Es, además, el primer paso de la Fase B y precede a la Software Architecture.
 
 1. [Vision](VISION.md)
 2. [Principles](SYSTEM_PRINCIPLES.md)
@@ -148,17 +150,17 @@ The **Interaction Model** closes the conceptual layer: how the researcher and th
 
 ---
 
-# Domain Verticals
+# Verticales de dominio
 
-The seven Core Entities specialize into six operational verticals. Four are substantial enough to carry their own document; two stay deliberately thin inside the index.
+Las siete Core Entities se especializan en seis verticales operativas. Cuatro tienen entidad suficiente para contar con su propio documento; dos permanecen deliberadamente ligeras dentro del índice.
 
-- [Domain Verticals](DOMAIN_VERTICALS.md) — index of all six
+- [Domain Verticals](DOMAIN_VERTICALS.md) — índice de las seis
 - [Research Vertical](RESEARCH_VERTICAL.md)
 - [Teaching Vertical](TEACHING_VERTICAL.md)
 - [Administration Vertical](ADMINISTRATION_VERTICAL.md)
 - [Organization Vertical](ORGANIZATION_VERTICAL.md)
 
-Personal and Daily Work are documented inline within [DOMAIN_VERTICALS.md](DOMAIN_VERTICALS.md).
+Personal y Daily Work se documentan de forma inline dentro de [DOMAIN_VERTICALS.md](DOMAIN_VERTICALS.md).
 
 ---
 

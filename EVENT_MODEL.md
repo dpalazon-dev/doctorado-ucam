@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines how Doctorado_UCAM reacts.
+This document defines how ResearchOS reacts.
 
 An event is a recorded change in the domain. Reactive behaviour is what the system does in response to those changes — the work it performs without being asked.
 
@@ -10,7 +10,7 @@ This document defines that behaviour: what an event is, where events come from, 
 
 It does not describe message brokers, queues or event buses. Those are realizations, chosen later, in the Software Architecture. This document defines the concept of an event in a way that must survive every change beneath it.
 
-It owns one concept: the domain Event and the reactive behaviour built on it.
+It owns one concept: the domain Event — the recorded change from which all reactive behaviour derives.
 
 It is the last of the three models of the cognitive substrate. Where Memory defines what persists and Context defines what is assembled, this document defines what changes — and what the system does about it.
 
@@ -30,7 +30,7 @@ That last property is the important one.
 
 > Events are facts, not commands.
 
-A command says *do this* — future tense, addressed to someone. An event says *this happened* — past tense, addressed to no one. Doctorado_UCAM is built on the second, not the first. The system is not a queue of instructions being executed. It is a standing reaction to the changing state of a research world.
+A command says *do this* — future tense, addressed to someone. An event says *this happened* — past tense, addressed to no one. ResearchOS is built on the second, not the first. The system is not a queue of instructions being executed. It is a standing reaction to the changing state of a research world.
 
 ---
 
@@ -40,7 +40,7 @@ A system that acts only when asked is a tool.
 
 A system that acts when its world changes is alive.
 
-This is the difference the Event Model makes real. It is what turns *Knowledge evolution is continuous* (System Principle 3) from an aspiration into a mechanism, and it is the reactive requirement the AI Architecture deferred here.
+This is the difference the Event Model makes real. It is what turns *Knowledge evolution is continuous* (Design Principle 3 of the AI Architecture) from an aspiration into a mechanism, and it is the reactive requirement the AI Architecture deferred here.
 
 The researcher captures a paper. A change is recorded. The system reacts — extracting knowledge, linking it, curating duplicates, proposing a next task — without being asked for any of it.
 
@@ -155,7 +155,7 @@ Proposing a Task in response to a new paper is an autonomous reaction. Sending t
 
 The Event Model sits between the other two substrates and binds them.
 
-**Events drive Memory.** A change is what there is to remember. Events are what episodic memory records and what triggers consolidation (Memory Model → Encode, Consolidate). Once an event is past, its retention belongs to memory. The Event Model owns the change *as it happens*; the Memory Model owns it *afterward*.
+**Events drive Memory.** A change is what there is to remember. The Activity and decision events are what episodic memory records; other domain changes — a Linked or Derived fact — update semantic memory instead. Either way, an event is what triggers consolidation (Memory Model → Encode, Consolidate). Once an event is past, its retention belongs to memory. The Event Model owns the change *as it happens*; the Memory Model owns it *afterward*.
 
 **Events feed Context.** Recent change is one of the sources a context is assembled from (Context Model → The Sources of Context). A single event can play two roles at once: it triggers an operation, and — as recent change — it informs the context that operation runs on.
 

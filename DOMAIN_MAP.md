@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines the conceptual domains of Doctorado_UCAM.
+This document defines the conceptual domains of ResearchOS.
 
 A domain represents a coherent area of responsibility within the Research Operating System.
 
@@ -16,7 +16,7 @@ Every future capability, entity and implementation should belong to one of these
 
 # Domain Philosophy
 
-Doctorado_UCAM is not organized around software features.
+ResearchOS is not organized around software features.
 
 It is organized around the operational reality of a researcher.
 
@@ -67,7 +67,7 @@ Core Domains represent the intellectual heart of the Research Operating System.
 
 They define the unique value of the platform.
 
-Without them, Doctorado_UCAM would simply become another productivity application.
+Without them, ResearchOS would simply become another productivity application.
 
 ---
 
@@ -355,4 +355,4 @@ Every capability consumes information.
 
 Every interface exposes different perspectives of the same underlying reality.
 
-Maintaining this coherence is the defining architectural characteristic of Doctorado_UCAM.
+Maintaining this coherence is the defining architectural characteristic of ResearchOS.

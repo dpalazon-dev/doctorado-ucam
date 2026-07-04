@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines the fundamental entities of Doctorado_UCAM.
+This document defines the fundamental entities of ResearchOS.
 
 Unlike a database schema or an object model, this document describes the conceptual objects that exist within the Research Operating System.
 
@@ -30,14 +30,14 @@ Specialized objects should emerge from these entities rather than becoming indep
 
 # Core Entities
 
-The current version of Doctorado_UCAM is built around seven core entities.
+The current version of ResearchOS is built around seven core entities.
 
 ```
                    Project
                   /   |   \
                  /    |    \
                 /     |     \
-         Task ------ Activity
+         Task ------ Activity ------ Resource
             \          /
              \        /
               \      /
@@ -45,9 +45,6 @@ The current version of Doctorado_UCAM is built around seven core entities.
               /   \
              /     \
       Document    Person
-             \
-              \
-            Resource
 ```
 
 Each entity represents a different aspect of the researcher's operational reality.
@@ -121,8 +118,6 @@ Future specializations may include:
 
 - Concepts
 - Ideas
-- Insights
-- Methodologies
 - Skills
 - Observations
 - Relationships
@@ -274,8 +269,9 @@ They may produce:
 - Knowledge
 - Documents
 - Decisions
-- Context
 - New Tasks
+
+Context is not produced here; it emerges from the relationships between these outputs (see Context below).
 
 ### Responsibilities
 

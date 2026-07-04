@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines how Doctorado_UCAM focuses.
+This document defines how ResearchOS focuses.
 
 Context is the task-shaped view of the system's state, assembled for a single operation. It is what an intelligent operation actually runs on.
 

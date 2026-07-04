@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines the canonical use cases of Doctorado_UCAM.
+This document defines the canonical use cases of ResearchOS.
 
 A use case represents a recurring research situation in which the Research Operating System assists the researcher to achieve an operational goal.
 
@@ -64,7 +64,7 @@ Every use case follows the same principles.
 
 Every use case originates from real research practice.
 
-The catalogue is intentionally derived from the operational behaviour of the first working instance of Doctorado_UCAM rather than hypothetical functionality.
+The catalogue is intentionally derived from the operational behaviour of the first working instance of ResearchOS rather than hypothetical functionality.
 
 ### Technology-independent
 
@@ -387,7 +387,7 @@ Part of the Research vertical — see [RESEARCH_VERTICAL.md](RESEARCH_VERTICAL.m
 
 **Intention.** Produce high-quality, structured search strategies for specialised discovery platforms, rather than having the system pretend to be one.
 
-**Context.** Doctorado_UCAM does not replace specialised literature search engines. Its role is to translate a knowledge gap into effective search strategies whose results are later brought back into the system.
+**Context.** ResearchOS does not replace specialised literature search engines. Its role is to translate a knowledge gap into effective search strategies whose results are later brought back into the system.
 
 **Operational Flow.**
 1. Retrieve the hypothesis, question or topic and its current knowledge context. → *Retrieve*
@@ -799,7 +799,7 @@ See [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md) for Derived Types and cross-ver
 
 ### UC-TE01 · Prepare a Course
 
-**Intention.** Set up a university course (*asignatura*) as an organized initiative — objectives, teaching guide, session plan and assessment scheme — reusing existing knowledge rather than starting from a blank syllabus.
+**Intention.** Set up a university course (*asignatura*) as an organised initiative — objectives, teaching guide, session plan and assessment scheme — reusing existing knowledge rather than starting from a blank syllabus.
 
 **Context.** A course recurs each academic year and must align its learning outcomes with a calendar, an official teaching guide (*guía docente*) and an assessment scheme under the institution's rules. Much of its content already exists as the researcher's own knowledge, documents and prior editions; the work is to organise it into a teachable structure.
 
@@ -855,7 +855,7 @@ See [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md) for Derived Types and cross-ver
 
 ---
 
-### UC-TE03 · Design an Assessment (Optional, not mandatory)
+### UC-TE03 · Design an Assessment (optional, not mandatory)
 
 **Intention.** Create an assessment instrument — an exam or a continuous-evaluation assignment — with a rubric aligned to the course's learning outcomes.
 
@@ -883,7 +883,7 @@ See [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md) for Derived Types and cross-ver
 
 ---
 
-### UC-TE04 · Grade Student Work (Never, i must do it my self)
+### UC-TE04 · Grade Student Work
 
 **Intention.** Evaluate student submissions against a rubric, producing consistent grades with actionable feedback.
 
@@ -913,11 +913,11 @@ See [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md) for Derived Types and cross-ver
 
 ---
 
-### UC-TE05 · Supervise a Final Project (Maybe it could happen but as a co-director with my thesis supervisor)
+### UC-TE05 · Supervise a Final Project
 
 **Intention.** Direct a student's final degree or master's project (TFG/TFM) from proposal to defence, keeping its evolving state connected to the researcher's own knowledge and projects.
 
-**Context.** Supervising a TFG/TFM is where teaching meets research: the student runs a small piece of research the supervisor must scope, steer and assess over months, through recurring meetings and draft reviews, toward a defended deliverable. It reuses the whole research machinery — knowledge, literature, writing review — applied to someone else's work.
+**Context.** Supervising a TFG/TFM is where teaching meets research: the student runs a small piece of research the supervisor must scope, steer and assess over months, through recurring meetings and draft reviews, toward a defended deliverable. It reuses the whole research machinery — knowledge, literature, writing review — applied to someone else's work. In the researcher's own case this typically arises as a co-direction alongside the thesis supervisor (see [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md)).
 
 **Operational Flow.**
 1. Register the final project, the student and the milestones toward defence. → *Acquire (Register) → Organize*
@@ -943,80 +943,33 @@ See [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md) for Derived Types and cross-ver
 
 ---
 
-# UC-TE06 · Track a Course
+### UC-TE06 · Track a Course
 
 **Intention.** Monitor the ongoing delivery of a course throughout the academic term, maintaining awareness of teaching progress, student engagement, assessment status and pending work so that the course remains aligned with its objectives and schedule.
 
 **Context.** Once a course begins, the work shifts from preparation to continuous operation. Sessions are delivered, assessments are scheduled and graded, attendance varies, incidents occur and preparation for future sessions continues. Rather than reviewing many independent documents and tasks, the researcher needs a single operational view of the course that highlights progress, deviations and recommended actions.
 
 **Operational Flow.**
-
 1. Retrieve the course, its calendar, planned sessions, assessments, tasks and recent teaching activities. → *Retrieve*
-
 2. Process the current operational state of the course, including completed sessions, pending preparation, assessment progress and upcoming deadlines. → *Process*
-
-3. Reason about deviations from the teaching plan, workload, assessment timing and potential risks. → *Reason (Analyse, Recommend, Detect)*
-
-4. Produce an operational summary highlighting completed work, upcoming commitments, pending actions and recommendations. → *Produce (Summarize)*
-
-5. Organize follow-up work by creating, updating or reprioritizing preparation tasks, assessment activities and course milestones where appropriate. → *Organize*
-
+3. Reason about deviations from the teaching plan, workload, assessment timing and potential risks. → *Reason (Compare, Recommend, Support Decision)*
+4. Produce an operational summary highlighting completed work, upcoming commitments, pending actions and recommendations. → *Produce (Generate)*
+5. Organize follow-up work by creating, updating or reprioritising preparation tasks, assessment activities and course milestones where appropriate. → *Organize*
 6. Continue operating the course until its completion while maintaining a complete operational history. → *Operate (Track)*
 
----
+**Expected Outcome.** The course has an always-current operational state that reflects teaching progress, assessment completion, upcoming activities and outstanding work. Deviations from the original plan are visible, and the researcher receives recommendations that support decision-making without replacing it.
 
-### Expected Outcome
+**State Changes.**
+- *Created* — Task(s) for upcoming preparation or follow-up actions; Activity entries recording operational reviews (optional).
+- *Updated* — Project (Course): progress indicators and operational state; Task(s): priorities, due dates and completion; Activity (Teaching Session): lifecycle as sessions are delivered; assessment schedule as evaluations progress.
+- *Derived* — Knowledge (course progress metrics, teaching workload summary, student engagement indicators, operational recommendations, upcoming risks and deadlines).
+- *Linked* — Course ↔ Teaching Sessions, Assessments, Tasks and Knowledge generated during delivery.
 
-The course has an always-current operational state that reflects teaching progress, assessment completion, upcoming activities and outstanding work. Deviations from the original plan are visible, and the researcher receives recommendations that support decision-making without replacing it.
+**Capabilities.** Retrieve · Process · Reason · Produce · Organize · Operate
 
----
+**Domain Entities.** Project (Course) · Activity (Teaching Session) · Task · Knowledge · Document (Assessment)
 
-### State Changes
-
-**Created**
-
-* Task(s) for upcoming preparation or follow-up actions.
-* Activity entries recording operational reviews (optional).
-
-**Updated**
-
-* Project (Course): progress indicators and operational state.
-* Task(s): priorities, due dates and completion.
-* Activity (Teaching Session): lifecycle as sessions are delivered.
-* Assessment schedule as evaluations progress.
-
-**Derived**
-
-* Course progress metrics.
-* Teaching workload summary.
-* Student engagement indicators.
-* Operational recommendations.
-* Upcoming risks and deadlines.
-
-**Linked**
-
-* Course ↔ Teaching Sessions.
-* Course ↔ Assessments.
-* Course ↔ Tasks.
-* Course ↔ Knowledge generated during delivery.
-
-
-
-### Capabilities
-
-Retrieve · Process · Reason · Produce · Organize · Operate
-
-
-
-### Domain Entities
-
-Project (Course) · Activity (Teaching Session) · Task · Knowledge · Document (Assessment)
-
-
-
-### Related Use Cases
-
-UC-TE01 · UC-TE02 · UC-TE03 · UC-TE04
+**Related Use Cases.** UC-TE01, UC-TE02, UC-TE03, UC-TE04
 
 ---
 
@@ -1024,69 +977,29 @@ UC-TE01 · UC-TE02 · UC-TE03 · UC-TE04
 
 **Intention.** Reflect on a completed course to consolidate teaching experience into reusable knowledge, identifying what worked, what did not and what should change for future editions.
 
-**Context.** Teaching does not end when the final grades are submitted. Every edition of a course produces valuable experience: successful explanations, ineffective assessments, recurring student misconceptions, pacing issues and organizational decisions. Capturing these lessons prevents repeating mistakes and allows each new edition to begin from accumulated teaching knowledge rather than from memory alone.
+**Context.** Teaching does not end when the final grades are submitted. Every edition of a course produces valuable experience: successful explanations, ineffective assessments, recurring student misconceptions, pacing issues and organisational decisions. Capturing these lessons prevents repeating mistakes and allows each new edition to begin from accumulated teaching knowledge rather than from memory alone.
 
 **Operational Flow.**
-
 1. Retrieve the completed course together with its teaching sessions, assessments, student feedback, grade distributions, operational history and teaching materials. → *Retrieve*
-
-2. Process the course's execution, identifying deviations from the original plan, recurring issues, successful practices and measurable outcomes. → *Process (Analyze, Compare)*
-
+2. Process the course's execution, then reason over it to identify deviations from the original plan, recurring issues, successful practices and measurable outcomes. → *Process → Reason (Compare)*
 3. Understand the causes behind successes and shortcomings by relating operational events, teaching decisions and observed outcomes. → *Understand*
+4. Reason about improvements for future editions, recommending changes to the syllabus, session sequence, assessment strategy, workload or teaching materials. → *Reason (Critique, Synthesize, Recommend)*
+5. Produce a Course Review summarising lessons learned, improvement actions and recommendations for the next academic year. → *Produce (Write, Generate)*
+6. Register the review, linking the resulting knowledge to the course and making it available for future course preparation. → *Acquire (Register) → Organize*
 
-4. Reason about improvements for future editions, recommending changes to the syllabus, session sequence, assessment strategy, workload or teaching materials. → *Reason (Evaluate, Synthesize, Recommend)*
+**Expected Outcome.** The completed course generates explicit teaching knowledge that becomes part of the system's long-term memory. Future editions can reuse accumulated experience instead of relying on personal recollection, enabling continuous improvement across academic years.
 
-5. Produce a Course Review summarizing lessons learned, improvement actions and recommendations for the next academic year. → *Produce (Write, Summarize)*
+**State Changes.**
+- *Created* — Document (Course Review); Knowledge (Teaching Insight); Task(s) for improvements to implement before the next edition (optional).
+- *Updated* — Project (Course): lifecycle `completed → archived`; Knowledge: new relationships to teaching materials, assessments and operational decisions.
+- *Derived* — Knowledge (teaching effectiveness analysis, assessment quality analysis, student performance trends, improvement recommendations, best practices and recurring issues).
+- *Linked* — Course Review ↔ Course; Teaching Insight ↔ Knowledge reused during the course, Teaching Sessions, Assessments, Teaching Materials and future Course editions.
 
-6. Register the review, linking the resulting knowledge to the course and making it available for future course preparation. → *Acquire (Register) · Organize*
+**Capabilities.** Retrieve · Process · Understand · Reason · Produce · Acquire · Organize
 
-### Expected Outcome
+**Domain Entities.** Project (Course) · Knowledge (Teaching Insight) · Document (Course Review) · Activity (Teaching Session) · Task
 
-The completed course generates explicit teaching knowledge that becomes part of the system's long-term memory. Future editions can reuse accumulated experience instead of relying on personal recollection, enabling continuous improvement across academic years.
-
----
-
-### State Changes
-
-**Created**
-
-* Document (Course Review).
-* Knowledge (Teaching Insight).
-* Task(s) for improvements to implement before the next edition (optional).
-
-**Updated**
-
-* Project (Course): lifecycle `completed → archived`.
-* Knowledge: new relationships to teaching materials, assessments and operational decisions.
-
-**Derived**
-
-* Teaching effectiveness analysis.
-* Assessment quality analysis.
-* Student performance trends.
-* Improvement recommendations.
-* Best practices and recurring issues.
-
-**Linked**
-
-* Course Review ↔ Course.
-* Teaching Insight ↔ Knowledge reused during the course.
-* Teaching Insight ↔ Teaching Sessions.
-* Teaching Insight ↔ Assessments.
-* Teaching Insight ↔ Teaching Materials.
-* Teaching Insight ↔ Future Course editions.
-
-### Capabilities
-
-Retrieve · Process · Understand · Reason · Produce · Acquire · Organize
-
-### Domain Entities
-
-Project (Course) · Knowledge (Teaching Insight) · Document (Course Review) · Activity (Teaching Session) · Task
-
-### Related Use Cases
-
-UC-TE01 · UC-TE02 · UC-TE03 · UC-TE04 · UC-TE06 · UC-R04
+**Related Use Cases.** UC-TE01, UC-TE02, UC-TE03, UC-TE04, UC-TE06, UC-R04
 
 ---
 
@@ -1525,14 +1438,14 @@ Preserve continuity across research sessions.
 **Expected Outcome.** The suspended activity's state is preserved for later resumption, and the researcher enters the new activity with its context loaded.
 
 **State Changes.**
-- *Created* — Context (checkpoint of the suspended activity).
-- *Updated* — Activity: state `active → suspended`; target Activity: state `→ active`.
+- *Created* — none.
+- *Updated* — Activity: working state checkpointed, lifecycle `active → suspended`; target Activity: state `→ active`.
 - *Derived* — none.
-- *Linked* — Checkpoint ↔ Activity and Project.
+- *Linked* — suspended and target Activity ↔ Project.
 
 **Capabilities.** Acquire · Organize · Retrieve · Reason
 
-**Domain Entities.** Project · Task · Activity · Context
+**Domain Entities.** Project · Task · Activity
 
 **Related Use Cases.** UC-X01, UC-X04, UC-P02
 
@@ -1570,12 +1483,12 @@ Preserve continuity across research sessions.
 
 **Intention.** Consolidate everything produced during the current session so the next session starts from a complete state.
 
-**Context.** Work produced in a session — knowledge, documents, tasks, decisions, context — must be integrated before it disperses, so continuity is preserved across sessions.
+**Context.** Work produced in a session — knowledge, documents, tasks, decisions — must be integrated before it disperses, so continuity is preserved across sessions.
 
 **Operational Flow.**
 1. Retrieve everything created or changed during the session. → *Retrieve*
 2. Understand and consolidate it into the operational state. → *Understand → Organize*
-3. Persist knowledge, documents, tasks, decisions and context coherently. → *Organize*
+3. Persist knowledge, documents, tasks and decisions coherently. → *Organize*
 4. Produce a session summary that becomes the next session's starting point. → *Produce*
 
 **Expected Outcome.** The session's output is fully integrated into the operational state, and a summary exists to seed the next session. Nothing produced is left unconsolidated.
@@ -1588,7 +1501,7 @@ Preserve continuity across research sessions.
 
 **Capabilities.** Retrieve · Understand · Organize · Produce
 
-**Domain Entities.** Knowledge · Document · Task · Activity · Context
+**Domain Entities.** Knowledge · Document · Task · Activity
 
 **Related Use Cases.** UC-X01, UC-X03, UC-P03
 

@@ -6,7 +6,7 @@ This document translates the Researcher Operational Model into architectural res
 
 Rather than defining features, it defines the permanent responsibilities that the Research Operating System must fulfill.
 
-Every capability implemented by Doctorado_UCAM should reinforce one or more of these responsibilities.
+Every capability implemented by ResearchOS should reinforce one or more of these responsibilities.
 
 ---
 
@@ -26,19 +26,17 @@ The system must continuously preserve contextual relationships.
 
 Every entity should remain understandable within its surrounding context.
 
-Projects.
+Many operational elements carry context that must be preserved, for example:
 
-Knowledge.
-
-Tasks.
-
-Communications.
-
-Decisions.
-
-Documents.
-
-Conversations.
+- projects
+- knowledge
+- tasks
+- activities
+- documents
+- people
+- communications
+- decisions
+- conversations
 
 All of them should contribute to contextual continuity.
 

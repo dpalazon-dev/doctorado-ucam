@@ -18,7 +18,7 @@ Its Use Cases are the most mature in the catalogue, and its Derived Types were t
 
 Research covers the production of science. It does not cover the institutional obligations that surround a doctorate — annual evaluations, committee approvals, training credits, deadlines — which belong to [ADMINISTRATION_VERTICAL.md](ADMINISTRATION_VERTICAL.md).
 
-An earlier draft of the domain named a separate **Doctorate** vertical, responsible for "producing a thesis" as distinct from "producing science." In practice it never became its own group of Use Cases: producing a chapter is Writing (UC-W01), grounded in the same Knowledge, Evidence and Bibliography as any other scientific document. The thesis is not a different kind of output — it is a Document (Chapter) like any other, composed from what Research already produces.
+An earlier draft of the domain named a separate **Doctorate** vertical, responsible for "producing a thesis" as distinct from "producing science." In practice it never became its own group of Use Cases: producing a chapter is Writing (UC-W01), grounded in the same Knowledge, Evidence and Bibliography as any other scientific document. Thesis *content* — its chapters and drafts — is produced as Documents through Writing, composed from what Research already produces; the Doctoral Thesis as a *project* is tracked by [ADMINISTRATION_VERTICAL.md](ADMINISTRATION_VERTICAL.md), not by Research.
 
 ---
 

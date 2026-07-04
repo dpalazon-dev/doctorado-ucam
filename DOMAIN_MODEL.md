@@ -37,7 +37,7 @@ The current version of ResearchOS is built around seven core entities.
                   /   |   \
                  /    |    \
                 /     |     \
-         Task ------ Activity
+         Task ------ Activity ------ Resource
             \          /
              \        /
               \      /
@@ -45,9 +45,6 @@ The current version of ResearchOS is built around seven core entities.
               /   \
              /     \
       Document    Person
-             \
-              \
-            Resource
 ```
 
 Each entity represents a different aspect of the researcher's operational reality.
@@ -121,8 +118,6 @@ Future specializations may include:
 
 - Concepts
 - Ideas
-- Insights
-- Methodologies
 - Skills
 - Observations
 - Relationships
@@ -274,8 +269,9 @@ They may produce:
 - Knowledge
 - Documents
 - Decisions
-- Context
 - New Tasks
+
+Context is not produced here; it emerges from the relationships between these outputs (see Context below).
 
 ### Responsibilities
 

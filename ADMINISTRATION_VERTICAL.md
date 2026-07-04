@@ -36,7 +36,7 @@ Administration is distinct from [ORGANIZATION_VERTICAL.md](ORGANIZATION_VERTICAL
 ## Documents
 - Progress Report
 - Regulation
-- institutional forms
+- Institutional Form
 - Certificate (training records, UC-AD03)
 
 ## Tasks
@@ -68,4 +68,4 @@ Full specifications live in [USE_CASES.md](USE_CASES.md) → Administration.
 
 # Relationships
 
-Administration reports on Research and Teaching without altering how either operates: UC-AD01 retrieves "activities, completed tasks, training, publications and research-plan progress" but produces only a Document, changing no upstream state. Committee decisions (UC-AD04) can update the Doctoral Thesis project's state directly — the one point where an institutional verdict has authority over research-facing state.
+Administration reports on Research and Teaching without altering how either operates: UC-AD01 retrieves "activities, completed tasks, training, publications and research-plan progress" but produces only a Document, changing no upstream state. Committee decisions (UC-AD04) can update the Doctoral Thesis project's state directly — the primary point where an institutional verdict has authority over research-facing state. UC-AD03 also touches the Doctoral Thesis project, but only to append a training record; UC-AD04 is where a committee verdict decides the project's state.

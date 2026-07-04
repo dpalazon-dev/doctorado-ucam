@@ -26,19 +26,17 @@ The system must continuously preserve contextual relationships.
 
 Every entity should remain understandable within its surrounding context.
 
-Projects.
+Many operational elements carry context that must be preserved, for example:
 
-Knowledge.
-
-Tasks.
-
-Communications.
-
-Decisions.
-
-Documents.
-
-Conversations.
+- projects
+- knowledge
+- tasks
+- activities
+- documents
+- people
+- communications
+- decisions
+- conversations
 
 All of them should contribute to contextual continuity.
 

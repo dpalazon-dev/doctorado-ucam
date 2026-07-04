@@ -26,9 +26,11 @@ The Research Operating System must therefore support the complete operational en
 
 # Operational Domains
 
-The daily work of a researcher naturally decomposes into several operational domains.
+The daily work of a researcher naturally decomposes into several operational areas.
 
-These domains are not isolated.
+These are the researcher's lived, day-to-day realities rather than architectural domains of the system. They map onto the architectural domains and verticals defined in the Domain Map — for example, Communication is not a domain of its own but is handled cross-domain through the People and Planning domains, while Teaching is handled through the Teaching vertical.
+
+These areas are not isolated.
 
 They constantly exchange information and continuously interrupt one another.
 

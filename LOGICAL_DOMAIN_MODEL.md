@@ -130,6 +130,8 @@ This is the single mental model of ResearchOS: the seven-entity domain at its co
 4. The responsibility reasons and **acts**, writing the result back to the **Domain** — within the autonomy and human-control limits of the AI Architecture.
 5. The write is a new change — a new **Event** — and the cycle continues.
 
+**Policies** are the autonomy and human-control constraints that govern what the AI Operating Layer may do on its own; they are defined in the AI Architecture and consumed here only as an input to the Context Builder.
+
 This one loop composes every use case: acquire or retrieve, understand, reason, produce, integrate. It is what keeps the system alive without continuous instruction from the researcher.
 
 ---
@@ -200,6 +202,7 @@ A persistent digital artifact. Stores information; is not itself Knowledge (Doma
 | `content`      | `locator`                                                        | Logical pointer to preserved content           |
 | `authors`      | `set<reference → Person>`                                        |                                                |
 | `versions`     | `list<Version>`                                                  | Version history (value objects)                |
+| `metadata`     | `Metadata`                                                       | Descriptive fields (value object)              |
 | `state`        | `enum` (Block 3)                                                 |                                                |
 | `registered_at`| `timestamp`                                                     |                                                |
 | `updated_at`   | `timestamp`                                                      |                                                |
@@ -250,7 +253,7 @@ A human actor in the operational environment (Domain Model → Person).
 |---------------|--------------------------------------------------------------|----------------------------------------|
 | `id`          | `identifier`                                                |                                        |
 | `name`        | `text`                                                      |                                        |
-| `roles`       | `set<enum(Supervisor\|Collaborator\|Student\|Reviewer\|Coordinator\|Author)>` | Contextual, may vary per Project |
+| `roles`       | `set<enum(Supervisor\|Collaborator\|Student\|Reviewer\|Coordinator\|Author\|Researcher\|Client)>` | Contextual, may vary per Project; `Coordinator` covers the project-manager role |
 | `affiliation` | `text`                                                     | Organization is not yet an entity      |
 | `contact`     | `ContactInfo`                                              | Value object                           |
 | `created_at`  | `timestamp`                                               |                                        |
@@ -314,7 +317,7 @@ Three Derived Types — **Hypothesis**, **Experiment** and **Evidence** — spec
 
 ## Other Derived Types in use
 
-The Use Cases already exercise further specializations through the `Entity (Specialization)` notation: **Decision** and **Draft** and **Chapter** (Document), **Meeting** (Activity), **Bibliography** and **Research Journal** (Document). These inherit their base entity's structure. Those recurring enough to warrant formal promotion are tracked under *Scope and Boundaries*; **Decision** is currently modelled as `Knowledge (Decision)`.
+The Use Cases already exercise further specializations through the `Entity (Specialization)` notation: **Draft** and **Chapter** (Document), **Bibliography** and **Research Journal** (Document), **Meeting** (Activity), and **Decision** (Knowledge). These inherit their base entity's structure. Those recurring enough to warrant formal promotion are tracked under *Scope and Boundaries*; **Decision** is currently modelled as `Knowledge (Decision)`.
 
 ---
 
@@ -443,7 +446,9 @@ The cardinality of each relationship, read as *"one From relates to how many To,
 | Project — references — Knowledge     | 0..N      | 0..N      |
 | Task — becomes — Activity            | 0..N      | 0..1      |
 | Task — produces — Knowledge          | 0..N      | 0..N      |
+| Task — informed by — Knowledge       | 0..N      | 0..N      |
 | Activity — produces — Knowledge      | 0..N      | 0..N      |
+| Activity — produces — Document       | 0..N      | 0..N      |
 | Activity — consumes — Resource       | 0..N      | 0..N      |
 | Document — supports — Knowledge      | 0..N      | 0..N      |
 | Knowledge — relates to — Knowledge   | 0..N      | 0..N      |
@@ -478,7 +483,7 @@ Each Core Entity is an aggregate root. Aggregates are kept small: a root **conta
 | **Document**   | Provenance, Version, Metadata                                  | Person, Project                    |
 | **Person**     | ContactInfo                                                     | Project, Activity, Document        |
 | **Task**       | —                                                               | Project, Knowledge, Activity       |
-| **Activity**   | ResourceUse                                                     | Person, Resource, Task, Knowledge  |
+| **Activity**   | ResourceUse                                                     | Person, Resource, Task, Knowledge, Document |
 | **Resource**   | —                                                               | Activity                           |
 
 Simple attributes (a Task's `priority` and `status`, a Resource's `capacity` and `cost`) are not value objects; they are plain typed attributes of the root.
@@ -590,7 +595,7 @@ Lifecycle: `planned → running → analysed | aborted` — replacing the generi
 | Added attribute | Type                                      | Notes |
 |-----------------|-------------------------------------------|-------|
 | `polarity`      | `enum(supports\|falsifies\|inconclusive)` |       |
-| `about`         | `reference → Hypothesis` (1)              |       |
+| `resolves`      | `reference → Hypothesis` (1)              | Mirrors `Hypothesis.resolved_by`; the `resolves` edge (Blocks 2, 4) |
 | `produced_by`   | `reference → Experiment` (1)              |       |
 | `strength`      | `degree`                                  |       |
 
@@ -674,6 +679,7 @@ To avoid duplication, this document does not redefine shared concepts.
 - The behaviour that operates on the entities — System Capabilities; AI Architecture
 - The cognitive products derived from the entities — Memory Model; Context Model; Event Model
 - The state changes behaviour produces, and the Traceability the graph must support — Use Cases
+- How the researcher and the system collaborate over the entities — Interaction Model
 
 The Logical Domain Model owns one thing: the exact structure of the domain, from which every schema, diagram and type is derived.
 

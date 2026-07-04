@@ -61,7 +61,7 @@ Insights
 Each step has a distinct responsibility:
 
 - A **Paper** enters the system as a **Document** (Acquire).
-- Meaning is **extracted** from the Document, producing **Knowledge** (Understand).
+- Meaning is **extracted** from the Document, producing **Knowledge** (Understand — *Extract* is the narrative name for this step, realised by the Understand capabilities such as Identify Concepts and Interpret; it is not a separate capability).
 - Knowledge is **related** to existing knowledge, forming a **Knowledge Graph** (Organize).
 - The system **reasons** over the graph, producing **Insights** (Reason).
 

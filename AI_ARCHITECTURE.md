@@ -47,9 +47,9 @@ Use Cases
     ↓
 ┌─── Cognitive Architecture ──────────────────┐
 │   AI Architecture      ← this document       │
-│   Memory Model         (forthcoming)         │
-│   Context Model        (forthcoming)         │
-│   Event Model          (forthcoming)         │
+│   Memory Model         (complete)            │
+│   Context Model        (complete)            │
+│   Event Model          (complete)            │
 └──────────────────────────────────────────────┘
     ↓
 Software Architecture   (future)
@@ -461,7 +461,7 @@ This document intentionally stops at the boundary of implementation.
 
 It defines *what* the intelligent layer is, *what* it is responsible for, *what* it requires from the cognitive substrate and *how far* it may act on its own. It does not define how any of this is built.
 
-The cognitive substrate is defined in three companion models, to be written next:
+The cognitive substrate is defined in three companion models, now complete:
 
 - **Memory Model** — the types of memory, how they persist, evolve and relate to the domain.
 - **Context Model** — how context is constructed, prioritized and bounded for each task.

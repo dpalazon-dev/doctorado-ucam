@@ -24,11 +24,11 @@ Every capability belongs to the same core operational model.
 
 Information alone has little value without context.
 
-Information, Knowledge, Context have different meanings, they dont mean the same and represent different concpets thay we need to exploit at different levels.
+Information, Knowledge, Context have different meanings, they don’t mean the same and represent different concepts that we need to exploit at different levels.
 
 Every document, note, experiment, task, hypothesis or conversation should exist within a network of meaningful relationships.
 
-The system should be capable of creating context whenever its needed, allowing knowledge to remain understandable and actionable long after it was created.
+The system should be capable of creating context whenever it’s needed, allowing knowledge to remain understandable and actionable long after it was created.
 
 Context must never be sacrificed for convenience.
 

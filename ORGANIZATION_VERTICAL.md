@@ -57,4 +57,4 @@ Full specifications live in [USE_CASES.md](USE_CASES.md) → Organization.
 
 # Relationships
 
-Organization provisions what Research's experiments consume (UC-OR02 ↔ UC-R01) and what Teaching's infrastructure needs draw on. It has no Use Case that produces scientific or teaching content — its output is always availability, cost visibility or an allocation decision, never Knowledge.
+Organization provisions what Research's experiments consume (UC-OR02 ↔ UC-R01). It has no Use Case that produces scientific or teaching content — its output is always availability, cost visibility or an allocation decision, never Knowledge.

@@ -92,10 +92,10 @@ The current core asset categories are:
 - Knowledge
 - Projects
 - Tasks
+- Activities
 - Documents
 - People
 - Resources
-- Configuration
 
 Specialized types such as Documentation, Bibliography and Research Journal are not independent assets.
 

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines how Doctorado_UCAM reacts.
+This document defines how ResearchOS reacts.
 
 An event is a recorded change in the domain. Reactive behaviour is what the system does in response to those changes — the work it performs without being asked.
 
@@ -30,7 +30,7 @@ That last property is the important one.
 
 > Events are facts, not commands.
 
-A command says *do this* — future tense, addressed to someone. An event says *this happened* — past tense, addressed to no one. Doctorado_UCAM is built on the second, not the first. The system is not a queue of instructions being executed. It is a standing reaction to the changing state of a research world.
+A command says *do this* — future tense, addressed to someone. An event says *this happened* — past tense, addressed to no one. ResearchOS is built on the second, not the first. The system is not a queue of instructions being executed. It is a standing reaction to the changing state of a research world.
 
 ---
 

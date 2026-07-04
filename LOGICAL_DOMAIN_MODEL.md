@@ -1,10 +1,12 @@
 # Logical Domain Model
 
-> **Status: Stable · v1.0.** This model changes only when the *domain* changes — never for implementation, AI, storage or tooling. Additions (an attribute, an enum, a Derived Type) are welcome; structural churn is not.
+> **Status: Stable · v1.1.** This model changes only when the *domain* changes — never for implementation, AI, storage or tooling. Additions (an attribute, an enum, a Derived Type) are welcome; structural churn is not.
+>
+> **v1.1** — added Vertical Lifecycle Extensions (Administrative Process, Submission, Final Project) so the Teaching, Administration and Organization verticals have canonical states to reuse instead of inventing their own; fixed Experiment's Block 3 casing to match its own specialized-lifecycle convention. No structural change.
 
 ## Purpose
 
-This document is the canonical logical specification of Doctorado_UCAM.
+This document is the canonical logical specification of ResearchOS.
 
 The Domain Model introduced the concepts that exist. This document specifies them precisely: their attributes, their types, their relationships, their cardinalities, their lifecycles and their invariants.
 
@@ -68,7 +70,7 @@ A diagram that drifts from this document is wrong. This document does not drift 
 
 # The System at a Glance
 
-This is the single mental model of Doctorado_UCAM: the seven-entity domain at its core, and the four models of the Cognitive Architecture operating over it. Everything specified in the rest of this document is a part of this one picture.
+This is the single mental model of ResearchOS: the seven-entity domain at its core, and the four models of the Cognitive Architecture operating over it. Everything specified in the rest of this document is a part of this one picture.
 
 ```
 ┌──────────────────────── AI OPERATING LAYER ───────────────────────────┐
@@ -412,9 +414,11 @@ An Activity may be suspended and resumed (UC-C05). Many Activities are recorded 
 ## Experiment · specialized Activity lifecycle
 
 ```
-Planned ──▶ Running ──▶ Analysed
-                    ──▶ Aborted
+planned ──▶ running ──▶ analysed
+                    ──▶ aborted
 ```
+
+Lowercase, matching the casing convention the Research Extension already established for specialized lifecycles (Hypothesis uses `captured`/`developing`/…), and the casing already used where this lifecycle is exercised (Use Cases → UC-R01, UC-R02).
 
 ## Resource
 
@@ -596,9 +600,57 @@ The Spine's relationships (`tests`, `resolves`, `produces`), cardinalities and i
 
 ---
 
+# Vertical Lifecycle Extensions
+
+The Teaching, Administration and Organization verticals (Use Cases; `TEACHING_VERTICAL.md`, `ADMINISTRATION_VERTICAL.md`, `ORGANIZATION_VERTICAL.md`) introduce Derived Types with their own operational shape. Most reuse a base entity's generic Block 3 lifecycle verbatim. A few genuinely do not fit it and need their own specialized lifecycle — the same treatment the Research Extension already gives Hypothesis and Experiment.
+
+This section is deliberately narrow: it specifies lifecycles only, not full attribute tables, because that is the only gap the verticals actually exposed.
+
+## Reuse the generic lifecycle, exactly
+
+These Derived Types map cleanly onto their base entity's existing Block 3 states and need nothing new — only the canonical state names, not invented ones.
+
+| Derived Type | Base Entity | Reuses |
+|---|---|---|
+| Course | Project | `Proposed → Active → Completed → Archived` |
+| Procedure | Task | `Proposed → Todo → In Progress → Done` |
+| Progress Report | Document | `Registered → Processed → Available → Superseded → Archived` |
+
+## Specialized lifecycles
+
+Three Derived Types have a genuinely different shape from their base entity's generic lifecycle and are specialized here, exactly as Hypothesis and Experiment were.
+
+### Administrative Process · specializes Project
+
+```
+Open ──▶ In Progress ──▶ Under Review ──▶ Resolved
+```
+
+An institutional procedure is opened, worked on, submitted for external evaluation and then resolved — a distinct "awaiting external verdict" phase the generic Project lifecycle has no state for.
+
+### Submission · specializes Document
+
+```
+Submitted ──▶ Graded
+```
+
+A student submission is not registered, processed and made available in the sense the generic Document lifecycle describes — it is handed in, then evaluated.
+
+### Final Project · specializes Project
+
+```
+Proposed ──▶ In Progress ──▶ Submitted ──▶ Defended
+```
+
+A TFG/TFM has a genuine "awaiting defence" phase and a true terminal state (Defended) that is not Completed/Archived in the generic sense.
+
+These three additions follow this document's own evolution rule: new Derived Types and their lifecycles are welcome; the seven Core Entities and their relationships are not touched.
+
+---
+
 # Scope and Boundaries
 
-**In scope.** The seven Core Entities and the formalized Research Spine (Hypothesis, Experiment, Evidence), specified to logical precision.
+**In scope.** The seven Core Entities, the formalized Research Spine (Hypothesis, Experiment, Evidence), and the Vertical Lifecycle Extensions (Administrative Process, Submission, Final Project), specified to logical precision.
 
 **Pending promotion.** Four concepts surfaced by the architecture are candidates for the Domain Model but are not yet promoted, and so are not fully specified here:
 

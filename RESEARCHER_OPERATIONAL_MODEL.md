@@ -6,7 +6,7 @@ This document describes the operational reality of a researcher.
 
 Its objective is not to define software features, but to understand the environment in which the Research Operating System must operate.
 
-Doctorado_UCAM is designed around the researcher rather than around isolated software capabilities.
+ResearchOS is designed around the researcher rather than around isolated software capabilities.
 
 Understanding the operational model is therefore a prerequisite for designing the system.
 

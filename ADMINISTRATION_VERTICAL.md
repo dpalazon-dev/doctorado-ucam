@@ -37,14 +37,18 @@ Administration is distinct from [ORGANIZATION_VERTICAL.md](ORGANIZATION_VERTICAL
 - Progress Report
 - Regulation
 - institutional forms
+- Certificate (training records, UC-AD03)
 
 ## Tasks
 - Procedure
 
-## Knowledge
-- Decision
+## Activities
+- Training (UC-AD03)
 
-Reuses Activity (Meeting, Training) and Person (Supervisor, Coordinator) without specialization.
+## Knowledge
+- Decision *(not yet formalized in the Domain Model — under observation, see Use Cases → Evolution)*
+
+Reuses Activity (Meeting) and Person (Supervisor, Coordinator) without specialization.
 
 ---
 

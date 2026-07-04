@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document defines the canonical use cases of Doctorado_UCAM.
+This document defines the canonical use cases of ResearchOS.
 
 A use case represents a recurring research situation in which the Research Operating System assists the researcher to achieve an operational goal.
 
@@ -64,7 +64,7 @@ Every use case follows the same principles.
 
 Every use case originates from real research practice.
 
-The catalogue is intentionally derived from the operational behaviour of the first working instance of Doctorado_UCAM rather than hypothetical functionality.
+The catalogue is intentionally derived from the operational behaviour of the first working instance of ResearchOS rather than hypothetical functionality.
 
 ### Technology-independent
 
@@ -219,7 +219,7 @@ Part of the Research vertical — see [RESEARCH_VERTICAL.md](RESEARCH_VERTICAL.m
 **Expected Outcome.** A document exists with preserved provenance, and the knowledge it carries is connected and retrievable. The literature is now operable across other use cases.
 
 **State Changes.**
-- *Created* — Document (Paper), initial state `pending`.
+- *Created* — Document (Paper), initial state `Registered`.
 - *Updated* — Bibliography.
 - *Derived* — Knowledge (Concepts) extracted from the document.
 - *Linked* — Paper ↔ Project, Hypothesis and Knowledge Graph.
@@ -313,7 +313,7 @@ Part of the Research vertical — see [RESEARCH_VERTICAL.md](RESEARCH_VERTICAL.m
 **Expected Outcome.** An experiment exists with objectives, required resources, expected observations and measurable outcomes, linked to the hypothesis it tests, which now carries an experimenting state.
 
 **State Changes.**
-- *Created* — Activity (Experiment), initial state `designed`; Document (experimental design).
+- *Created* — Activity (Experiment), initial state `planned`; Document (experimental design).
 - *Updated* — Knowledge (Hypothesis): lifecycle state `developing → experimenting`.
 - *Derived* — Resource requirements identified for the experiment.
 - *Linked* — Experiment ↔ Hypothesis, Resource and Project.
@@ -322,7 +322,7 @@ Part of the Research vertical — see [RESEARCH_VERTICAL.md](RESEARCH_VERTICAL.m
 
 **Domain Entities.** Knowledge (Hypothesis) · Activity (Experiment) · Resource · Project
 
-**Related Use Cases.** UC-K02, UC-R02, UC-R03
+**Related Use Cases.** UC-K02, UC-R02, UC-R03, UC-OR02
 
 ---
 
@@ -387,7 +387,7 @@ Part of the Research vertical — see [RESEARCH_VERTICAL.md](RESEARCH_VERTICAL.m
 
 **Intention.** Produce high-quality, structured search strategies for specialised discovery platforms, rather than having the system pretend to be one.
 
-**Context.** Doctorado_UCAM does not replace specialised literature search engines. Its role is to translate a knowledge gap into effective search strategies whose results are later brought back into the system.
+**Context.** ResearchOS does not replace specialised literature search engines. Its role is to translate a knowledge gap into effective search strategies whose results are later brought back into the system.
 
 **Operational Flow.**
 1. Retrieve the hypothesis, question or topic and its current knowledge context. → *Retrieve*
@@ -813,14 +813,14 @@ See [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md) for Derived Types and cross-ver
 **Expected Outcome.** A course exists as a Project with objectives, a planned sequence of sessions and an assessment scheme, linked to the knowledge and documents it draws on, ready to drive preparation and evaluation across the term.
 
 **State Changes.**
-- *Created* — Project (Course), initial state `planned`; Document (Teaching Guide); Activity (Teaching Session) entries `planned` along the calendar; Task(s) for session preparation and assessment.
+- *Created* — Project (Course), initial state `Proposed`; Document (Teaching Guide); Task(s), one per planned session along the calendar, plus session preparation and assessment.
 - *Updated* — none.
 - *Derived* — Knowledge (mapping from learning outcomes to sessions and assessments).
-- *Linked* — Course ↔ Knowledge, Documents and prior editions; Teaching Sessions and deliverables ↔ Course calendar.
+- *Linked* — Course ↔ Knowledge, Documents and prior editions; planned-session Tasks and deliverables ↔ Course calendar.
 
 **Capabilities.** Acquire · Retrieve · Reason · Produce · Organize · Operate
 
-**Domain Entities.** Project (Course) · Document (Teaching Guide) · Activity (Teaching Session) · Knowledge · Task
+**Domain Entities.** Project (Course) · Document (Teaching Guide) · Knowledge · Task
 
 **Related Use Cases.** UC-TE02, UC-TE03, UC-P02
 
@@ -843,13 +843,13 @@ See [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md) for Derived Types and cross-ver
 
 **State Changes.**
 - *Created* — Document (Lecture).
-- *Updated* — Activity (Teaching Session): material linked, state remains `planned` until delivered; Project (Course): session-plan progress.
+- *Updated* — Task (the session's preparation task): lecture material linked; Project (Course): session-plan progress.
 - *Derived* — Document (lecture material) composed from existing knowledge.
-- *Linked* — Lecture ↔ Course, Knowledge, Bibliography and previous Lectures; Lecture ↔ its Teaching Session.
+- *Linked* — Lecture ↔ Course, Knowledge, Bibliography and previous Lectures; Lecture ↔ its planned-session Task.
 
 **Capabilities.** Retrieve · Understand · Reason · Produce · Organize · Operate
 
-**Domain Entities.** Project (Course) · Document (Lecture) · Activity (Teaching Session) · Knowledge · Bibliography
+**Domain Entities.** Project (Course) · Document (Lecture) · Task · Knowledge · Bibliography
 
 **Related Use Cases.** UC-TE01, UC-TE03, UC-W01, UC-C04
 
@@ -901,7 +901,7 @@ See [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md) for Derived Types and cross-ver
 
 **State Changes.**
 - *Created* — Knowledge (Evaluation) per submission; Document (feedback) per student.
-- *Updated* — Document (Submission): lifecycle state `submitted → graded`; Project (Course): grade record.
+- *Updated* — Document (Submission): lifecycle state `Submitted → Graded`; Project (Course): grade record.
 - *Derived* — Knowledge (grade justification linking each mark to rubric criteria and evidence in the submission).
 - *Linked* — Evaluation ↔ Submission, Rubric, Student and Course.
 
@@ -930,8 +930,8 @@ See [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md) for Derived Types and cross-ver
 **Expected Outcome.** The final project exists as a supervised initiative with a scoped objective, milestones and a running record of meetings, drafts, feedback and decisions, connected to the knowledge it draws on and resolved by a final evaluation at defence.
 
 **State Changes.**
-- *Created* — Project (Final Project), initial state `proposed`; Person (Student), when new; Task(s) (milestones); Knowledge (Evaluation), at defence.
-- *Updated* — Project (Final Project): lifecycle state `proposed → in progress → submitted → defended`.
+- *Created* — Project (Final Project), initial state `Proposed`; Person (Student), when new; Task(s) (milestones); Knowledge (Evaluation), at defence.
+- *Updated* — Project (Final Project): lifecycle state `Proposed → In Progress → Submitted → Defended`.
 - *Derived* — Knowledge (scoping and supervision decisions, feedback on drafts).
 - *Linked* — Final Project ↔ Student, Supervisor, Knowledge, Bibliography and related research Projects; supervision Meetings ↔ Final Project.
 
@@ -943,80 +943,33 @@ See [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md) for Derived Types and cross-ver
 
 ---
 
-# UC-TE06 · Track a Course
+### UC-TE06 · Track a Course
 
 **Intention.** Monitor the ongoing delivery of a course throughout the academic term, maintaining awareness of teaching progress, student engagement, assessment status and pending work so that the course remains aligned with its objectives and schedule.
 
 **Context.** Once a course begins, the work shifts from preparation to continuous operation. Sessions are delivered, assessments are scheduled and graded, attendance varies, incidents occur and preparation for future sessions continues. Rather than reviewing many independent documents and tasks, the researcher needs a single operational view of the course that highlights progress, deviations and recommended actions.
 
 **Operational Flow.**
-
 1. Retrieve the course, its calendar, planned sessions, assessments, tasks and recent teaching activities. → *Retrieve*
-
 2. Process the current operational state of the course, including completed sessions, pending preparation, assessment progress and upcoming deadlines. → *Process*
-
 3. Reason about deviations from the teaching plan, workload, assessment timing and potential risks. → *Reason (Analyse, Recommend, Detect)*
-
 4. Produce an operational summary highlighting completed work, upcoming commitments, pending actions and recommendations. → *Produce (Summarize)*
-
 5. Organize follow-up work by creating, updating or reprioritizing preparation tasks, assessment activities and course milestones where appropriate. → *Organize*
-
 6. Continue operating the course until its completion while maintaining a complete operational history. → *Operate (Track)*
 
----
+**Expected Outcome.** The course has an always-current operational state that reflects teaching progress, assessment completion, upcoming activities and outstanding work. Deviations from the original plan are visible, and the researcher receives recommendations that support decision-making without replacing it.
 
-### Expected Outcome
+**State Changes.**
+- *Created* — Task(s) for upcoming preparation or follow-up actions; Activity entries recording operational reviews (optional).
+- *Updated* — Project (Course): state `Proposed → Active` as the term begins, then progress indicators; Task(s): priorities, due dates and completion; Activity (Teaching Session): `Active → Completed` as sessions are delivered; Assessment schedule as evaluations progress.
+- *Derived* — Course progress metrics; teaching workload summary; student engagement indicators; operational recommendations; upcoming risks and deadlines.
+- *Linked* — Course ↔ Teaching Sessions, Assessments, Tasks and Knowledge generated during delivery.
 
-The course has an always-current operational state that reflects teaching progress, assessment completion, upcoming activities and outstanding work. Deviations from the original plan are visible, and the researcher receives recommendations that support decision-making without replacing it.
+**Capabilities.** Retrieve · Process · Reason · Produce · Organize · Operate
 
----
+**Domain Entities.** Project (Course) · Activity (Teaching Session) · Task · Knowledge · Document (Assessment)
 
-### State Changes
-
-**Created**
-
-* Task(s) for upcoming preparation or follow-up actions.
-* Activity entries recording operational reviews (optional).
-
-**Updated**
-
-* Project (Course): progress indicators and operational state.
-* Task(s): priorities, due dates and completion.
-* Activity (Teaching Session): lifecycle as sessions are delivered.
-* Assessment schedule as evaluations progress.
-
-**Derived**
-
-* Course progress metrics.
-* Teaching workload summary.
-* Student engagement indicators.
-* Operational recommendations.
-* Upcoming risks and deadlines.
-
-**Linked**
-
-* Course ↔ Teaching Sessions.
-* Course ↔ Assessments.
-* Course ↔ Tasks.
-* Course ↔ Knowledge generated during delivery.
-
-
-
-### Capabilities
-
-Retrieve · Process · Reason · Produce · Organize · Operate
-
-
-
-### Domain Entities
-
-Project (Course) · Activity (Teaching Session) · Task · Knowledge · Document (Assessment)
-
-
-
-### Related Use Cases
-
-UC-TE01 · UC-TE02 · UC-TE03 · UC-TE04
+**Related Use Cases.** UC-TE01, UC-TE02, UC-TE03, UC-TE04
 
 ---
 
@@ -1040,53 +993,19 @@ UC-TE01 · UC-TE02 · UC-TE03 · UC-TE04
 
 6. Register the review, linking the resulting knowledge to the course and making it available for future course preparation. → *Acquire (Register) · Organize*
 
-### Expected Outcome
+**Expected Outcome.** The completed course generates explicit teaching knowledge that becomes part of the system's long-term memory. Future editions can reuse accumulated experience instead of relying on personal recollection, enabling continuous improvement across academic years.
 
-The completed course generates explicit teaching knowledge that becomes part of the system's long-term memory. Future editions can reuse accumulated experience instead of relying on personal recollection, enabling continuous improvement across academic years.
+**State Changes.**
+- *Created* — Document (Course Review); Knowledge (Teaching Insight); Task(s) for improvements to implement before the next edition (optional).
+- *Updated* — Project (Course): lifecycle `Completed → Archived`; Knowledge: new relationships to teaching materials, assessments and operational decisions.
+- *Derived* — Teaching effectiveness analysis; assessment quality analysis; student performance trends; improvement recommendations; best practices and recurring issues.
+- *Linked* — Course Review ↔ Course; Teaching Insight ↔ Knowledge reused during the course, Teaching Sessions, Assessments, Teaching Materials and future Course editions.
 
----
+**Capabilities.** Retrieve · Process · Understand · Reason · Produce · Acquire · Organize
 
-### State Changes
+**Domain Entities.** Project (Course) · Knowledge (Teaching Insight) · Document (Course Review) · Activity (Teaching Session) · Task
 
-**Created**
-
-* Document (Course Review).
-* Knowledge (Teaching Insight).
-* Task(s) for improvements to implement before the next edition (optional).
-
-**Updated**
-
-* Project (Course): lifecycle `completed → archived`.
-* Knowledge: new relationships to teaching materials, assessments and operational decisions.
-
-**Derived**
-
-* Teaching effectiveness analysis.
-* Assessment quality analysis.
-* Student performance trends.
-* Improvement recommendations.
-* Best practices and recurring issues.
-
-**Linked**
-
-* Course Review ↔ Course.
-* Teaching Insight ↔ Knowledge reused during the course.
-* Teaching Insight ↔ Teaching Sessions.
-* Teaching Insight ↔ Assessments.
-* Teaching Insight ↔ Teaching Materials.
-* Teaching Insight ↔ Future Course editions.
-
-### Capabilities
-
-Retrieve · Process · Understand · Reason · Produce · Acquire · Organize
-
-### Domain Entities
-
-Project (Course) · Knowledge (Teaching Insight) · Document (Course Review) · Activity (Teaching Session) · Task
-
-### Related Use Cases
-
-UC-TE01 · UC-TE02 · UC-TE03 · UC-TE04 · UC-TE06 · UC-R04
+**Related Use Cases.** UC-TE01, UC-TE02, UC-TE03, UC-TE04, UC-TE06, UC-R04
 
 ---
 
@@ -1112,8 +1031,8 @@ See [ADMINISTRATION_VERTICAL.md](ADMINISTRATION_VERTICAL.md) for Derived Types a
 **Expected Outcome.** A formal progress report exists in the prescribed format, grounded in the year's real operational record, ready for the researcher to review and submit for committee evaluation.
 
 **State Changes.**
-- *Created* — Document (Progress Report), initial state `drafting`.
-- *Updated* — Project (Administrative Process · annual evaluation): state `open → in progress`.
+- *Created* — Document (Progress Report), initial state `Registered`.
+- *Updated* — Project (Administrative Process · annual evaluation): state `Open → In Progress`.
 - *Derived* — Knowledge (synthesis of yearly advances, blockers and plan evolution).
 - *Linked* — Progress Report ↔ Administrative Process, Activities, Tasks, Documents (publications, training records) and Project (Doctoral Thesis).
 
@@ -1141,8 +1060,8 @@ See [ADMINISTRATION_VERTICAL.md](ADMINISTRATION_VERTICAL.md) for Derived Types a
 **Expected Outcome.** An administrative process exists, decomposed into ordered, scheduled procedures with their required documents identified, tracked from initiation to resolution.
 
 **State Changes.**
-- *Created* — Project (Administrative Process), initial state `open`; Task (Procedure) per step; Document (forms), as required.
-- *Updated* — Task (Procedure): lifecycle `pending → in progress → completed` as steps advance.
+- *Created* — Project (Administrative Process), initial state `Open`; Task (Procedure) per step; Document (forms), as required.
+- *Updated* — Task (Procedure): lifecycle `Todo → In Progress → Done` as steps advance.
 - *Derived* — Knowledge (the extracted step, document and deadline structure of the procedure).
 - *Linked* — Administrative Process ↔ Regulation, Procedures, Documents and Project (Doctoral Thesis).
 
@@ -1199,7 +1118,7 @@ See [ADMINISTRATION_VERTICAL.md](ADMINISTRATION_VERTICAL.md) for Derived Types a
 
 **State Changes.**
 - *Created* — Knowledge (Decision · the verdict and its rationale); Task (Procedure), for any obligation the verdict imposes.
-- *Updated* — Project (Administrative Process): state `under evaluation → resolved`; Project (Doctoral Thesis) or Document (Progress Report), as the verdict dictates (e.g. research plan `approved`, evaluation `favourable | unfavourable`).
+- *Updated* — Project (Administrative Process): state `Under Review → Resolved`; Project (Doctoral Thesis) or Document (Progress Report): an outcome attribute set from the verdict (e.g. research plan approval, evaluation result) — a recorded value, not a lifecycle-state transition.
 - *Derived* — Knowledge (conditions and consequences of the decision).
 - *Linked* — Decision ↔ Activity (Meeting · committee session), Person (Supervisor, Coordinator), Administrative Process and Project (Doctoral Thesis).
 
@@ -1269,7 +1188,7 @@ See [ORGANIZATION_VERTICAL.md](ORGANIZATION_VERTICAL.md) for Derived Types and c
 
 **Domain Entities.** Resource (Compute) · Resource (Dataset) · Resource (License) · Resource (Budget)
 
-**Related Use Cases.** UC-OR02, UC-OR03, UC-PE01
+**Related Use Cases.** UC-OR02, UC-OR03, UC-PE01, UC-OR04
 
 ---
 
@@ -1656,7 +1575,7 @@ They span six axes: provenance (backward), decisions, recall, impact (forward), 
 
 **Domain Entities.** Knowledge (Decision) · Activity · Project · Document
 
-**Related Use Cases.** UC-T01, UC-P03, UC-C04
+**Related Use Cases.** UC-T01, UC-P03, UC-C04, UC-AD04
 
 ---
 
@@ -1783,8 +1702,12 @@ Likewise, new concepts should appear in the Domain Model only after repeated obs
 
 Across this catalogue, **Hypothesis**, **Experiment** and **Evidence** recur as operative concepts; following the Domain Consistency principle, they have been promoted into the Domain Model as Derived Types.
 
-**Interaction** (currently modelled as a specialization of Activity) is under observation: its centrality in UC-C03 and UC-C04, connecting People, Projects, Knowledge and Tasks, may justify promoting it to a first-class concept in the future. It is not promoted yet.
+**Interaction** (currently modelled as a specialization of Activity) is under observation: its centrality in UC-C03 and UC-C04, connecting People, Projects, Knowledge and Tasks, may justify promoting it to a first-class concept in the future. Teaching Session (UC-TE01, UC-TE02, UC-TE06, UC-TE07) is a second witness to the same shape — "work that occurred with people" — recorded in a different vertical. It is not promoted yet.
 
-**Decision** is a further concept under observation: it is produced in UC-R03 and UC-C04 and consumed by the Traceability use cases, so its recurrence may soon justify formalization. It is not promoted yet.
+**Decision** is a further concept under observation: it is produced in UC-R03, UC-C04 and UC-AD04, and consumed by the Traceability use cases, so its recurrence may soon justify formalization. It is not promoted yet.
+
+**Evaluation** (currently modelled as a specialization of Knowledge, in Teaching) is under observation: UC-TE04 and UC-TE05 both produce it as the interpreted, justified result of assessing a Submission against a Rubric — the same structural role Evidence plays for an Experiment in the Research Spine (Domain Model → The Research Spine). This assessment-spine parallel (Rubric/Exam/Assignment → Submission → Evaluation, mirroring Hypothesis → Experiment → Evidence) is noted but not promoted yet.
+
+**Allocation** is a further concept under observation: UC-OR02 and UC-OR05 both reserve Resource capacity ahead of actual consumption — a forward commitment that neither `ResourceUse` (actual consumption) nor `FundingAllocation` (committed funding) captures. Its recurrence may justify a first-class Resource-side reservation concept. It is not promoted yet.
 
 This keeps the architecture grounded in real research practice while allowing the platform to evolve incrementally.

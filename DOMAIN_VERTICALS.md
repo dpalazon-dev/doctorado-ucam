@@ -70,7 +70,7 @@ are different views over the same domain.
 | Teaching | Academic teaching | Developed | [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md) |
 | Organization | Infrastructure and institutional management | Developed | [ORGANIZATION_VERTICAL.md](ORGANIZATION_VERTICAL.md) |
 
-Two further groups of Use Cases in [USE_CASES.md](USE_CASES.md) do not appear above because they are not verticals: **People**, **Context** and **Traceability** operate identically regardless of which vertical produced the entity they touch. They are infrastructure — the behavioural expression of the Context, Search & Retrieval and Memory domains already named in [DOMAIN_MAP.md](DOMAIN_MAP.md) — not specializations of it.
+Three further groups of Use Cases in [USE_CASES.md](USE_CASES.md) do not appear above because they are not verticals: **People**, **Context** and **Traceability** operate identically regardless of which vertical produced the entity they touch. They are infrastructure — the behavioural expression of the Context, Search & Retrieval and Memory domains already named in [DOMAIN_MAP.md](DOMAIN_MAP.md) — not specializations of it.
 
 ---
 
@@ -119,7 +119,7 @@ Represents operational execution: meetings, email, decisions, documents.
 
 ## Typical Knowledge
 
-- Decision
+- Decision *(not yet formalized in the Domain Model — under observation, see USE_CASES.md → Evolution)*
 
 Daily Work introduces no Project of its own — it attaches to whatever project the work serves. (Administrative Process, sketched here in earlier drafts, is now owned by [ADMINISTRATION_VERTICAL.md](ADMINISTRATION_VERTICAL.md).)
 

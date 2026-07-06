@@ -16,7 +16,7 @@ It does not add models. It sequences the work that carries a frozen conceptual f
 |--------|-----------|-------|
 | Conceptual | Vision, Principles, System Model, Operational Model, Responsibilities, Domain Map, Domain Model, Knowledge Model, System Capabilities, Use Cases | Mature |
 | Cognitive Architecture | AI Architecture, Memory Model, Context Model, Event Model | Complete |
-| Logical | Logical Domain Model | Frozen · v1.0 |
+| Logical | Logical Domain Model | Stable · v1.1 |
 | **Domain breadth** | Derived Types + Use Cases across all operational domains | **Closed** |
 | **Interaction model** | System interaction modalities | **Complete** |
 | **System design** | Software Architecture and below | **Not started** |

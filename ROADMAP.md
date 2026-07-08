@@ -42,7 +42,7 @@ The current objective is not to add more general models. It is to convert the ex
 | Technical baseline | Technical Architecture | Provisional canonical baseline · v0.3 |
 | Documentation governance | Documentation Architecture + Implementation Contexts + document contracts | Complete · v1.0 |
 | Significant decisions | ADR-0001 through ADR-0011 | Closed for the current baseline |
-| Development specifications | Specification catalogue and bounded implementation contracts | **Next** |
+| Development specifications | `SPEC_CATALOG.md` active; bounded implementation contracts | **In progress · SPEC-001 Ready** |
 | Executable product | Desktop foundation and proving slice | Pending |
 
 The architecture is closed far enough to begin development specifications. The baseline is intentionally provisional where experiments must still produce evidence, but no additional cross-cutting architecture document is required before specification work begins.
@@ -173,7 +173,7 @@ The product topology, runtime ownership, local data baseline and vertical-extens
 
 # Phase D — Development Specifications
 
-**Status:** Next
+**Status:** In progress · `SPEC_CATALOG.md` active · `SPEC-001` Ready
 
 ## Objective
 
@@ -182,8 +182,8 @@ Translate the canonical architecture into bounded, testable and implementable co
 ## Specification structure
 
 ```text
+SPEC_CATALOG.md
 specs/
-├── SPEC_CATALOG.md
 ├── foundation/
 ├── platform/
 ├── cognitive/
@@ -220,7 +220,7 @@ Vertical Specs begin only after the shared foundation has executable evidence.
 5. commands, queries, events, jobs, processes, Proposals and effects;
 6. ports and adapters;
 7. logical and physical schema plus migration implications;
-8. API, IPC, UI and worker contracts;
+8. Workspace, IPC, runtime-role and external-interface contracts;
 9. authorization, approval and classification rules;
 10. failure, idempotency, retry and recovery behavior;
 11. observability and audit evidence;
@@ -433,7 +433,7 @@ No vertical introduces an independent database, graph, memory system, event mech
 | M8 · Technical baseline | Local-first desktop technologies and process topology are selected provisionally | Achieved |
 | M8.5 · Canonical data model | Shared structural contracts and vertical extension mechanism are canonical | Achieved |
 | M9 · Architecture decision closure | ADR-0001 through ADR-0011 record the current baseline | Achieved |
-| M10 · Development specification set | Catalogue and foundation Specs are approved | **Next** |
+| M10 · Development specification set | Catalogue and foundation Specs are approved | **In progress** |
 | M11 · Executable desktop foundation | Installable shell, Rust core, SQLite and Python sidecar operate together | Pending |
 | M12 · Proving slice | Document-to-Knowledge cycle executes with evidence and recovery | Pending |
 | M13 · First vertical | Research extension operates on the shared model | Pending |

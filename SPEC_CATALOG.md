@@ -242,12 +242,33 @@ Author vertical Specs only after the shared extension mechanism and proving slic
 | **SPEC-007** | Durable Jobs and Event Runtime | platform | 1 | SPEC-003, SPEC-004, SPEC-005 | `SOFTWARE_ARCHITECTURE.md`, `EVENT_MODEL.md`, `DATA_ARCHITECTURE.md` | Planned |
 | **SPEC-008** | Rust–Python IPC Protocol | cognitive | 1 | SPEC-001, SPEC-002, SPEC-003 | `TECHNICAL_ARCHITECTURE.md`, `AGENT_RUNTIME.md`, ADR-0009 | Planned |
 | **SPEC-009** | Python Cognitive Sidecar | cognitive | 2 | SPEC-001, SPEC-008 | `AGENT_RUNTIME.md`, `TECHNICAL_ARCHITECTURE.md`, `COMPONENT_MODEL.md` | Planned |
-| **SPEC-010** | Document Ingestion Pipeline | platform | 2 | SPEC-005, SPEC-006, SPEC-007, SPEC-008, SPEC-009 | `CANONICAL_DATA_MODEL.md`, `DATA_ARCHITECTURE.md`, `AGENT_RUNTIME.md` | Planned |
+| **SPEC-010** | Document Ingestion Pipeline | platform | 2 | SPEC-005, SPEC-006, SPEC-007, SPEC-008, SPEC-009 | `CANONICAL_DATA_MODEL.md`, `DATA_ARCHITECTURE.md`, `AGENT_RUNTIME.md`, `TECHNICAL_ARCHITECTURE.md` | Planned |
 | **SPEC-011** | Retrieval and Projection System | cognitive | 2 | SPEC-004, SPEC-005, SPEC-010 | `DATA_ARCHITECTURE.md`, `CONTEXT_MODEL.md`, `TECHNICAL_ARCHITECTURE.md` | Planned |
 | **SPEC-012** | Proposal and Approval Flow | platform | 2 | SPEC-005, SPEC-007, SPEC-008, SPEC-009, SPEC-010 | `SOFTWARE_ARCHITECTURE.md`, `INTERACTION_MODEL.md`, `AGENT_RUNTIME.md` | Planned |
 | **SPEC-013** | Workspace Shell | workspace | 2 | SPEC-002, SPEC-003, SPEC-005, SPEC-007, SPEC-012 | `INTERACTION_MODEL.md`, `COMPONENT_MODEL.md`, `TECHNICAL_ARCHITECTURE.md` | Planned |
 
 The registry status is the only authoritative source for which Spec is next. `ROADMAP.md` owns milestone ordering at a higher level.
+
+## SPEC-010 Deferred Parser Evaluation
+
+SPEC-010 must preserve the simple PyMuPDF extraction baseline and evaluate optional rich structured representations only where the document corpus demonstrates a need.
+
+The evaluation set must include:
+
+```text
+Baseline A
+PyMuPDF → normalized text
+
+Candidate B
+Docling → native structured representation → normalized text
+
+Candidate C
+Docling or compatible adapter → DocLang → normalized text + structural anchors
+```
+
+Docling and DocLang are candidates, not preselected dependencies. Adoption requires measurable improvement in structural fidelity, evidence localization or retrieval quality that justifies runtime, packaging, security and maintenance cost.
+
+SPEC-010 must not introduce a technology-specific canonical `representation_kind`. When a rich representation is retained, the canonical record uses a semantic kind such as `structured_document` and records the concrete media type, format version, generator and generator version separately.
 
 ---
 

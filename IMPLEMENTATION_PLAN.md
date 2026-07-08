@@ -4,7 +4,7 @@
 >
 > Each entry below is an experiment designed to **falsify** a specific hypothesis, not a feature to ship. A hypothesis that fails is a result, not a setback: it tells us what to revise before we build on it.
 >
-> This first pass specifies three hypotheses. Their broader assumption catalogue, the decisions they feed (ADRs), and any technology selection are named here only as *deferred*.
+> This first pass specifies four experiments: a gating hypothesis about whether the Domain Model survives real use, and three that build on it. Their broader assumption catalogue, the decisions they feed (ADRs), and any technology selection are named here only as *deferred*.
 
 ## Purpose
 
@@ -30,6 +30,30 @@ Haystack        orbits  pipelines
 ```
 
 ResearchOS must orbit **none** of these. Its center is the **Domain Model**; memory, events, retrieval, agents, Git and indices are all *mechanisms in service of it* — each replaceable without touching the domain. That is the single most important thing the research validated, and it is the property these experiments are designed to protect. If any experiment can only be made to work by letting a mechanism become the center, the experiment has failed even if the feature works.
+
+## Two kinds of architectural claim
+
+Not everything this document scrutinizes is falsifiable in weeks, and pretending otherwise would be dishonest. There are two kinds of claim, evaluated differently — conflating them is how projects fool themselves into "validating" a decision that was never on the table.
+
+**Irreversible assumptions.** A few decisions are not hypotheses at all — they are architectural bets, already made, that shape everything else and cannot be settled by a single two-week experiment:
+
+- **Domain-first** — the Domain Model is the center; everything else is a mechanism serving it.
+- **Single Source of Truth** — the domain is the only authoritative state; no shadow store is ever authoritative over it.
+- **Event-driven** — components coordinate through domain events, not by calling one another.
+- **AI as an operational layer** — the intelligence operates over the domain; it never owns a private copy of it, nor controls the high-level flow.
+- **Capabilities before tools** — the system speaks in abstract verbs; concrete tools are implementation detail.
+
+These are not tested; they are *committed*. What an experiment can reveal is not whether a bet is "true," but whether **its consequences justify their cost**. Experiment 2 is exactly this: it does not prove Domain-first is correct — it measures whether the cost of the graph, memory and context (the consequences of Domain-first) buys more than a cheaper alternative. If the consequences never justify the cost, the bet was wrong even though no experiment "failed."
+
+**Falsifiable hypotheses.** Everything in the numbered experiments below is a claim that can be put at risk and killed by a concrete observation within weeks. This is where the discipline of the document lives.
+
+The distinction governs how we react to a result. A failed hypothesis means *revise the design*. A bet whose consequences never justify their cost means *reconsider the bet* — a slower, heavier decision, recorded as an ADR, not a quick pivot. And note the relationship between the two: **Domain-first** is the bet that the domain should be the center; **Experiment 0** is the falsifiable test of whether the *specific* seven-entity model chosen under that bet actually survives real use. The first is committed; the second we actively try to break.
+
+Each experiment below also illuminates the cost/benefit of one or more assumptions:
+
+- Experiment 0 → **Domain-first** (does the chosen model even hold up under use?)
+- Experiment 2 → **Domain-first + Single Source of Truth** (do the graph, memory and context earn their cost against plain RAG?)
+- Experiment 3 → **Event-driven** (does coordination-through-events hold consistency in practice?)
 
 ## The mechanism map
 
@@ -57,6 +81,28 @@ Every experiment carries the same six fields, so each stays a test of the archit
 - **Metrics** — what is measured to decide.
 - **What would falsify it** — the concrete observation that kills the hypothesis.
 - **Dependent decisions** — what we commit to, revise, or unlock depending on the outcome.
+
+**Experiment 0 comes first and gates the rest.** Its method is the exception: it is falsified by structured real use, not by a benchmark or a baseline. If the domain does not survive use, the other three are premature — they would only measure how well we optimize an incorrect foundation.
+
+---
+
+## Experiment 0 — The Domain Model survives real use
+
+**Architectural hypothesis.** The seven Core Entities and their relations are sufficient to represent the researcher's everyday operational reality **without significant friction** — without requiring new root entities, without breaking invariants, without inventing artificial relations to make things fit. This is the highest-risk claim in the project: if the domain does not survive real use, then memory, context and events — however well built — optimize an incorrect foundation.
+
+**Minimal implementation.** No benchmark, and ideally no new code. Over several days, attempt real, everyday operations expressed *only* in the model's entities, relations and lifecycles, deliberately spanning verticals so the breadth claim is tested and not just the research path:
+
+- import a paper (Research) · register a meeting (Daily Work) · create a task · associate Knowledge · prepare a lecture (Teaching) · record a decision (Administration) · relate people (People).
+
+Keep a structured **friction log**: every time the reaction is *"I need a new entity"* or *"I don't know where this fits,"* record the operation, what was missing, and the workaround used.
+
+**Acceptance criteria.** The everyday operations can be represented within the existing model, and the friction log shows exceptions are rare and superficial: no new root entity was required, no invariant had to be broken, and no artificial relation had to be invented. This is the Phase A claim — *seven entities, no new roots, covering all six verticals* — surviving contact with real use rather than holding only on paper.
+
+**Metrics.** Frequency of "new entity needed" and "doesn't fit" events per operation; number of invariants strained or broken; number of forced or artificial relations introduced; share of operations completed with no modeling exception. Qualitative counts from real use, not benchmark scores.
+
+**What would falsify it.** The friction recurs often: everyday operations repeatedly demand new entities, break invariants, or force artificial relations. Frequent friction is not an implementation problem — it is the signal that the domain itself is wrong.
+
+**Dependent decisions.** This experiment gates the other three. If it holds, the foundation is trustworthy and Experiments 1–3 proceed. If it fails, the correct response is to revise the Domain Model — a deliberate change to the frozen conceptual layer, recorded as a decision — *before* investing in memory, context, events or AI on top of it. Nothing downstream is worth optimizing on a model that does not survive use.
 
 ---
 
@@ -131,7 +177,7 @@ Every experiment carries the same six fields, so each stays a test of the archit
 
 ## What "trusting the architecture" means
 
-When the three hypotheses have been demonstrated — or falsified informatively — we can either build on a validated foundation or revise the model *before* committing to a technology stack. That is the point of doing this now, before the Software Architecture: to make the expensive decisions on evidence rather than on the elegance of the design.
+Experiment 0 is the precondition: if the Domain Model does not survive real use, no result from the others is worth acting on. When Experiment 0 holds and the three that follow have been demonstrated — or falsified informatively — we can either build on a validated foundation or revise the model *before* committing to a technology stack. That is the point of doing this now, before the Software Architecture: to make the expensive decisions on evidence rather than on the elegance of the design.
 
 Concretely, this realizes the ROADMAP's **M6 · Proving slice**, reframed from "a feature running end-to-end" to "the architecture's core claims, tested." One full turn of the operating cycle appears across the three experiments: capture changes the domain (E1), a question assembles context and produces a grounded answer (E2), and change propagates through events without breaking consistency (E3).
 
@@ -149,6 +195,7 @@ Named so the boundary of this first pass is explicit; none is decided here.
 - **Use Cases** — the experiments are minimal realizations of UC-K03, UC-K04, UC-K05; they invent no new use case.
 - **System Capabilities** — the verbs each experiment composes.
 - **Logical Domain Model** — the entities, lifecycles and invariants each experiment must preserve, including the `locator` for content and the Knowledge human gate.
+- **Domain Verticals** — Experiment 0 stress-tests their founding claim, *seven Core Entities cover all six operational verticals*, against real everyday use rather than on paper.
 - **Context Model** — the construction pipeline Experiment 2 puts to the test against a baseline.
 - **Event Model** — the events and the bounded-cascade discipline Experiment 3 stresses.
 - **AI Architecture** — the Artifact, the Improvement Loop, and the autonomy/human-control boundaries every experiment obeys.

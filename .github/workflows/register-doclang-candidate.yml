@@ -1,10 +1,9 @@
 name: Register deferred DocLang candidate
 
 on:
-  push:
+  pull_request_target:
     branches: [main]
-    paths:
-      - .github/workflows/register-doclang-candidate.yml
+    types: [opened]
   workflow_dispatch:
 
 permissions:
@@ -17,6 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: main
           fetch-depth: 0
 
       - name: Register candidate in architecture and catalog
@@ -156,4 +156,4 @@ SPEC-010 must not introduce a technology-specific canonical `representation_kind
           git rm .github/workflows/register-doclang-candidate.yml
           git add TECHNICAL_ARCHITECTURE.md SPEC_CATALOG.md
           git commit -m "Register DocLang as deferred ingestion candidate"
-          git push
+          git push origin HEAD:main

@@ -10,6 +10,7 @@ on:
 permissions:
   contents: write
 
+# This temporary workflow applies the deferred DocLang documentation decision.
 jobs:
   update:
     runs-on: ubuntu-latest

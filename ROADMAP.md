@@ -8,272 +8,449 @@
 | **Normative status** | Plan of record |
 | **Authoritative for** | Project phases, ordering, milestones, current status and completion criteria. |
 | **Not authoritative for** | Domain structure, architecture, runtime behavior, technology choices or experiment results. |
-| **Required reading** | `VISION.md`, `DOCUMENTATION_ARCHITECTURE.md`, current canonical architecture documents. |
-| **Downstream documents** | `README.md`, `CLAUDE.md`, `IMPLEMENTATION_PLAN.md`, development planning and release milestones. |
+| **Required reading** | `VISION.md`, `DOCUMENTATION_ARCHITECTURE.md`, current canonical architecture documents and `DECISIONS.md`. |
+| **Downstream documents** | `README.md`, `CLAUDE.md`, `IMPLEMENTATION_PLAN.md`, development specifications, implementation planning and release milestones. |
 
 > Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
 
 ---
 
-> **Status: Living.** Updated as phases progress. This document owns *what gets built, in what order, and why*. It is the plan of record.
+> **Status: Living.** Updated as phases progress. This document owns what gets built, in what order, and why.
 
 ## Purpose
 
-The conceptual work is mature. This document turns it into a build plan.
+ResearchOS has completed its conceptual and architectural foundation. The plan of record now moves from architecture closure to implementable specifications, an executable desktop foundation and one evidence-producing vertical slice.
 
-It does not add models. It sequences the work that carries a frozen conceptual foundation into a real system — first by completing the *breadth* of the domain, then by building the *system* that runs it.
+The current objective is not to add more general models. It is to convert the existing contracts into a local-first product that can be installed, run and evaluated on real data.
 
 ---
 
 # Where We Stand
 
-| Layer | Documents | State |
-|--------|-----------|-------|
-| Conceptual | Vision, Principles, System Model, Operational Model, Responsibilities, Domain Map, Domain Model, Knowledge Model, System Capabilities, Use Cases | Mature |
-| Cognitive Architecture | AI Architecture, Memory Model, Context Model, Event Model | Complete |
-| Logical | Logical Domain Model | Stable · v1.1 |
-| **Domain breadth** | Derived Types + Use Cases across all operational domains | **Closed** |
-| **Interaction model** | System interaction modalities | **Complete** |
-| **System architecture** | System Architecture | **Complete · v1.0** |
-| **Software architecture** | Software Architecture | **Complete · v1.0** |
-| **Documentation governance** | Documentation Architecture + Implementation Contexts + per-document contracts | **Complete · v1.0** |
-| **Implementation design** | Views, ADRs and Technical Architecture | **Next** |
+| Layer | Principal documents | State |
+|---|---|---|
+| Conceptual foundation | Vision, Principles, System Model, Core Operational Model, Responsibilities, Domain Map, Domain Model, Knowledge Model, Capabilities, Use Cases | Mature |
+| Cognitive architecture | AI Architecture, Memory Model, Context Model, Event Model | Complete |
+| Logical domain | Logical Domain Model | Stable · v1.1 |
+| Domain breadth | Derived Types and Use Cases across six operational verticals | Closed |
+| Interaction model | Interaction Model | Complete |
+| System architecture | System Architecture | Complete · v1.0 |
+| Software architecture | Software Architecture | Complete · v1.0 |
+| Component architecture | Component Model | Complete · v1.0 |
+| Data architecture | Canonical Data Model + Data Architecture | Complete · v1.0 |
+| Agent execution | Agent Runtime | Complete · v1.1 |
+| Technical baseline | Technical Architecture | Provisional canonical baseline · v0.3 |
+| Documentation governance | Documentation Architecture + Implementation Contexts + document contracts | Complete · v1.0 |
+| Significant decisions | ADR-0001 through ADR-0011 | Closed for the current baseline |
+| Development specifications | Specification catalogue and bounded implementation contracts | **Next** |
+| Executable product | Desktop foundation and proving slice | Pending |
 
-The reference architecture is now defined. The remaining gap is **implementation evidence**.
+The architecture is closed far enough to begin development specifications. The baseline is intentionally provisional where experiments must still produce evidence, but no additional cross-cutting architecture document is required before specification work begins.
 
-Breadth is closed. Every operational level now has Derived Types and worked Use Cases — [USE_CASES.md](USE_CASES.md) carries 52 across twelve groups. [DOMAIN_VERTICALS.md](DOMAIN_VERTICALS.md) itemizes 39 of them by ID across the six verticals (see the Phase A Deliverables table below); the remaining 13 — People, Context and Traceability — are catalogued there as cross-cutting infrastructure, not verticals, since they operate identically regardless of which vertical produced the entity they touch. The [Interaction Model](INTERACTION_MODEL.md) is also complete.
+The product target is now explicit:
 
-`SYSTEM_ARCHITECTURE.md` now defines authority, planes, trust boundaries and runtime invariants. `SOFTWARE_ARCHITECTURE.md` translates them into modules, ports, adapters, commands, events, processes and executable runtime roles.
-
-`DOCUMENTATION_ARCHITECTURE.md` assigns one owner to every concern, and `IMPLEMENTATION_CONTEXTS.md` packages bounded reading sets for humans and coding agents. Every Markdown file now declares its authority, prerequisites and downstream impact.
-
-What remains is to derive implementation views, record the significant decisions as ADRs, select concrete technologies and execute the proving experiments.
+```text
+single-user
++
+local-first
++
+cross-platform desktop application
++
+Tauri and React Workspace
++
+authoritative Rust runtime
++
+subordinate Python cognitive sidecar
++
+embedded local persistence
+```
 
 ---
 
-# The Breadth Gap — Closed
+# Delivery Strategy
 
-A researcher is not only a researcher.
-
-The Vision and the Operational Model always said so — the Operational Model names Research, Project Management, Knowledge Management, Communication, Teaching and Institutional Responsibilities as parallel domains. The Derived Types and the Use Cases drifted, for a time, into a research-only view.
-
-That gap is now closed. Teaching, Administration and Organization each carry a full set of Derived Types and worked Use Cases — Teaching alone has more of them (7) than Research's own dedicated group (4). Personal and Daily Work remain intentionally thin: not an oversight but the point, since personal life needs almost nothing the platform doesn't already provide, and daily coordination is largely Planning and Communication wearing no vertical-specific clothing.
-
-One level named in earlier drafts of this document — **Doctorate** — never became a use-case group of its own. Producing a thesis chapter is Research (Writing); everything institutional around it — progress reports, procedures, training credits, committee decisions, deadlines — is Administration. Both already existed by the time this was first written; the level is retired, not missing.
-
-## The Six Levels
-
-The researcher's operational reality spans six levels.
-
-| Level | Operational reality | Example concerns | State |
-|-------|---------------------|------------------|-------|
-| 1 | **Personal life** | calendar, health, travel, personal tasks | Minimal · by design |
-| 2 | **Daily work** | meetings, email, decisions, documents | Thin |
-| 3 | **Administration** | institutional procedures, progress reports, training, deadlines | Developed |
-| 4 | **Teaching** | courses, lectures, students, exams | Developed |
-| 5 | **Research** | projects, publications, grants, reviews | Developed |
-| 6 | **Organization** | budget, infrastructure, licenses, compute | Developed |
-
-## One Domain, Many Verticals
-
-No additional root entities are required.
-
-The seven Core Entities already describe every operational level. What changes are the Derived Types.
-
-```
-Project
- ├── Doctoral Thesis
- ├── Research Project
- ├── Teaching Course
- ├── Grant
- ├── Administrative Process
- └── Personal Goal
-
-Document
- ├── Paper
- ├── Chapter
- ├── Lecture
- ├── Exam
- ├── Rubric
- ├── Presentation
- ├── Email
- └── Minutes
-
-Activity
- ├── Reading
- ├── Writing
- ├── Teaching
- ├── Experiment
- ├── Meeting
- ├── Coding
- └── Administration
-
-Knowledge
- ├── Concept
- ├── Hypothesis
- ├── Evidence
- ├── Decision
- └── Insight
-```
-
-Completing the domain means completing these verticals without changing the seven Core Entities or the frozen Logical Domain Model.
-
----
-
-# Two Phases
-
-```
-Phase A — Complete the Domain
+```text
+Architecture Closure
         ↓
-Phase B — Build the System
+Development Specifications
+        ↓
+Executable Desktop Foundation
+        ↓
+Document-to-Knowledge Proving Slice
+        ↓
+First Vertical
+        ↓
+Product Hardening
+        ↓
+Additional Verticals
 ```
+
+The architecture documents define constraints. Specs define implementable contracts. Code begins only against an approved bounded Spec or an explicitly labelled experiment.
 
 ---
 
-# Phase A — Complete the Domain
+# Phase A — Domain Breadth
+
+**Status:** Complete
 
 ## Objective
 
-Complete the operational coverage of the system.
+Represent the user's operational reality without expanding the root ontology unnecessarily.
 
-## Approach
+## Result
 
-Only Derived Types and Use Cases.
+The six operational verticals are represented:
 
-No new root entities.
+1. Personal;
+2. Daily Work;
+3. Administration;
+4. Teaching;
+5. Research;
+6. Organization.
 
-No changes to the Logical Domain Model.
+The seven Core Entities remain the routine canonical roots. Vertical breadth is expressed through Derived Types, relationships, invariants, lifecycles and use cases.
 
-## Deliverables
+## Completion criterion
 
-| Vertical | Work | Status |
-|----------|------|--------|
-| Research | Derived Types + 12 Use Cases (Knowledge, Research, Writing) | Done |
-| Teaching | Derived Types + 7 Use Cases | Done |
-| Administration | Derived Types + 5 Use Cases | Done |
-| Organization | Derived Types + 5 Use Cases | Done |
-| Daily Work | Derived Types + 7 Use Cases (Planning, Communication) | Thin · sufficient for now |
-| Personal | Derived Types + 3 Use Cases | Minimal · by design |
+Every operational level has representative Derived Types and Use Cases.
 
-Completion criterion:
-
-Every operational level has its Derived Types defined and representative Use Cases.
-
-This criterion is met. See [DOMAIN_VERTICALS.md](DOMAIN_VERTICALS.md) for the index and [RESEARCH_VERTICAL.md](RESEARCH_VERTICAL.md), [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md), [ADMINISTRATION_VERTICAL.md](ADMINISTRATION_VERTICAL.md) and [ORGANIZATION_VERTICAL.md](ORGANIZATION_VERTICAL.md) for the four verticals substantial enough to carry their own document. Remaining thinness in Daily Work and Personal is a scope decision, not a gap.
+**Criterion met.**
 
 ---
 
-# Phase B — Build the System
+# Phase B — Reference Architecture
+
+**Status:** Complete
 
 ## Objective
 
-Turn the conceptual architecture into executable software.
+Define authority, semantics, components, data ownership, runtime behavior and interaction boundaries without prematurely binding the system to distributed infrastructure.
 
-## Architectural progression
+## Delivered
 
-```
-Conceptual Models
-        ↓
-Interaction Model
-        ↓
-System Architecture
-        ↓
-Software Architecture
-        ↓
-Application Services
-        ↓
-Cognitive Runtime
-(Memory · Context · Events · Knowledge)
-        ↓
-Infrastructure
-(Graph · Database · MCP · LLMs · Storage)
-        ↓
-Interfaces
-(Dashboard · Editors · Chat · Automation)
-```
+- Interaction Model;
+- System Architecture;
+- Software Architecture;
+- Component Model;
+- Data Architecture;
+- Agent Runtime;
+- Technical Architecture baseline;
+- documentation authority and bounded implementation contexts.
 
-The Interaction Model is completed before Software Architecture because the way users interact with the system determines the architecture that follows.
+## Completion criterion
 
-Conversation is one interaction modality among several.
+Every major architectural concern has one canonical owner and no unresolved contradiction blocks specification work.
 
-## Deliverables
-
-Design the runtime architecture and implement a first vertical slice.
-
-## Proving milestone
-
-A complete operating cycle running end-to-end:
-
-```
-Domain change
-        ↓
-Domain Event
-        ↓
-Memory update
-        ↓
-Context rebuild
-        ↓
-Agent reasoning
-        ↓
-Recommendation / Action
-        ↓
-User accepts or rejects
-        ↓
-Domain updated
-```
-
-The system is considered validated when this cycle executes over real data with traceability and reproducible results.
+**Criterion met for the current baseline.**
 
 ---
 
-# Document Plan
+# Phase C — Architecture Closure
 
-| # | Document | Phase | Purpose | Status |
-|---|----------|-------|---------|--------|
-| 1 | ROADMAP.md | — | Build sequence | This document |
-| 2 | Domain verticals | A | Complete missing operational domains | Done |
-| 3 | INTERACTION_MODEL.md | B | Define every interaction modality | Done |
-| 4 | SYSTEM_ARCHITECTURE.md | B | Define authority, planes, trust boundaries and system invariants | Done · v1.0 |
-| 5 | SOFTWARE_ARCHITECTURE.md | B | Translate system invariants into modules, contracts and runtimes | Done · v1.0 |
-| 6 | DOCUMENTATION_ARCHITECTURE.md | B | Govern document authority, precedence and change impact | Done · v1.0 |
-| 7 | IMPLEMENTATION_CONTEXTS.md | B | Define bounded coding-agent context bundles | Done · v1.0 |
-| 8 | UML.md / Architecture Views | B | Derive structural, runtime and deployment-neutral implementation views | Next |
-| 9 | DECISIONS.md (ADR) | B | Record significant architectural decisions | Pending |
-| 10 | TECHNICAL_ARCHITECTURE.md | B | Select technologies and deployment topology | Pending |
-| 11 | IMPLEMENTATION_PLAN.md | B | Validate architectural hypotheses through proving experiments | First pass |
+**Status:** Complete
 
-DECISIONS.md also owns the promotion (or rejection) of the remaining candidate concepts:
+## Objective
 
-- Decision
-- Artifact
-- Event
-- Curate
+Close the decisions needed to move from architecture into development specifications.
+
+## Delivered
+
+- `CANONICAL_DATA_MODEL.md` as the shared structural contract beneath vertical extensions;
+- ADRs for local-first product topology;
+- ADR for Tauri and React as the desktop shell;
+- ADR for Rust authority and the Python cognitive sidecar;
+- ADR for embedded local persistence;
+- ADR for canonical governance of vertical data extensions;
+- reconciliation of the Technical Architecture with the actual desktop product target.
+
+## Completion criterion
+
+The product topology, runtime ownership, local data baseline and vertical-extension mechanism are explicit and recorded.
+
+**Criterion met.**
+
+---
+
+# Phase D — Development Specifications
+
+**Status:** Next
+
+## Objective
+
+Translate the canonical architecture into bounded, testable and implementable contracts.
+
+## Specification structure
+
+```text
+specs/
+├── SPEC_CATALOG.md
+├── foundation/
+├── platform/
+├── cognitive/
+├── workspace/
+└── verticals/
+```
+
+## Initial specification order
+
+| Order | Specification | Primary outcome |
+|---:|---|---|
+| 1 | `SPEC-001 Repository and Build System` | Cross-platform workspace, toolchains and architecture enforcement |
+| 2 | `SPEC-002 Desktop Application Lifecycle` | Startup, single-instance behavior, shutdown, paths and recovery |
+| 3 | `SPEC-003 Rust Module Boundaries` | Authoritative crates, dependency rules and ports |
+| 4 | `SPEC-004 SQLite Canonical Persistence` | Connections, transactions, migrations, concurrency and backup |
+| 5 | `SPEC-005 Canonical Entity and Relationship Storage` | Shared records, extensions, provenance and repositories |
+| 6 | `SPEC-006 Content-Addressed Document Store` | Immutable content objects, manifests and safe deletion |
+| 7 | `SPEC-007 Durable Jobs and Event Runtime` | Jobs, outbox, inbox, scheduling, retries and recovery |
+| 8 | `SPEC-008 Rust–Python IPC Protocol` | Versioned messages, capability negotiation, progress and cancellation |
+| 9 | `SPEC-009 Python Cognitive Sidecar` | Process lifecycle, cognitive capability adapters and packaging |
+| 10 | `SPEC-010 Document Ingestion Pipeline` | Import, extraction, versions, segments and provenance |
+| 11 | `SPEC-011 Retrieval and Projection System` | FTS, vector projection, relationship traversal and context inputs |
+| 12 | `SPEC-012 Proposal and Approval Flow` | Human-gated cognitive results and canonical commitment |
+| 13 | `SPEC-013 Workspace Shell` | Initial navigation, health, document and operation surfaces |
+
+Vertical Specs begin only after the shared foundation has executable evidence.
+
+## Required content of every Spec
+
+1. scope and non-goals;
+2. concern owner and component boundary;
+3. use cases or proving experiment;
+4. entities, invariants and state transitions;
+5. commands, queries, events, jobs, processes, Proposals and effects;
+6. ports and adapters;
+7. logical and physical schema plus migration implications;
+8. API, IPC, UI and worker contracts;
+9. authorization, approval and classification rules;
+10. failure, idempotency, retry and recovery behavior;
+11. observability and audit evidence;
+12. tests and acceptance fixtures;
+13. implementation tasks and dependency order;
+14. completion criteria and explicit deferrals.
+
+## Completion criterion
+
+The executable foundation and proving slice can be implemented without inventing architecture inside code.
+
+---
+
+# Phase E — Executable Desktop Foundation
+
+**Status:** Pending
+
+## Objective
+
+Produce the smallest installable application that proves the process topology and local operational baseline.
+
+## Minimum executable cycle
+
+```text
+Tauri application starts
+        ↓
+React Workspace loads
+        ↓
+Rust initializes application paths and SQLite
+        ↓
+Schema migrations run
+        ↓
+Python cognitive sidecar starts
+        ↓
+IPC handshake and capability negotiation succeed
+        ↓
+Health and diagnostics are visible
+        ↓
+Application shuts down and recovers cleanly
+```
+
+## Required evidence
+
+- Windows, macOS and Linux builds execute in CI or documented target environments;
+- local paths and credentials are not hard-coded;
+- migrations are repeatable and failure-safe;
+- the sidecar can be supervised, cancelled and restarted;
+- logs correlate Workspace, Rust and Python operations;
+- the application can create and restore a minimal backup;
+- no external server is required to start the product.
+
+## Completion criterion
+
+A clean machine can install, open, close and reopen ResearchOS while preserving valid local state.
+
+---
+
+# Phase F — Document-to-Knowledge Proving Slice
+
+**Status:** Pending
+
+## Objective
+
+Validate the center of ResearchOS through one complete, evidence-producing workflow rather than broad CRUD coverage.
+
+## Proving flow
+
+```text
+Import document
+        ↓
+Store immutable source content
+        ↓
+Extract normalized text
+        ↓
+Create document version and segments
+        ↓
+Build lexical and vector projections
+        ↓
+Extract Knowledge candidates
+        ↓
+User reviews Proposals
+        ↓
+Commit accepted Knowledge and relationships
+        ↓
+Ask a question
+        ↓
+Retrieve hybrid context
+        ↓
+Answer with source evidence
+```
+
+## What this slice must validate
+
+- Document and Knowledge roots;
+- canonical data envelopes and vertical-neutral extension rules;
+- content-addressed storage;
+- provenance and source spans;
+- jobs, events, checkpoints and recovery;
+- Rust–Python IPC;
+- document processing and embeddings;
+- lexical, vector and relationship retrieval;
+- Context Manifest construction;
+- cognitive operation budgets and verification;
+- Proposal and approval boundaries;
+- citations and traceability in the Workspace.
+
+## Completion criterion
+
+The cycle runs over real documents with reproducible traceability, survives an interrupted long-running operation and never allows the cognitive sidecar to mutate canonical state directly.
+
+---
+
+# Phase G — First Vertical
+
+**Status:** Pending
+
+## Objective
+
+Build the first domain extension on top of the proven shared foundation.
+
+## Initial vertical
+
+Research is the preferred first vertical because it exercises the strongest combination of:
+
+- Documents;
+- Knowledge;
+- evidence;
+- provenance;
+- relationships;
+- retrieval;
+- reasoning;
+- citation;
+- projects and activities.
+
+The first bounded type set should remain small:
+
+```text
+ResearchProject
+Hypothesis
+Evidence
+Finding
+Paper
+LiteratureReview
+```
+
+## Completion criterion
+
+The vertical demonstrates that Derived Types, typed extension profiles, vertical invariants, relationships and projections can be added without creating a separate persistence authority or runtime.
+
+---
+
+# Phase H — Product Hardening
+
+**Status:** Pending
+
+## Objective
+
+Make the proving product safe to retain and evolve before broadening vertical coverage.
+
+## Required work
+
+- native signing, notarization and update flow;
+- backup, restoration and migration rollback;
+- credential storage and provider configuration;
+- crash recovery and interrupted-job reconciliation;
+- complete deletion and projection invalidation;
+- disk-space, cache and rebuild management;
+- diagnostic export with sensitive-data redaction;
+- cognitive evaluation and regression suites;
+- security tests for prompt injection, retrieval poisoning and unsafe tools;
+- performance budgets for startup, retrieval and document processing.
+
+## Completion criterion
+
+The application can be upgraded, diagnosed, backed up, restored and recovered without hidden infrastructure or loss of canonical authority.
+
+---
+
+# Additional Verticals
+
+Additional verticals follow only after the shared foundation and first vertical demonstrate stable extension mechanics.
+
+Recommended order is determined by real user value rather than conceptual completeness. Each vertical Spec must extend `CANONICAL_DATA_MODEL.md` and declare:
+
+- base Core Entities used;
+- Derived Types introduced;
+- typed extension profiles;
+- relationships and cardinalities;
+- invariants and state machines;
+- commands, events and workflows;
+- projections and interaction surfaces;
+- explicit non-goals.
+
+No vertical introduces an independent database, graph, memory system, event mechanism or AI runtime.
 
 ---
 
 # Milestones
 
-| Milestone | Phase | Done when | Status |
-|-----------|-------|-----------|--------|
-| M1 · Domain breadth | A | All six operational levels are represented | Achieved |
-| M2 · Interaction model | B | Manual, assisted, conversational and autonomous interactions are defined | Achieved |
-| M3 · Reference architecture | B | System and Software Architecture completed | Achieved |
-| M3.5 · Documentation operationalization | B | Ownership, precedence and bounded agent contexts defined | Achieved |
-| M4 · Implementation views | B | Logical and software architecture projected to structural and runtime views | Next |
-| M5 · Build plan | B | Components, epics and MVP defined | Pending |
-| M6 · Proving slice | B | End-to-end operating cycle validated | Pending |
+| Milestone | Done when | Status |
+|---|---|---|
+| M1 · Domain breadth | All six operational levels are represented | Achieved |
+| M2 · Interaction model | Manual, assisted, conversational and autonomous interaction modes are defined | Achieved |
+| M3 · Reference architecture | System and Software Architecture are complete | Achieved |
+| M3.5 · Documentation operationalization | Ownership, precedence and bounded context bundles are defined | Achieved |
+| M4 · Implementation views | Structural and runtime views are derived | Achieved |
+| M5 · Component model | Component responsibilities, dependencies and runtime placement are fixed | Achieved |
+| M6 · Data architecture | Data ownership, lifecycle, projections and persistence classes are fixed | Achieved |
+| M7 · Agent runtime | Cognitive lifecycle, verification, budgets and recovery are fixed | Achieved |
+| M8 · Technical baseline | Local-first desktop technologies and process topology are selected provisionally | Achieved |
+| M8.5 · Canonical data model | Shared structural contracts and vertical extension mechanism are canonical | Achieved |
+| M9 · Architecture decision closure | ADR-0001 through ADR-0011 record the current baseline | Achieved |
+| M10 · Development specification set | Catalogue and foundation Specs are approved | **Next** |
+| M11 · Executable desktop foundation | Installable shell, Rust core, SQLite and Python sidecar operate together | Pending |
+| M12 · Proving slice | Document-to-Knowledge cycle executes with evidence and recovery | Pending |
+| M13 · First vertical | Research extension operates on the shared model | Pending |
+| M14 · Product hardening | Upgrade, backup, recovery, diagnostics and security gates are proven | Pending |
 
 ---
 
-# Working Principles for This Stage
+# Working Principles
 
-- **No new root entities.** Breadth comes from Derived Types.
-- **Frozen stays frozen.** The conceptual and logical models remain implementation-independent.
-- **Interaction precedes implementation.** The system's interaction model defines how software is structured.
-- **Mechanisms enter at Software Architecture; concrete products enter only at Technical Architecture.**
-- **Conversation is not the system.** It is one interaction modality among several.
-- **Document authority is explicit.** Every change starts from the concern owner and follows declared downstream impact.
-- **Bounded context for agents.** Coding agents load a task-specific bundle, never the entire repository by default.
-- **Architectural decisions are recorded.** Significant technical decisions become ADRs.
-- **Thin slice first.** Prove one complete operating cycle before broadening.
-- **The objective is execution.** The conceptual architecture is considered complete; value now comes from building.
+- **Architecture is closed enough to build.** New general architecture documents require evidence of a real unresolved concern.
+- **Specs before implementation.** Production code implements bounded contracts rather than inventing them.
+- **Local-first is the product baseline.** No hidden server or managed infrastructure is required to start ResearchOS.
+- **Rust owns authority.** Python and models perform bounded cognitive work and return typed results or Proposals.
+- **One canonical state.** Vertical extensions never create parallel data authority.
+- **Derived Types before new roots.** ADR-0004 remains the burden-of-proof rule.
+- **Projections are rebuildable.** Search, vectors, graph views and dashboards do not become truth.
+- **Human authority is explicit.** Sensitive or epistemically meaningful mutations pass through policy and approval gates.
+- **Thin slice before breadth.** Prove one complete operating cycle before implementing full vertical coverage.
+- **Experiments may challenge the baseline.** Measured evidence can trigger a new ADR; convenience cannot silently rewrite architecture.
+- **The objective is execution.** Value now comes from installable software, real data and reproducible evidence.

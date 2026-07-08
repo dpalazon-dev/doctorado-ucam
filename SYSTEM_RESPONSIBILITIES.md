@@ -1,5 +1,20 @@
 # System Responsibilities
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 2 — Specialized Model |
+| **Normative status** | Canonical within responsibility scope |
+| **Authoritative for** | Permanent responsibilities ResearchOS must fulfill in response to the operational model. |
+| **Not authoritative for** | Capabilities, use cases, component ownership, runtime contracts or technologies. |
+| **Required reading** | `VISION.md`, `SYSTEM_PRINCIPLES.md`, `RESEARCHER_OPERATIONAL_MODEL.md`, `SYSTEM_MODEL.md`. |
+| **Downstream documents** | `SYSTEM_CAPABILITIES.md`, `USE_CASES.md`, `SYSTEM_ARCHITECTURE.md`. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 ## Purpose
 
 This document translates the Researcher Operational Model into architectural responsibilities.

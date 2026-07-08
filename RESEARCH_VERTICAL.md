@@ -1,5 +1,20 @@
 # Research Vertical
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 3 — Functional and Vertical Specification |
+| **Normative status** | Canonical within Research vertical scope |
+| **Authoritative for** | Research-specific scope, derived types and mapping to canonical use cases. |
+| **Not authoritative for** | Copied use-case definitions, Core Entity changes, generic research workflows outside the catalogue or software implementation. |
+| **Required reading** | `DOMAIN_VERTICALS.md`, `DOMAIN_MODEL.md`, `USE_CASES.md`. |
+| **Downstream documents** | Research implementation slices, `LOGICAL_DOMAIN_MODEL.md` impact reviews and `ROADMAP.md` status. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 > Materializes the Research vertical named in [DOMAIN_VERTICALS.md](DOMAIN_VERTICALS.md).
 >
 > Scientific production: turning knowledge into validated, published understanding.

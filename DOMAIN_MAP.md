@@ -1,5 +1,20 @@
 # Domain Map
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 2 — Specialized Model |
+| **Normative status** | Canonical within conceptual-domain-boundary scope |
+| **Authoritative for** | Conceptual domains, responsibility boundaries, cross-cutting domains and relationships between domains. |
+| **Not authoritative for** | Microservices, source modules, entity attributes, aggregate mechanics or deployment boundaries. |
+| **Required reading** | `VISION.md`, `SYSTEM_MODEL.md`, `RESEARCHER_OPERATIONAL_MODEL.md`, `SYSTEM_RESPONSIBILITIES.md`. |
+| **Downstream documents** | `DOMAIN_MODEL.md`, `LOGICAL_DOMAIN_MODEL.md`, `SOFTWARE_ARCHITECTURE.md`, `DOMAIN_VERTICALS.md`. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 ## Purpose
 
 This document defines the conceptual domains of ResearchOS.

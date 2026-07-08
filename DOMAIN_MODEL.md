@@ -1,5 +1,20 @@
 # Domain Model
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 2 — Specialized Model |
+| **Normative status** | Canonical within conceptual-entity scope |
+| **Authoritative for** | The meaning, identity and conceptual relationships of the seven Core Entities and their distinction from processes, domains and derived concepts. |
+| **Not authoritative for** | Attributes, logical types, cardinalities, lifecycle transitions, persistence or module implementation. |
+| **Required reading** | `SYSTEM_PRINCIPLES.md`, `DOMAIN_MAP.md`, `SYSTEM_RESPONSIBILITIES.md`. |
+| **Downstream documents** | `KNOWLEDGE_MODEL.md`, `SYSTEM_CAPABILITIES.md`, `USE_CASES.md`, `DOMAIN_VERTICALS.md`, `LOGICAL_DOMAIN_MODEL.md`. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 ## Purpose
 
 This document defines the fundamental entities of ResearchOS.
@@ -340,6 +355,7 @@ These specializations are called Derived Types.
 | Hypothesis       | Knowledge   | A proposed explanation with a lifecycle (captured → experimenting → evidenced / falsified) |
 | Experiment       | Activity    | Structured work that tests a Hypothesis, consumes Resources and produces Evidence |
 | Evidence         | Knowledge   | The interpreted result of an Experiment that supports or falsifies a Hypothesis |
+| Decision         | Knowledge   | A traceable conclusion or commitment with rationale, conditions, provenance and consequences |
 
 Deriving from a Base Entity means a Derived Type inherits its responsibilities and relationships.
 

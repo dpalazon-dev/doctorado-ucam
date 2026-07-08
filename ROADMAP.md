@@ -1,5 +1,20 @@
 # Roadmap
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 4 — Navigation, Delivery and Process |
+| **Normative status** | Plan of record |
+| **Authoritative for** | Project phases, ordering, milestones, current status and completion criteria. |
+| **Not authoritative for** | Domain structure, architecture, runtime behavior, technology choices or experiment results. |
+| **Required reading** | `VISION.md`, `DOCUMENTATION_ARCHITECTURE.md`, current canonical architecture documents. |
+| **Downstream documents** | `README.md`, `CLAUDE.md`, `IMPLEMENTATION_PLAN.md`, development planning and release milestones. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 > **Status: Living.** Updated as phases progress. This document owns *what gets built, in what order, and why*. It is the plan of record.
 
 ## Purpose
@@ -21,6 +36,7 @@ It does not add models. It sequences the work that carries a frozen conceptual f
 | **Interaction model** | System interaction modalities | **Complete** |
 | **System architecture** | System Architecture | **Complete · v1.0** |
 | **Software architecture** | Software Architecture | **Complete · v1.0** |
+| **Documentation governance** | Documentation Architecture + Implementation Contexts + per-document contracts | **Complete · v1.0** |
 | **Implementation design** | Views, ADRs and Technical Architecture | **Next** |
 
 The reference architecture is now defined. The remaining gap is **implementation evidence**.
@@ -28,6 +44,8 @@ The reference architecture is now defined. The remaining gap is **implementation
 Breadth is closed. Every operational level now has Derived Types and worked Use Cases — [USE_CASES.md](USE_CASES.md) carries 52 across twelve groups. [DOMAIN_VERTICALS.md](DOMAIN_VERTICALS.md) itemizes 39 of them by ID across the six verticals (see the Phase A Deliverables table below); the remaining 13 — People, Context and Traceability — are catalogued there as cross-cutting infrastructure, not verticals, since they operate identically regardless of which vertical produced the entity they touch. The [Interaction Model](INTERACTION_MODEL.md) is also complete.
 
 `SYSTEM_ARCHITECTURE.md` now defines authority, planes, trust boundaries and runtime invariants. `SOFTWARE_ARCHITECTURE.md` translates them into modules, ports, adapters, commands, events, processes and executable runtime roles.
+
+`DOCUMENTATION_ARCHITECTURE.md` assigns one owner to every concern, and `IMPLEMENTATION_CONTEXTS.md` packages bounded reading sets for humans and coding agents. Every Markdown file now declares its authority, prerequisites and downstream impact.
 
 What remains is to derive implementation views, record the significant decisions as ADRs, select concrete technologies and execute the proving experiments.
 
@@ -217,10 +235,12 @@ The system is considered validated when this cycle executes over real data with 
 | 3 | INTERACTION_MODEL.md | B | Define every interaction modality | Done |
 | 4 | SYSTEM_ARCHITECTURE.md | B | Define authority, planes, trust boundaries and system invariants | Done · v1.0 |
 | 5 | SOFTWARE_ARCHITECTURE.md | B | Translate system invariants into modules, contracts and runtimes | Done · v1.0 |
-| 6 | UML.md / Architecture Views | B | Derive structural, runtime and deployment-neutral implementation views | Next |
-| 7 | DECISIONS.md (ADR) | B | Record significant architectural decisions | Pending |
-| 8 | TECHNICAL_ARCHITECTURE.md | B | Select technologies and deployment topology | Pending |
-| 9 | IMPLEMENTATION_PLAN.md | B | Validate architectural hypotheses through proving experiments | First pass |
+| 6 | DOCUMENTATION_ARCHITECTURE.md | B | Govern document authority, precedence and change impact | Done · v1.0 |
+| 7 | IMPLEMENTATION_CONTEXTS.md | B | Define bounded coding-agent context bundles | Done · v1.0 |
+| 8 | UML.md / Architecture Views | B | Derive structural, runtime and deployment-neutral implementation views | Next |
+| 9 | DECISIONS.md (ADR) | B | Record significant architectural decisions | Pending |
+| 10 | TECHNICAL_ARCHITECTURE.md | B | Select technologies and deployment topology | Pending |
+| 11 | IMPLEMENTATION_PLAN.md | B | Validate architectural hypotheses through proving experiments | First pass |
 
 DECISIONS.md also owns the promotion (or rejection) of the remaining candidate concepts:
 
@@ -238,6 +258,7 @@ DECISIONS.md also owns the promotion (or rejection) of the remaining candidate c
 | M1 · Domain breadth | A | All six operational levels are represented | Achieved |
 | M2 · Interaction model | B | Manual, assisted, conversational and autonomous interactions are defined | Achieved |
 | M3 · Reference architecture | B | System and Software Architecture completed | Achieved |
+| M3.5 · Documentation operationalization | B | Ownership, precedence and bounded agent contexts defined | Achieved |
 | M4 · Implementation views | B | Logical and software architecture projected to structural and runtime views | Next |
 | M5 · Build plan | B | Components, epics and MVP defined | Pending |
 | M6 · Proving slice | B | End-to-end operating cycle validated | Pending |
@@ -251,6 +272,8 @@ DECISIONS.md also owns the promotion (or rejection) of the remaining candidate c
 - **Interaction precedes implementation.** The system's interaction model defines how software is structured.
 - **Mechanisms enter at Software Architecture; concrete products enter only at Technical Architecture.**
 - **Conversation is not the system.** It is one interaction modality among several.
+- **Document authority is explicit.** Every change starts from the concern owner and follows declared downstream impact.
+- **Bounded context for agents.** Coding agents load a task-specific bundle, never the entire repository by default.
 - **Architectural decisions are recorded.** Significant technical decisions become ADRs.
 - **Thin slice first.** Prove one complete operating cycle before broadening.
 - **The objective is execution.** The conceptual architecture is considered complete; value now comes from building.

@@ -1,5 +1,20 @@
 # Organization Vertical
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 3 — Functional and Vertical Specification |
+| **Normative status** | Canonical within Organization vertical scope |
+| **Authoritative for** | Organization-specific scope, resource specializations and mapping to canonical use cases. |
+| **Not authoritative for** | Copied use-case definitions, Core Entity changes, infrastructure products, budgeting software or deployment architecture. |
+| **Required reading** | `DOMAIN_VERTICALS.md`, `DOMAIN_MODEL.md`, `USE_CASES.md`. |
+| **Downstream documents** | Organization implementation slices, `LOGICAL_DOMAIN_MODEL.md` impact reviews and `ROADMAP.md` status. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 > Materializes the Organization vertical named in [DOMAIN_VERTICALS.md](DOMAIN_VERTICALS.md).
 >
 > The shared infrastructure research runs on.

@@ -1,5 +1,20 @@
 # System Model
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 2 — Specialized Model |
+| **Normative status** | Canonical within conceptual-system scope |
+| **Authoritative for** | The highest-level conceptual composition of ResearchOS: assets, capabilities, interfaces, unified state and context for reasoning. |
+| **Not authoritative for** | Detailed domain entities, software modules, authority boundaries, runtime mechanics or technologies. |
+| **Required reading** | `VISION.md`, `SYSTEM_PRINCIPLES.md`. |
+| **Downstream documents** | `DOMAIN_MAP.md`, `DOMAIN_MODEL.md`, `SYSTEM_RESPONSIBILITIES.md`, `SYSTEM_ARCHITECTURE.md`. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 ## Purpose
 
 This document defines the conceptual model of ResearchOS.

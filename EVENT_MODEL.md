@@ -1,6 +1,23 @@
 # Event Model
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 2 — Specialized Model |
+| **Normative status** | Canonical within event semantics |
+| **Authoritative for** | What an event means, event categories, lifecycle, reaction discipline, causality and relationship to memory and context. |
+| **Not authoritative for** | Broker selection, outbox/inbox mechanics, transport guarantees, transaction implementation or process deployment. |
+| **Required reading** | `SYSTEM_PRINCIPLES.md`, `DOMAIN_MODEL.md`, `SYSTEM_CAPABILITIES.md`, `SYSTEM_ARCHITECTURE.md`. |
+| **Downstream documents** | `AI_ARCHITECTURE.md`, `MEMORY_MODEL.md`, `CONTEXT_MODEL.md`, `SOFTWARE_ARCHITECTURE.md`, event runtime implementations. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 ## Purpose
+
+This document adopts the event-after-commit and state-authority rules defined in `SYSTEM_ARCHITECTURE.md`. It owns event meaning and reaction semantics; delivery mechanics belong to `SOFTWARE_ARCHITECTURE.md`.
 
 This document defines how ResearchOS reacts.
 

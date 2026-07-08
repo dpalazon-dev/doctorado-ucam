@@ -1,5 +1,20 @@
 # Teaching Vertical
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 3 — Functional and Vertical Specification |
+| **Normative status** | Canonical within Teaching vertical scope |
+| **Authoritative for** | Teaching-specific scope, derived types, authorship boundaries and mapping to canonical use cases. |
+| **Not authoritative for** | Copied use-case definitions, Core Entity changes, grading implementation or UI workflows. |
+| **Required reading** | `DOMAIN_VERTICALS.md`, `DOMAIN_MODEL.md`, `USE_CASES.md`. |
+| **Downstream documents** | Teaching implementation slices, `LOGICAL_DOMAIN_MODEL.md` impact reviews and `ROADMAP.md` status. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 > Materializes the Teaching vertical named in [DOMAIN_VERTICALS.md](DOMAIN_VERTICALS.md).
 >
 > Prepare, deliver and evaluate university teaching.

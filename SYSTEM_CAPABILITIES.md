@@ -1,5 +1,20 @@
 # System Capabilities
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 3 — Functional and Vertical Specification |
+| **Normative status** | Canonical capability vocabulary |
+| **Authoritative for** | Stable capability families and primitive verbs from which use cases, automations, tools and AI behaviors are composed. |
+| **Not authoritative for** | Use-case sequencing, entity schemas, software interfaces, tools or provider integrations. |
+| **Required reading** | `SYSTEM_PRINCIPLES.md`, `SYSTEM_RESPONSIBILITIES.md`, `DOMAIN_MODEL.md`. |
+| **Downstream documents** | `USE_CASES.md`, `AI_ARCHITECTURE.md`, `SOFTWARE_ARCHITECTURE.md`, capability registry and tool adapters. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 ## Purpose
 
 This document defines the fundamental capabilities of ResearchOS.
@@ -27,6 +42,10 @@ Together they form the conceptual foundation of ResearchOS.
 Capabilities are intentionally stable.
 
 New features should emerge by composing existing capabilities rather than introducing new ones whenever possible.
+
+## Composite responsibilities
+
+A named responsibility may span several capabilities without becoming a new capability family. **Curate** is the canonical example: improving existing knowledge composes `Understand`, `Organize` and `Reason` to detect duplication or inconsistency, consolidate representations and strengthen relationships. Curate remains an AI Operating Layer responsibility rather than a ninth capability.
 
 ---
 

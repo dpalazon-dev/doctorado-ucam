@@ -1,5 +1,20 @@
 # Knowledge Model
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 2 — Specialized Model |
+| **Normative status** | Canonical within Knowledge semantics |
+| **Authoritative for** | Forms, provenance, evidence relationships, evolution and semantic boundaries of Knowledge. |
+| **Not authoritative for** | Global entity structure, memory infrastructure, context construction, graph products or retrieval algorithms. |
+| **Required reading** | `SYSTEM_PRINCIPLES.md`, `DOMAIN_MODEL.md`. |
+| **Downstream documents** | `MEMORY_MODEL.md`, `AI_ARCHITECTURE.md`, `LOGICAL_DOMAIN_MODEL.md`, knowledge-related use cases and implementations. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 ## Purpose
 
 This document defines how Knowledge exists and behaves inside ResearchOS.

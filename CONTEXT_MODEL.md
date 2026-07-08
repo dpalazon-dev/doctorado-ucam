@@ -1,5 +1,20 @@
 # Context Model
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 2 — Specialized Model |
+| **Normative status** | Canonical within context scope |
+| **Authoritative for** | Definition, sources, construction stages, prioritization, bounding, lifecycle and traceability of Context. |
+| **Not authoritative for** | Global state authority, retrieval products, ranking algorithms, prompt formats or runtime component topology. |
+| **Required reading** | `SYSTEM_PRINCIPLES.md`, `DOMAIN_MODEL.md`, `MEMORY_MODEL.md`, `EVENT_MODEL.md`, `AI_ARCHITECTURE.md`, `SYSTEM_ARCHITECTURE.md`. |
+| **Downstream documents** | `SOFTWARE_ARCHITECTURE.md`, `IMPLEMENTATION_CONTEXTS.md`, context builders and AI operations. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 ## Purpose
 
 This document defines how ResearchOS focuses.
@@ -129,7 +144,7 @@ Policy shapes what may enter a context: access rights, data sensitivity, and the
 
 It is a gate applied during construction — not a memory type, and not a model of its own.
 
-Where policy comes from is defined elsewhere: the autonomy bounds in AI Architecture → Autonomy Levels, and their eventual enforcement in the future Software Architecture (Policy Enforcement). This document treats policy only as a constraint the pipeline must honor when deciding what a given operation is permitted to see.
+Where policy comes from is defined elsewhere: the autonomy bounds in AI Architecture → Autonomy Levels, and their enforcement through the policy contracts defined in `SOFTWARE_ARCHITECTURE.md`. This document treats policy only as a constraint the pipeline must honor when deciding what a given operation is permitted to see.
 
 Policy is a fifth influence on context, deliberately *not* promoted to a fifth model. It is a cross-cutting concern realized across several documents, consistent with how the AI Architecture flagged it.
 
@@ -196,7 +211,7 @@ This model fixes the concept and defers everything mechanical.
 
 Later work will define:
 
-- **Relevance strategy** — how relevance to intent is scored and selected, in the Software Architecture.
+- **Relevance strategy** — the concrete ranking and selection mechanism, owned by future Technical Architecture or implementation ADRs under the contracts in `SOFTWARE_ARCHITECTURE.md`.
 - **Budgeting strategy** — how the bound is set and enforced for different classes of task.
 - **Context reuse** — whether, and how, a constructed context may be partially retained across closely related tasks without ever becoming a source of truth.
 - **The formal status of Policy** — governance and access control as a cross-cutting concern rather than a standalone model.

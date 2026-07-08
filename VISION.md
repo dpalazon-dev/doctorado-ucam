@@ -1,5 +1,20 @@
 # Vision
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 1 — Canonical Foundation |
+| **Normative status** | Canonical |
+| **Authoritative for** | Why ResearchOS exists, the fragmentation it addresses, its intended scope and the human outcome it seeks. |
+| **Not authoritative for** | Architectural mechanisms, domain structure, software design, delivery sequence or technology choices. |
+| **Required reading** | None. |
+| **Downstream documents** | `SYSTEM_PRINCIPLES.md`, `SYSTEM_MODEL.md`, `RESEARCHER_OPERATIONAL_MODEL.md`, `SYSTEM_ARCHITECTURE.md`, `README.md`, `ROADMAP.md`. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 ## Why this project exists
 
 The daily work of a researcher is not a single coherent activity. It is a continuous transition between multiple operational realities: personal life, institutional responsibilities, teaching, collaboration, administration, and scientific work.

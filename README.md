@@ -1,16 +1,31 @@
 # ResearchOS
 
-> Plataforma de investigación, gestión del conocimiento e inteligencia artificial para el desarrollo del doctorado.
+## Document Contract
 
-Construyendo una plataforma de investigación donde el conocimiento, la automatización y la inteligencia artificial trabajan juntos para acelerar el proceso científico.
+| Concern | Contract |
+|---|---|
+| **Level** | Level 4 — Navigation, Delivery and Process |
+| **Normative status** | Repository front door; non-authoritative for system behavior |
+| **Authoritative for** | Concise repository identity, current documentation map, links and current high-level status. |
+| **Not authoritative for** | Product requirements, architectural decisions, domain semantics, implementation contracts or phase details. |
+| **Required reading** | `VISION.md`, `DOCUMENTATION_ARCHITECTURE.md`, `ROADMAP.md`. |
+| **Downstream documents** | New-contributor orientation and repository navigation. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
+> Sistema operativo personal para trabajo de conocimiento, investigación y continuidad operativa.
+
+ResearchOS unifica conocimiento, proyectos, documentos, tareas, personas, recursos e inteligencia artificial dentro de un único estado coherente y gobernado.
 
 ---
 
 ## Visión
 
-ResearchOS es una plataforma diseñada para centralizar todo el conocimiento generado durante el doctorado, facilitar la investigación científica y automatizar tareas mediante inteligencia artificial.
+ResearchOS es un sistema operativo personal para la realidad completa del investigador: investigación, docencia, administración, colaboración, organización y trabajo cotidiano.
 
-El objetivo no es únicamente almacenar información, sino construir un sistema capaz de organizar, relacionar y explotar el conocimiento científico a lo largo de todo el proceso investigador.
+El objetivo no es almacenar información ni reunir herramientas desconectadas. Es mantener continuidad de contexto, conocimiento conectado y capacidad operativa a lo largo del tiempo y entre dominios.
 
 Este repositorio constituye la fuente principal de documentación, arquitectura y desarrollo del proyecto.
 
@@ -20,13 +35,13 @@ Este repositorio constituye la fuente principal de documentación, arquitectura 
 
 # Objetivos
 
-- Centralizar toda la documentación del doctorado.
-- Gestionar artículos científicos, notas y bibliografía.
-- Diseñar una base de conocimiento estructurada.
-- Automatizar procesos de investigación.
-- Incorporar herramientas basadas en IA.
-- Facilitar la escritura de la tesis y publicaciones.
-- Mantener la trazabilidad de todas las decisiones tomadas durante el proyecto.
+- Mantener un único estado operativo coherente para todas las áreas de trabajo.
+- Preservar contexto entre proyectos, documentos, tareas, personas, recursos y conocimiento.
+- Reducir la carga cognitiva causada por herramientas y flujos fragmentados.
+- Automatizar trabajo repetitivo sin ceder la autoridad del investigador.
+- Incorporar inteligencia artificial como una capa operativa gobernada y reemplazable.
+- Conservar trazabilidad, procedencia, historial y capacidad de recuperación.
+- Validar la arquitectura mediante flujos reales antes de ampliar el sistema.
 
 ---
 
@@ -86,79 +101,82 @@ ResearchOS/
 ├── INTERACTION_MODEL.md
 ├── SYSTEM_ARCHITECTURE.md
 ├── SOFTWARE_ARCHITECTURE.md
-└── ROADMAP.md
+├── DOCUMENTATION_ARCHITECTURE.md
+├── IMPLEMENTATION_CONTEXTS.md
+├── IMPLEMENTATION_PLAN.md
+├── ROADMAP.md
+└── CLAUDE.md
 ```
 
 La estructura modular por directorios (architecture/, platform/, ai/…) se introducirá cuando comience la fase de implementación.
 
 ---
 
-# Documentos de arquitectura
+# Arquitectura documental
 
-Los documentos de arquitectura trabajan a distintos niveles conceptuales y deben leerse en el siguiente orden. Cada uno depende conceptualmente del anterior:
+La documentación ya no se trata como una única cadena que un agente deba cargar completa. Está gobernada mediante cuatro niveles y un propietario explícito para cada preocupación.
 
-```
-Vision
-    ↓
-Principles
-    ↓
-System Model
-    ↓
-Operational Model
-    ↓
-Responsibilities
-    ↓
-Domain Map
-    ↓
-Domain Model
-    ↓
-Knowledge Model
-    ↓
-System Capabilities
-    ↓
-Use Cases
-    ↓
-AI Architecture ─┬─ Memory Model
-                 ├─ Context Model
-                 └─ Event Model
-    ↓
-Logical Domain Model
-    ↓
-Interaction Model
-    ↓
-System Architecture
-    ↓
-Software Architecture
-```
+La especificación completa se encuentra en **[DOCUMENTATION_ARCHITECTURE.md](DOCUMENTATION_ARCHITECTURE.md)**. Para tareas de implementación, **[IMPLEMENTATION_CONTEXTS.md](IMPLEMENTATION_CONTEXTS.md)** define qué documentos y secciones debe cargar un coding agent.
 
-Los documentos 11–14 conforman la **Arquitectura Cognitiva**: la capa operativa de IA y los tres modelos del sustrato sobre el que opera — lo que el sistema recuerda (Memory), lo que ensambla por tarea (Context) y aquello a lo que reacciona (Events).
+## Nivel 1 · Fundamentos canónicos
 
-El **Logical Domain Model** es la especificación lógica del dominio: la definición canónica y neutral respecto a la tecnología de su estructura, de la que se derivan todos los esquemas, diagramas y tipos.
+Definen el núcleo estable y las reglas globales.
 
-El **Interaction Model** cierra la arquitectura conceptual: define cómo colaboran el investigador y el sistema con independencia de cualquier tecnología de interfaz.
+- [Vision](VISION.md)
+- [System Principles](SYSTEM_PRINCIPLES.md)
+- [System Architecture](SYSTEM_ARCHITECTURE.md)
+- [Logical Domain Model](LOGICAL_DOMAIN_MODEL.md)
+- [Software Architecture](SOFTWARE_ARCHITECTURE.md)
 
-El **System Architecture** integra todos los modelos en una única arquitectura de sistema, fija la autoridad del Domain State, las fronteras entre planos y las invariantes de ejecución.
+## Nivel 2 · Modelos especializados
 
-El **Software Architecture** traduce esas invariantes a módulos, puertos, adaptadores, contratos, transacciones y runtimes implementables, todavía sin elegir productos tecnológicos concretos.
+Cada documento es canónico únicamente dentro de una preocupación delimitada.
 
-1. [Vision](VISION.md)
-2. [Principles](SYSTEM_PRINCIPLES.md)
-3. [System Model](SYSTEM_MODEL.md)
-4. [Operational Model](RESEARCHER_OPERATIONAL_MODEL.md)
-5. [Responsibilities](SYSTEM_RESPONSIBILITIES.md)
-6. [Domain Map](DOMAIN_MAP.md)
-7. [Domain Model](DOMAIN_MODEL.md)
-8. [Knowledge Model](KNOWLEDGE_MODEL.md)
-9. [System Capabilities](SYSTEM_CAPABILITIES.md)
-10. [Use Cases](USE_CASES.md)
-11. [AI Architecture](AI_ARCHITECTURE.md)
-12. [Memory Model](MEMORY_MODEL.md)
-13. [Context Model](CONTEXT_MODEL.md)
-14. [Event Model](EVENT_MODEL.md)
-15. [Logical Domain Model](LOGICAL_DOMAIN_MODEL.md)
-16. [Interaction Model](INTERACTION_MODEL.md)
-17. [System Architecture](SYSTEM_ARCHITECTURE.md)
-18. [Software Architecture](SOFTWARE_ARCHITECTURE.md)
+- [System Model](SYSTEM_MODEL.md)
+- [Researcher Operational Model](RESEARCHER_OPERATIONAL_MODEL.md)
+- [System Responsibilities](SYSTEM_RESPONSIBILITIES.md)
+- [Domain Map](DOMAIN_MAP.md)
+- [Domain Model](DOMAIN_MODEL.md)
+- [Knowledge Model](KNOWLEDGE_MODEL.md)
+- [AI Architecture](AI_ARCHITECTURE.md)
+- [Memory Model](MEMORY_MODEL.md)
+- [Context Model](CONTEXT_MODEL.md)
+- [Event Model](EVENT_MODEL.md)
+- [Interaction Model](INTERACTION_MODEL.md)
+
+## Nivel 3 · Especificaciones funcionales y verticales
+
+Definen vocabulario de comportamiento, casos de uso y amplitud del dominio.
+
+- [System Capabilities](SYSTEM_CAPABILITIES.md)
+- [Use Cases](USE_CASES.md)
+- [Domain Verticals](DOMAIN_VERTICALS.md)
+- [Research Vertical](RESEARCH_VERTICAL.md)
+- [Teaching Vertical](TEACHING_VERTICAL.md)
+- [Administration Vertical](ADMINISTRATION_VERTICAL.md)
+- [Organization Vertical](ORGANIZATION_VERTICAL.md)
+
+## Nivel 4 · Navegación, entrega y proceso
+
+Orientan el trabajo, pero no introducen comportamiento ni arquitectura del sistema.
+
+- [README](README.md)
+- [Roadmap](ROADMAP.md)
+- [Implementation Plan](IMPLEMENTATION_PLAN.md)
+- [Claude Code guidance](CLAUDE.md)
+- [Documentation Architecture](DOCUMENTATION_ARCHITECTURE.md)
+- [Implementation Contexts](IMPLEMENTATION_CONTEXTS.md)
+
+## Regla de autoridad
+
+Cada decisión tiene un único documento propietario. Los demás documentos pueden resumirla, aplicarla o derivar consecuencias, pero no redefinirla. Cada archivo declara al principio:
+
+- de qué es autoridad;
+- de qué no es autoridad;
+- qué lectura requiere antes de modificarlo;
+- qué documentos deben revisarse si cambia.
+
+Un coding agent debe seleccionar un *context bundle* en `IMPLEMENTATION_CONTEXTS.md`; no debe leer todos los Markdown por defecto.
 
 ---
 

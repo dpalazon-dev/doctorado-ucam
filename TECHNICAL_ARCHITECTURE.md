@@ -5,47 +5,70 @@
 | Concern | Contract |
 |---|---|
 | **Level** | Level 2 — Specialized Implementation Model |
-| **Normative status** | Provisional canonical technical baseline · v0.2 |
-| **Authoritative for** | Current implementation technologies, repository layout, runtime packaging, physical data mapping, development toolchain, deployment baseline, security mechanisms, observability, backup and technical acceptance constraints. |
-| **Not authoritative for** | Product vision, domain meaning, system authority, software/component boundaries, logical data ownership, agent-runtime semantics or experiment conclusions. |
-| **Required reading** | `SYSTEM_ARCHITECTURE.md`, `SOFTWARE_ARCHITECTURE.md`, `COMPONENT_MODEL.md`, `DATA_ARCHITECTURE.md`, `AGENT_RUNTIME.md`, `IMPLEMENTATION_PLAN.md`, `DECISIONS.md` (especially ADR-0002 and ADR-0006). |
-| **Downstream documents** | Repository bootstrap, development specifications, dependency manifests, Compose files, CI workflows, database migrations, deployment/runbook documentation and later technology ADRs. |
+| **Normative status** | Provisional canonical technical baseline · v0.3 |
+| **Authoritative for** | Current implementation languages, desktop runtime, process topology, physical storage baseline, inter-process protocol, repository layout, packaging, installation, update, security mechanisms, observability, backup, development toolchain and technical acceptance constraints. |
+| **Not authoritative for** | Product vision, domain meaning, system authority, component ownership, logical data meaning, canonical record structure, agent-runtime semantics, vertical rules or experiment conclusions. |
+| **Required reading** | `SYSTEM_ARCHITECTURE.md`, `SOFTWARE_ARCHITECTURE.md`, `COMPONENT_MODEL.md`, `CANONICAL_DATA_MODEL.md`, `DATA_ARCHITECTURE.md`, `AGENT_RUNTIME.md`, `IMPLEMENTATION_PLAN.md`, `DECISIONS.md`. |
+| **Downstream documents** | Repository bootstrap, desktop-shell specification, Rust-core specifications, cognitive-runtime specifications, IPC contracts, database specifications, migrations, packaging workflows, release runbooks and technology ADRs. |
 
-> This document selects a reversible Experimental Technical Baseline. Evidence from the proving experiments may replace any technology without changing upstream contracts.
+> This document selects a reversible local-first technical baseline. A technology is retained only while it remains the simplest mechanism that satisfies upstream contracts and measured requirements.
 
 ---
 
 ## Status
 
 **Baseline date:** 2026-07-08  
-**Target:** single-user ResearchOS proving environment and first personal VPS deployment  
-**Architecture stage:** modular monolith with separated interactive and worker runtime roles  
-**Stability:** provisional until Experiments 0–3 produce evidence
+**Target:** single-user, local-first ResearchOS desktop application distributed through native installers for Windows, macOS and Linux  
+**Architecture stage:** modular desktop monolith with one authoritative Rust runtime and one subordinated Python cognitive sidecar  
+**Stability:** provisional until the proving experiments and desktop packaging tests produce evidence
 
-This is not a claim that every selected tool is a permanent production standard.
+This baseline supersedes the previous VPS-oriented Python/PostgreSQL deployment model.
 
-It is the smallest coherent stack capable of implementing and testing the reference architecture.
+ResearchOS is not initially deployed as a web service.
+
+The user installs and runs one local application. External services are optional capability providers, not runtime prerequisites except when a selected AI capability explicitly requires them.
 
 ---
 
 ## Purpose
 
-The prior architecture documents intentionally deferred product and framework decisions.
+The technical platform must support a product that behaves like ordinary desktop software:
 
-The project now needs a technical baseline to:
+```text
+Download installer
+        ↓
+Install ResearchOS
+        ↓
+Open the application
+        ↓
+Work locally
+```
 
-- create the repository and package structure;
-- implement Domain and Application contracts;
-- persist canonical and operational state;
-- process real documents durably;
-- execute bounded cognitive operations;
-- expose a usable Workspace/API;
-- deploy safely to one VPS;
-- collect experiment evidence;
-- recover from failure;
-- replace components without architectural rewrite.
+The user must not be required to install or administer:
 
-This document turns logical components into a concrete but reversible implementation platform.
+- Python;
+- Node.js;
+- PostgreSQL;
+- Docker;
+- a message broker;
+- a reverse proxy;
+- a graph database;
+- a vector database server;
+- a separate background service.
+
+The baseline must nevertheless support:
+
+- a rich cross-platform Workspace;
+- canonical local persistence;
+- durable long-running operations;
+- document ingestion and processing;
+- lexical, vector and graph retrieval;
+- bounded cognitive execution;
+- optional remote and local model providers;
+- auditability and provenance;
+- backup and restoration;
+- safe upgrades and schema migrations;
+- replacement of specialized engines when evidence justifies them.
 
 ---
 
@@ -55,88 +78,144 @@ This document turns logical components into a concrete but reversible implementa
 Canonical models and architecture
         ↓ constrain
 Component Model
-        ↓ defines executable responsibility
+        ↓ defines executable responsibilities
+Canonical Data Model
+        ↓ defines shared structural form
 Data Architecture
-        ↓ defines logical state and ownership
+        ↓ defines authority and lifecycle
 Agent Runtime
         ↓ defines cognitive execution semantics
 Technical Architecture
-        ↓ selects mechanisms and products
+        ↓ selects languages, products and packaging
 Development Specifications
-        ↓ define exact endpoints, schemas and code tasks
+        ↓ define exact contracts and code changes
 Implementation
 ```
 
-A technical convenience never overrides an upstream authority or invariant.
+A technical convenience never overrides a domain invariant, authority boundary or human-control policy.
+
+---
+
+# Architectural Thesis
+
+> ResearchOS is a local desktop application whose authoritative state, execution control and security live in a native Rust runtime. Python is a specialized cognitive runtime that performs bounded AI, document and scientific operations under Rust supervision.
+
+The baseline is deliberately polyglot but contains only three first-class implementation languages:
+
+```text
+TypeScript
+    owns presentation
+
+Rust
+    owns authority, state, execution and operating-system integration
+
+Python
+    owns bounded cognitive and scientific computation
+```
+
+Other languages may enter only behind explicit adapters when a concrete capability cannot be implemented reasonably with the baseline stack.
 
 ---
 
 # Baseline Selection Principles
 
-## 1. One Deployable System Before Distribution
+## 1. Local-First Product
 
-The first implementation is one codebase and one deployment stack with distinct runtime processes.
+The installed application remains useful without a server deployment.
 
-No microservices, service mesh or distributed database are introduced.
+Canonical state and retained content reside on the user's machine unless the user explicitly configures synchronization or an external provider.
 
-## 2. PostgreSQL-Centred Until Proven Insufficient
+## 2. One Authoritative Runtime
 
-Canonical state, operational state, Outbox/Inbox, initial projections, lexical search and vector search begin in one PostgreSQL instance under logically separate schemas.
+Rust owns:
 
-This minimizes dual-write and operations complexity while preserving replaceable ports.
+- canonical writes;
+- transactions;
+- authorization;
+- durable jobs;
+- process supervision;
+- event dispatch;
+- filesystem authority;
+- secret access;
+- approval and commit paths.
 
-## 3. Python for Domain, Application and Cognitive Work
+No sidecar, model or frontend may write canonical state directly.
 
-Python is selected because the proving slice combines:
+## 3. Specialized Cognitive Runtime
 
-- document processing;
-- data modeling;
-- HTTP APIs;
-- background processing;
-- AI/model integrations;
-- scientific evaluation.
+Python executes bounded capabilities such as:
 
-The Domain remains plain Python and independent of frameworks.
+- parsing;
+- OCR coordination;
+- extraction;
+- embeddings;
+- reranking;
+- classification;
+- synthesis;
+- evaluation;
+- model invocation.
 
-## 4. Browser Workspace, Not Chat-Only UI
+Python returns Artifacts, evidence and Proposals. Rust validates and mediates every canonical effect.
 
-A typed React workspace provides documents, candidates, evidence and process status.
+## 4. Desktop Shell, Not Browser Deployment
 
-Conversation may be added as one interface but does not define the frontend architecture.
+React renders inside a Tauri WebView.
 
-## 5. Durable Work Without an External Broker
+The production package does not contain a Node.js server and does not expose the Workspace through a public web endpoint.
 
-The first queue, scheduler, Outbox and Inbox use PostgreSQL records and leases.
+## 5. Embedded Storage Before Servers
 
-A broker or workflow engine is introduced only after measured need.
+SQLite and the local filesystem form the initial persistence baseline.
 
-## 6. Provider Adapters, Not Provider Architecture
+Specialized database servers are introduced only after measured insufficiency.
 
-One reasoning-model adapter is implemented first, but contracts remain provider-neutral.
+## 6. Two Long-Lived Processes Before Distribution
 
-Embeddings, parsing and model calls are independently replaceable.
+The initial application contains:
 
-## 7. Operational Simplicity on One VPS
+```text
+Process 1: ResearchOS Desktop
+           Tauri + Rust + React WebView
 
-Docker Compose, Caddy, PostgreSQL and a small number of application containers form the deployment baseline.
+Process 2: Cognitive Runtime
+           supervised Python sidecar
+```
 
-Kubernetes is explicitly out of scope.
+Additional processes are ephemeral adapters for isolated or native work, not permanent services.
 
-## 8. Exact Versions Live in Lockfiles
+## 7. Progressive Retrieval
 
-This document chooses supported major/minor lines.
+The baseline begins with:
 
-The repository pins exact versions and image digests in lockfiles/manifests for reproducibility.
+- structured SQLite queries;
+- SQLite FTS5;
+- canonical relationships and recursive queries;
+- small-scale vector projection stored locally.
 
-## 9. Progressive Cognitive Complexity
+Dedicated vector or graph engines require explicit extraction triggers.
 
-The implementation follows the Agent Runtime complexity ladder. Deterministic code and bounded single-model calls are preferred over planners, loops, parallel branches or multi-agent patterns when they satisfy the same contract.
+## 8. Progressive Cognitive Complexity
 
-No framework or infrastructure is introduced merely to imitate benchmark-leading agent systems.
+The runtime prefers, in order:
 
-## 10. Domain Evaluation Before Benchmark Optimization
+1. deterministic logic;
+2. one structured model call;
+3. a static pipeline;
+4. plan–act–verify;
+5. maker–checker or bounded parallelism;
+6. experimental multi-agent coordination.
 
-The technical stack is optimized first against versioned ResearchOS tasks and proving-slice evidence. Public agent benchmarks may diagnose capabilities, but they do not determine the architecture or justify infrastructure by themselves.
+Infrastructure must not force a more complex execution pattern than the operation requires.
+
+## 9. Native Packaging Without External Prerequisites
+
+Every production dependency required to launch ResearchOS is included in the platform-specific application package or is supplied by the operating system.
+
+## 10. Exact Versions Live in Lockfiles
+
+This document selects technology families and compatibility lines.
+
+Exact versions, checksums and build inputs live in repository manifests and release provenance.
 
 ---
 
@@ -144,536 +223,658 @@ The technical stack is optimized first against versioned ResearchOS tasks and pr
 
 | Concern | Selected baseline | Role |
 |---|---|---|
-| Backend language | Python 3.13.x | Domain, Application, workers, cognitive runtime, CLI |
-| Python dependency/tooling | uv + `pyproject.toml` + lockfile | environments, dependency resolution, commands |
-| HTTP framework | FastAPI | API adapter and OpenAPI contract |
-| Contract validation | Pydantic v2 | transport/runtime schemas; not Domain entities |
-| Persistence mapping | SQLAlchemy 2.x | repository and projection adapters |
-| PostgreSQL driver | Psycopg 3 | synchronous/asynchronous database access |
-| Migrations | Alembic | reviewed schema migrations |
-| Canonical database | PostgreSQL 17.x | canonical, operational, event and initial projection state |
-| Vector extension | pgvector | initial semantic projection for Experiment 2 |
-| Content storage | content-addressed local filesystem volume | PDFs, normalized text and persisted Artifacts |
-| Background runtime | ResearchOS Python worker using PostgreSQL jobs/leases | durable jobs, processes, event reactions |
-| Scheduler/dispatcher | PostgreSQL-backed scheduler + Outbox dispatcher | timers, retries, dispatch |
-| Frontend language | TypeScript on Node.js 24 LTS | Workspace build/tooling |
-| Frontend | React 19 + Vite | browser Workspace |
-| API client | generated/typed client from OpenAPI or equivalent schema | frontend/backend contract |
-| PDF parsing | PyMuPDF | initial text/metadata extraction |
-| OCR fallback | Tesseract adapter, disabled until required by corpus | image-based documents |
-| Reasoning provider | Anthropic adapter first | extraction, synthesis and answer generation |
-| Embedding provider | configurable embedding adapter; first implementation may use an OpenAI-compatible API | vector projection |
-| Observability | structured JSON logs + OpenTelemetry instrumentation | logs, traces and metrics |
-| Testing | pytest, Hypothesis, architecture tests, Playwright/Vitest | unit, property, integration and UI tests |
-| Packaging/deployment | Docker images + Docker Compose | local and VPS runtime |
-| Edge/TLS | Caddy | HTTPS, static UI and reverse proxy |
-| Backups | `pg_dump` + restic encrypted repository | database/content/config recovery |
-| CI | GitHub Actions | lint, type, test, build, migration and security checks |
+| Desktop framework | Tauri 2 | native lifecycle, windows, menus, tray, notifications, installer and sidecar supervision |
+| Workspace | React + TypeScript + Vite | rich desktop UI rendered inside the system WebView |
+| Authoritative runtime | Rust stable toolchain | Domain/Application execution, persistence, jobs, events, security and OS integration |
+| Rust async runtime | Tokio | bounded asynchronous I/O and supervised runtime tasks |
+| Rust serialization | Serde | canonical technical and IPC serialization |
+| Rust validation/schema | typed domain structures plus JSON Schema generation where needed | compile-time and boundary validation |
+| Canonical database | SQLite with WAL | canonical, operational, event, audit and initial projection records |
+| Rust database access | SQLx SQLite adapter | explicit SQL, transactions, migrations and typed repository mapping |
+| Lexical retrieval | SQLite FTS5 | initial full-text projection |
+| Graph baseline | canonical relationship tables + recursive SQL | typed relationships and bounded traversal |
+| Vector baseline | SQLite metadata/BLOB projection + NumPy similarity in the cognitive runtime | small-corpus semantic retrieval proving baseline |
+| Future embedded vector option | replaceable embedded adapter, initially evaluated against LanceDB or equivalent | introduced only by measured retrieval/scale need |
+| Content storage | content-addressed local filesystem | retained source bytes, versions, normalized text and generated Documents |
+| Cognitive runtime | Python supported release packaged as a sidecar | model, document, retrieval and evaluation capabilities |
+| Python environment | `uv`, `pyproject.toml` and lockfile | deterministic development and sidecar build |
+| Python schemas | Pydantic v2 | IPC payloads and cognitive capability contracts; not canonical Domain authority |
+| Scientific stack | NumPy plus capability-specific libraries | vector operations and scientific processing |
+| PDF parsing | PyMuPDF adapter | initial text and metadata extraction |
+| OCR | optional Tesseract or native OCR adapter | invoked only when extraction quality requires it |
+| Model integration | provider-neutral Python adapters | remote or local reasoning and embedding providers |
+| Inter-process protocol | framed, versioned JSON-RPC-like messages over stdin/stdout | Rust–Python commands, progress, results and cancellation |
+| Secrets | OS credential-store abstraction | API keys and sensitive local configuration |
+| Logging | Rust `tracing` + structured Python logging | local correlated diagnostics |
+| Rust tests | `cargo test`, property and architecture tests | authoritative runtime verification |
+| Python tests | pytest and property/evaluation suites | cognitive capability verification |
+| Frontend tests | Vitest + Playwright where applicable | UI and interaction verification |
+| Packaging Python | PyInstaller baseline; Nuitka evaluated only by evidence | self-contained sidecar binaries |
+| Packaging desktop | Tauri bundler | Windows, macOS and Linux application packages |
+| CI | native GitHub Actions runners per target OS | test, build, sign, package and verify installers |
 
-## Version Policy
+---
 
-- Python: pin the latest approved patch in the 3.13 line; review 3.14 after dependency compatibility is demonstrated.
-- PostgreSQL: pin the current approved 17.x minor and update minors promptly after backup/restore testing.
-- Node.js: use the active 24 LTS line for frontend tooling.
-- Framework/library major versions are pinned in lockfiles and upgraded through reviewed changes.
-- Container images use immutable tags or digests in deployment.
-- Model identifiers and provider configuration are recorded per experiment and invocation; no floating “latest” model identifier is permitted in reproducible runs.
+# Language Responsibility Model
+
+## TypeScript
+
+TypeScript owns presentation and interaction concerns:
+
+- Workspace composition;
+- navigation;
+- forms;
+- tables;
+- editors;
+- dashboards;
+- graph visualization;
+- process-status presentation;
+- conversation surfaces;
+- optimistic local UI state;
+- accessibility behavior.
+
+TypeScript does not own:
+
+- domain invariants;
+- authorization;
+- canonical transactions;
+- durable job state;
+- secrets;
+- model-provider credentials;
+- direct SQLite access.
+
+## Rust
+
+Rust owns the authoritative application runtime.
+
+### Domain and Application
+
+- Core Entity and Value Object implementations;
+- domain invariants;
+- Commands and Queries;
+- Application Services;
+- proposal and approval paths;
+- Unit of Work;
+- optimistic concurrency;
+- canonical event creation.
+
+### Data and Execution
+
+- SQLite access;
+- schema migration;
+- content-addressed storage;
+- durable Jobs and Process Instances;
+- Outbox/Inbox;
+- event dispatch and reactions;
+- checkpoints and recovery;
+- cancellation;
+- process supervision;
+- backup and restore coordination.
+
+### Security and Native Integration
+
+- capability authorization;
+- secret retrieval;
+- filesystem permissions;
+- file selection and drag-and-drop boundary;
+- notification and tray integration;
+- updater coordination;
+- application-instance locking;
+- sidecar lifecycle.
+
+## Python
+
+Python owns bounded cognitive and scientific execution.
+
+### Appropriate Responsibilities
+
+- model-provider invocation;
+- prompt rendering;
+- PDF and scientific document processing;
+- OCR orchestration;
+- embeddings;
+- reranking;
+- semantic extraction;
+- classification;
+- summarization;
+- synthesis;
+- evaluation;
+- experimental retrieval algorithms;
+- optional local-model adapters.
+
+### Forbidden Responsibilities
+
+Python must not:
+
+- open the canonical database for direct writes;
+- bypass Rust authorization;
+- commit Domain Entities;
+- own the canonical event stream;
+- store hidden provider memory as ResearchOS memory;
+- modify prompts, policies or routing autonomously;
+- retain unrestricted filesystem access;
+- become a second Application Layer.
+
+## Other Languages
+
+C, C++, Java, Swift, Kotlin or other languages may be introduced only when:
+
+1. a required capability has no acceptable baseline implementation;
+2. the adapter boundary is explicit and versioned;
+3. the dependency is independently testable and replaceable;
+4. the language does not acquire canonical authority;
+5. packaging and security impact are documented through an ADR.
+
+Typical acceptable uses include:
+
+- native inference engines;
+- OCR or media libraries;
+- hardware-specific acceleration;
+- institutional JVM-only integrations;
+- platform-specific system adapters.
 
 ---
 
 # Runtime Topology
 
-## Stage 0 — Development and Initial Proving Slice
+## Installed Application
 
 ```text
-Developer machine / CI
-
-┌───────────────────────────────────────────────────────────┐
-│ api process                                               │
-│ FastAPI · Commands · Queries · Domain · Application       │
-└──────────────────────┬────────────────────────────────────┘
-                       │
-┌──────────────────────▼────────────────────────────────────┐
-│ PostgreSQL                                                │
-│ domain · ops · eventing · projection · audit schemas      │
-│ pgvector                                                  │
-└──────────────────────┬────────────────────────────────────┘
-                       │
-┌──────────────────────▼────────────────────────────────────┐
-│ worker process                                            │
-│ Jobs · Process Managers · Events · Cognitive Runtime      │
-└──────────────────────┬────────────────────────────────────┘
-                       │
-             ┌─────────▼─────────┐
-             │ content volume    │
-             └───────────────────┘
-
-web dev server or built static Workspace calls `/api/v1`.
+┌──────────────────────────────────────────────────────────────┐
+│ ResearchOS Desktop                                           │
+│ Tauri process                                                │
+│                                                              │
+│  React Workspace                                             │
+│          │ Tauri commands/events/channels                    │
+│          ▼                                                   │
+│  Rust Authoritative Runtime                                  │
+│  ├── Domain and Application                                  │
+│  ├── SQLite repositories                                     │
+│  ├── Jobs and Process Managers                               │
+│  ├── Event dispatcher                                        │
+│  ├── Content store                                           │
+│  ├── Security and credentials                                │
+│  └── Cognitive Runtime Supervisor                            │
+│                    │ framed IPC                              │
+└────────────────────┼─────────────────────────────────────────┘
+                     ▼
+┌──────────────────────────────────────────────────────────────┐
+│ Python Cognitive Sidecar                                     │
+│ ├── capability registry                                      │
+│ ├── document processing                                      │
+│ ├── model adapters                                           │
+│ ├── embeddings and retrieval                                 │
+│ ├── verification helpers                                     │
+│ └── evaluation                                               │
+└──────────────────────────────────────────────────────────────┘
 ```
 
-Development MAY run API and worker as local processes while PostgreSQL runs in a container.
+## Optional Ephemeral Processes
 
-## Stage 1 — Personal VPS
+The Rust runtime may start short-lived processes for:
 
-```text
-Internet
-    ↓ HTTPS
-Caddy
-    ├── `/`       → static Workspace
-    └── `/api/*`  → API container
+- OCR;
+- media conversion;
+- local inference;
+- isolated code execution;
+- format-specific parsing;
+- migration or repair utilities.
 
-Docker Compose network
-    ├── api
-    ├── worker
-    ├── postgres
-    └── optional isolated-runner (disabled by default)
+Such processes receive the minimum required authority and terminate after the operation.
 
-Persistent volumes
-    ├── postgres-data
-    ├── researchos-content
-    └── backup-staging
-```
+## No Public Server Baseline
 
-The Scheduler and Outbox Dispatcher initially execute inside the worker process as independently supervised loops.
+The production application does not expose:
 
-## Runtime Separation
+- a public HTTP API;
+- a fixed localhost port;
+- a database port;
+- a message broker;
+- an externally reachable administration interface.
 
-### API Process
-
-May host:
-
-- Experience adapters;
-- Command/Query/Application components;
-- Domain components;
-- authentication/session;
-- synchronous proposal/approval operations.
-
-Must not host:
-
-- long model calls;
-- full PDF processing;
-- vector rebuild;
-- unbounded event cascades;
-- browser/code execution.
-
-### Worker Process
-
-Hosts:
-
-- Job Coordinator;
-- Process Manager Host;
-- Event Reaction Host;
-- Outbox Dispatcher;
-- Scheduler;
-- Cognitive Operation Manager;
-- Context Builder;
-- Agent Runtime;
-- projection builders;
-- model/tool adapters.
-
-### Isolated Runner
-
-Not required for initial paper extraction.
-
-When introduced, it executes as a separate locked-down container/process with:
-
-- no canonical database credentials;
-- no unrestricted host filesystem;
-- scoped network policy;
-- one-time task credentials;
-- resource/time limits;
-- normalized result return.
+A local integration API may be introduced later behind an explicit user-controlled feature and security specification.
 
 ---
 
-# Repository Structure
+# Desktop Architecture
 
-```text
-researchos/
-├── pyproject.toml
-├── uv.lock
-├── .python-version
-├── package.json                 # root scripts/workspace metadata if needed
-├── compose.yaml
-├── Caddyfile
-├── .env.example
-├── README.md
-├── docs/                        # architecture and future specifications
-│
-├── apps/
-│   ├── api/
-│   │   └── main.py
-│   ├── worker/
-│   │   └── main.py
-│   └── cli/
-│       └── main.py
-│
-├── src/researchos/
-│   ├── shared_kernel/
-│   ├── domain/
-│   │   ├── knowledge/
-│   │   ├── documents/
-│   │   ├── projects/
-│   │   ├── people/
-│   │   ├── tasks/
-│   │   ├── activities/
-│   │   └── resources/
-│   ├── application/
-│   │   ├── commands/
-│   │   ├── queries/
-│   │   ├── proposals/
-│   │   ├── policies/
-│   │   └── effects/
-│   ├── cognitive/
-│   │   ├── operations/
-│   │   ├── context/
-│   │   ├── agent_runtime/
-│   │   ├── verification/
-│   │   └── artifacts/
-│   ├── processes/
-│   ├── eventing/
-│   ├── contracts/
-│   │   ├── driving/
-│   │   └── driven/
-│   ├── adapters/
-│   │   ├── persistence/
-│   │   ├── content/
-│   │   ├── projections/
-│   │   ├── models/
-│   │   ├── tools/
-│   │   ├── integrations/
-│   │   └── notifications/
-│   ├── interfaces/
-│   │   ├── http/
-│   │   └── cli/
-│   └── operations/
-│       ├── config/
-│       ├── identity/
-│       ├── telemetry/
-│       ├── audit/
-│       └── health/
-│
-├── migrations/
-│   ├── env.py
-│   └── versions/
-│
-├── web/
-│   ├── package.json
-│   ├── src/
-│   │   ├── app/
-│   │   ├── features/
-│   │   ├── entities/
-│   │   ├── api/
-│   │   └── components/
-│   └── tests/
-│
-├── tests/
-│   ├── unit/
-│   ├── property/
-│   ├── architecture/
-│   ├── integration/
-│   ├── contract/
-│   ├── end_to_end/
-│   └── fixtures/
-│
-├── experiments/
-│   ├── datasets/
-│   ├── manifests/
-│   ├── evaluations/
-│   └── reports/
-│
-├── infra/
-│   ├── docker/
-│   ├── backup/
-│   └── scripts/
-│
-└── scripts/
-    ├── dev
-    ├── test
-    ├── migrate
-    ├── backup
-    └── restore-test
-```
+## Tauri Host
 
-## Package Rules
+Tauri owns:
 
-- `domain` imports only `shared_kernel` and standard-library/domain-safe dependencies.
-- `application` imports Domain and port contracts, never concrete adapters.
-- `cognitive` imports cognitive/application ports and read contracts, never canonical write adapters.
-- `processes` issue Commands through application ports.
-- `adapters` implement driven ports.
-- `interfaces` call driving ports.
-- runtime bootstrap under `apps/` composes concrete implementations.
-- provider SDK imports are restricted to their adapter packages.
+- application startup and shutdown;
+- single-instance enforcement;
+- window lifecycle;
+- menus and shortcuts;
+- tray behavior;
+- native notifications;
+- file and directory dialogs;
+- drag-and-drop admission;
+- deep links and file associations when introduced;
+- updater integration;
+- platform package metadata;
+- cognitive-sidecar startup and supervision.
 
-These rules are enforced through architecture tests.
+## React Workspace
+
+The React application is compiled into static assets included in the desktop bundle.
+
+Node.js is a build-time dependency only.
+
+The Workspace communicates with Rust through typed Tauri commands and event channels.
+
+It never communicates directly with Python.
+
+## Tauri Boundary
+
+Every command exposed to the Workspace must define:
+
+- request schema;
+- response schema;
+- required authority;
+- synchronous or durable execution behavior;
+- cancellation semantics;
+- error codes;
+- redaction behavior.
+
+Large payloads are referenced by identifiers or authorized local handles rather than copied through the WebView boundary.
 
 ---
 
-# Backend Architecture
+# Authoritative Rust Runtime
 
-## Python Runtime
+## Crate Boundaries
 
-Python 3.13.x is the baseline.
+The initial repository should contain cohesive Rust crates rather than one unrestricted application crate.
 
-Reasons:
+```text
+crates/
+├── domain
+├── application
+├── canonical-data
+├── persistence-sqlite
+├── content-store
+├── events
+├── jobs
+├── process-runtime
+├── agent-control
+├── security
+├── ipc-contracts
+├── cognitive-client
+└── diagnostics
+```
 
-- active bugfix line at baseline creation;
-- mature library compatibility;
-- modern typing and runtime behavior;
-- long enough security horizon for the proving phase.
+The exact decomposition may evolve, but dependency direction remains inward toward Domain and Application contracts.
 
-The exact patch is pinned in `.python-version` and CI/container images.
+## Async Model
 
-## Dependency Management
+Tokio supports:
 
-`uv` owns:
+- sidecar I/O;
+- filesystem operations;
+- provider-independent progress streams;
+- timers;
+- durable job dispatch;
+- cancellation propagation.
 
-- Python installation for development/CI where practical;
-- virtual environment and dependency resolution;
-- reproducible lockfile;
-- task execution through repository scripts.
+Domain operations remain synchronous and deterministic inside explicit transaction boundaries.
 
-Production images install from the lockfile, not unconstrained requirements.
+Async execution must not leak into Domain semantics.
 
-Dependency groups:
+## Error Model
 
-- runtime;
-- development;
-- test;
-- experiment;
-- optional adapters.
+Rust errors are typed by boundary:
 
-Provider SDKs remain optional extras where possible.
+- Domain Error;
+- Validation Error;
+- Authorization Error;
+- Conflict Error;
+- Persistence Error;
+- Content Error;
+- Cognitive Runtime Error;
+- Provider Error;
+- Process Error;
+- Technical Failure.
 
-## FastAPI Boundary
+User-facing messages are derived from typed errors and do not expose secrets, raw prompts or stack traces.
 
-FastAPI implements only the HTTP adapter.
+---
 
-It provides:
+# Cognitive Runtime Sidecar
 
-- routing;
-- authentication/session integration;
-- transport validation;
-- OpenAPI generation;
-- streaming/status endpoints where useful;
-- mapping of application results to HTTP.
+## Packaging
 
-FastAPI types do not enter Domain modules.
+The cognitive runtime is built into a platform-specific executable containing:
 
-## Pydantic Usage
+- the Python interpreter;
+- locked Python dependencies;
+- ResearchOS cognitive packages;
+- provider adapters;
+- required native libraries.
 
-Pydantic v2 is used for:
+The user does not install Python separately.
 
-- Command/Query transport models;
-- event envelopes;
-- model structured outputs;
-- capability/tool schemas;
-- configuration validation;
-- OpenAPI/JSON Schema generation.
+PyInstaller is the initial packaging mechanism because it minimizes bootstrap work.
 
-Pydantic models are not the canonical Domain model by default.
+Nuitka may replace it if measurements demonstrate meaningful advantages in:
 
-Domain entities and Value Objects remain framework-independent dataclasses/classes with explicit constructors and invariants.
+- startup time;
+- package size;
+- native-library reliability;
+- antivirus compatibility;
+- runtime performance.
 
-## Persistence Adapter
+## Process Contract
 
-SQLAlchemy 2.x implements:
+The Rust supervisor:
 
-- repository mappings;
-- Unit of Work;
-- projection queries;
-- migrations metadata;
-- explicit transaction boundaries.
+- starts the sidecar;
+- performs protocol negotiation;
+- sends only admitted tasks;
+- monitors heartbeat and progress;
+- enforces time and cancellation budgets;
+- terminates and restarts unhealthy processes;
+- reconciles interrupted operations;
+- records process metadata.
 
-Psycopg 3 is the PostgreSQL driver.
+The Python sidecar:
 
-The initial implementation may use async database access in API/worker adapters while keeping Domain behavior synchronous.
+- advertises supported capabilities and versions;
+- accepts bounded tasks;
+- requests only authorized resources;
+- streams progress;
+- returns typed results;
+- emits no canonical event directly;
+- exits cleanly when instructed.
 
-No lazy ORM object graph crosses repository boundaries.
+## Capability Isolation
 
-Repositories load one aggregate boundary explicitly.
+A capability receives:
 
-## Migrations
+```text
+operation identifier
+capability identifier and version
+objective
+context manifest reference
+authorized content references
+tool policy
+model policy
+budget
+output schema
+stopping conditions
+```
 
-Alembic manages physical schema migrations.
+It returns:
 
-Rules:
+```text
+status
+Artifacts
+Proposals
+Evidence references
+metrics
+provider invocation records
+warnings
+failure details
+```
 
-- migrations are reviewed code;
-- autogeneration is advisory;
-- every migration declares affected logical owner;
-- destructive changes use expand/backfill/switch/contract where possible;
-- semantic data migrations have tests and rollback/recovery plan;
-- production migration runs before application cutover;
-- CI checks for model/migration drift.
+## Provider Independence
+
+Provider SDKs remain inside Python adapters.
+
+The Rust runtime sees provider-neutral operation contracts and usage records.
+
+One provider may be implemented first. Multi-provider routing is introduced only after a concrete resilience, quality or cost requirement is measured.
+
+---
+
+# Rust–Python IPC
+
+## Baseline Transport
+
+The initial protocol uses framed messages over the sidecar's standard input and output.
+
+```text
+Rust supervisor
+      ⇅
+length-prefixed JSON frames
+      ⇅
+Python cognitive sidecar
+```
+
+Standard error is reserved for structured sidecar diagnostics and must not carry protocol messages.
+
+## Protocol Requirements
+
+Every message includes:
+
+- protocol version;
+- message type;
+- request or event identifier;
+- operation identifier;
+- timestamp;
+- payload schema version;
+- correlation identifier.
+
+Supported message families include:
+
+```text
+hello
+capability_manifest
+execute
+progress
+artifact
+proposal
+result
+cancel
+cancelled
+heartbeat
+error
+shutdown
+```
+
+## Contract Definition
+
+IPC schemas live in a language-neutral directory.
+
+```text
+schemas/ipc/
+├── envelope.schema.json
+├── capability-manifest.schema.json
+├── execute.schema.json
+├── progress.schema.json
+├── result.schema.json
+└── error.schema.json
+```
+
+Rust and Python types are generated or validated against the same schema version.
+
+Contract tests run both implementations against a shared fixture suite.
+
+## Payload Rules
+
+IPC messages must not carry large document bodies or vector matrices unless no reference mechanism is available.
+
+Preferred exchange:
+
+```text
+content object identifier
+content version identifier
+authorized temporary path
+segment identifiers
+Artifact identifier
+Context Manifest identifier
+```
+
+The Rust runtime grants capability-scoped access and revokes temporary access after completion.
+
+## Future Transport Trigger
+
+Named pipes on Windows and Unix-domain sockets on macOS/Linux may replace standard streams if measurements demonstrate that the baseline cannot support:
+
+- required concurrency;
+- streaming throughput;
+- cancellation reliability;
+- sidecar multiplexing.
+
+The logical protocol remains unchanged.
 
 ---
 
 # Database Architecture
 
-## PostgreSQL Version
+## SQLite Baseline
 
-PostgreSQL 17.x is the conservative experimental baseline.
+SQLite stores the initial physical representation of:
 
-The current minor is pinned and updated through normal maintenance.
+- canonical Domain records;
+- canonical relationships;
+- provenance;
+- document metadata and versions;
+- Commands and Proposals;
+- approvals;
+- Jobs and Process Instances;
+- Domain Events;
+- Outbox and Inbox records;
+- audit records;
+- configuration metadata;
+- projection manifests;
+- lexical-search projection;
+- initial vector metadata and values.
 
-PostgreSQL 18 may be evaluated later, but no experiment depends on an 18-only feature.
+## Ownership
 
-## Logical Schemas
+Only Rust persistence adapters may open the canonical database for writes.
+
+Python, React and external adapters do not receive a writable database connection.
+
+Read access is also mediated through Rust contracts unless an explicitly read-only technical adapter is approved.
+
+## Connection and Concurrency Model
+
+The baseline uses:
+
+- WAL mode;
+- foreign keys enabled;
+- short explicit transactions;
+- a bounded connection pool;
+- one logical write coordinator;
+- optimistic concurrency through `record_version`;
+- busy timeouts and bounded retries;
+- no silent last-write-wins behavior.
+
+Single-user does not mean single-operation. Multiple UI actions and background jobs may coexist, but canonical mutation remains serialized through declared transaction paths.
+
+## Migrations
+
+SQL migrations are owned by the Rust persistence package.
+
+Each application release defines:
+
+- minimum readable schema version;
+- target schema version;
+- forward migration;
+- backup requirement;
+- failure behavior;
+- restoration procedure.
+
+A migration failure prevents normal application startup and offers recovery or diagnostic export. It must not continue with a partially migrated canonical database.
+
+## Local Data Location
+
+The application resolves operating-system appropriate data directories.
+
+Conceptually:
 
 ```text
-researchos database
-├── domain
-│   ├── knowledge_*
-│   ├── document_*
-│   ├── project_*
-│   ├── person_*
-│   ├── task_*
-│   ├── activity_*
-│   └── resource_*
-├── ops
-│   ├── command_receipt
-│   ├── proposal / approval
-│   ├── job / process_instance
-│   ├── cognitive_operation / checkpoint
-│   ├── model_invocation / capability_invocation
-│   └── effect_intent / effect_result
-├── eventing
-│   ├── outbox
-│   ├── inbox
-│   └── dead_letter
-├── projection
-│   ├── workspace views
-│   ├── lexical search records
-│   ├── vector records
-│   ├── graph nodes/edges
-│   └── projection checkpoints
-├── audit
-│   └── audit_entry
-└── public
-    └── extension metadata only; application tables avoided
+ResearchOS/
+├── data/
+│   └── researchos.db
+├── content/
+├── projections/
+├── cache/
+├── logs/
+├── backups/
+└── runtime/
 ```
 
-Exact table names are defined by data specifications.
+Paths are not hard-coded to one operating system.
 
-## Database Roles
+## Database Encryption
 
-At minimum:
+Whole-database encryption is not assumed by default because it introduces cross-platform and recovery complexity.
 
-- migration owner;
-- application read/write role;
-- worker role;
-- projection/rebuild role;
-- backup role;
-- read-only diagnostic role.
+Sensitive values are excluded from SQLite where practical and stored in the operating-system credential store.
 
-The proving deployment may initially share some credentials, but production configuration must preserve least privilege and schema ownership.
+Database encryption may be added after a threat-model and recovery ADR.
 
-## Transactions
+---
 
-- command transaction: aggregate + Outbox + idempotency result;
-- operational transitions: separate short transactions;
-- no model/network/tool call while a database transaction is open;
-- optimistic aggregate version check;
-- explicit isolation level per operation, defaulting to ordinary read committed unless stronger semantics are justified;
-- advisory locks only for scheduler/maintenance coordination, not Domain correctness.
+# Canonical Physical Mapping
 
-## Job Queue
+## Aggregate Families
 
-The first durable queue is an `ops.job` table.
+The Canonical Data Model permits separate tables for each aggregate family.
 
-Workers claim ready rows using:
+The baseline should prefer explicit tables and extension tables over one generic entity-property store.
 
-- short transaction;
-- ordered selection;
-- `FOR UPDATE SKIP LOCKED` or equivalent;
-- lease owner and expiry;
-- attempt counter;
-- committed claim before work begins.
+Conceptual families include:
 
-A worker:
+```text
+projects
+project_extensions
 
-1. claims a job;
-2. executes outside the claim transaction;
-3. checkpoints operation/process state;
-4. marks success, retry or terminal failure;
-5. releases/renews lease explicitly.
+documents
+document_versions
+document_extensions
 
-## Wake-Up Mechanism
+knowledge
+knowledge_extensions
 
-Polling is the correctness mechanism.
+people
+person_extensions
 
-PostgreSQL `LISTEN/NOTIFY` may reduce wake-up latency but is not the durable queue and may be lost without affecting correctness.
+tasks
+task_extensions
 
-## Outbox/Inbox
+activities
+activity_extensions
 
-- Outbox inserts atomically with canonical mutation.
-- Dispatcher leases undispatched rows and publishes to the internal consumer registry.
-- For the modular monolith, “publish” initially means durable routing to registered event consumers/jobs through database-backed records.
-- Inbox uniqueness is `(consumer_id, event_id)`.
-- External brokers may later implement the same contracts.
+resources
+resource_extensions
+```
 
-## Lexical Search
+Exact fields and table names belong to physical data specifications.
 
-Initial retrieval uses PostgreSQL full-text search and structured filters.
+## Derived Type Registry
 
-It indexes:
+The database stores a governed registry for:
 
-- Document title/metadata;
-- normalized text segments;
-- validated Knowledge;
-- selected Person/Project/Task labels.
+- type identifier;
+- base Core Entity kind;
+- owning vertical;
+- schema version;
+- extension schema reference;
+- lifecycle status.
 
-Language configuration and stemming are explicit per content language.
+Unversioned arbitrary JSON does not become canonical extension data.
 
-## Vector Search
+## Relationships
 
-pgvector implements the first vector projection.
+Typed relationships remain canonical records.
 
-Rules:
+They include, at minimum:
 
-- vectors remain in `projection` schema;
-- each row carries source/version/model/preprocessing generation;
-- exact search is acceptable for small experiment corpora;
-- approximate indexes are introduced after measured dataset/query need;
-- changing embedding model creates a new generation and rebuild;
-- vector results never bypass canonical access policy.
+- source reference;
+- relationship type;
+- target reference;
+- origin;
+- validation status;
+- confidence when applicable;
+- provenance;
+- temporal validity;
+- record version.
 
-## Graph Projection
-
-The first graph representation is relational:
-
-- canonical relationship records projected as typed edges;
-- candidate/inferred edges explicitly classified;
-- recursive SQL for bounded traversal;
-- no dedicated graph database in the baseline.
-
-A graph database requires measured query/scale evidence and an ADR.
-
-## Hybrid Retrieval Assembly
-
-The Context Builder combines retrieval channels at the application level rather than delegating authority to one database product.
-
-The initial channel set is:
-
-1. canonical references and structured SQL filters;
-2. PostgreSQL full-text search;
-3. pgvector semantic similarity;
-4. relational graph traversal;
-5. authorized external retrieval through a capability adapter.
-
-Implementation rules:
-
-- every result carries source identity, version, retrieval channel and projection generation;
-- access policy is applied before ranking and fusion;
-- lexical, vector and graph scores are not assumed to be directly comparable;
-- fusion/reranking is implemented as a replaceable application strategy and recorded in the Context Manifest;
-- a simple deterministic fusion method is preferred before model-based reranking;
-- external results remain raw evidence until ingested and governed;
-- deletion or reclassification of canonical data invalidates dependent projection entries.
-
-This provides hybrid retrieval without requiring separate vector and graph products during the proving phase.
+Graph projections are derived from these records and never become an alternative source of truth.
 
 ---
 
@@ -681,1157 +882,1257 @@ This provides hybrid retrieval without requiring separate vector and graph produ
 
 ## Baseline
 
-Content is stored on a persistent filesystem volume using content-addressed paths.
+Retained bytes are stored outside SQLite in a local content-addressed store.
 
 ```text
-/content/
-└── sha256/
-    └── ab/
-        └── cd/
-            └── <full-digest>
+content/<algorithm>/<prefix>/<digest>
 ```
 
-Metadata remains in PostgreSQL.
+SQLite stores:
+
+- digest;
+- size;
+- media type;
+- content version;
+- original source metadata;
+- storage state;
+- integrity verification state.
 
 ## Write Protocol
 
-1. stream upload to temporary restricted path;
-2. enforce size/media policy;
-3. calculate SHA-256 digest;
-4. optionally scan/inspect;
-5. atomically move into content-addressed path;
-6. commit Content Object metadata and Document reference;
-7. clean temporary file on failure.
+```text
+admit source
+    ↓
+write to temporary file
+    ↓
+calculate digest
+    ↓
+validate size and media type
+    ↓
+atomically move to content store
+    ↓
+commit metadata and Domain transition
+```
 
-## Rules
+If metadata commit fails, orphan reconciliation removes or adopts the unreferenced object according to policy.
 
-- content files are immutable;
-- application paths are never canonical identifiers;
-- generated/normalized content has its own digest and provenance;
-- content access occurs through the Content Repository port;
-- filenames from users are metadata, never trusted paths;
-- the API does not expose raw host paths;
-- backup includes content and database metadata consistently enough for reconciliation.
+## Access
 
-## Future S3 Compatibility
+The frontend never receives unrestricted filesystem paths.
 
-An S3-compatible adapter may replace the filesystem when:
+The Rust runtime exposes bounded read streams, temporary handles or application URLs.
 
-- multi-host access is required;
-- content volume exceeds practical VPS storage;
-- off-host durability or lifecycle policies justify it.
+The Python sidecar receives only capability-authorized content references or temporary paths.
 
-The logical Content Object contract remains unchanged.
+## Integrity
+
+Content integrity is periodically checked against stored digests.
+
+Corruption creates an operational incident and does not silently substitute another source.
 
 ---
 
 # Document Processing
 
-## Initial Parser
-
-PyMuPDF is the baseline PDF parser for:
-
-- page count and metadata;
-- text blocks/words;
-- page coordinates;
-- basic images/tables where available;
-- text extraction for ordinary digital PDFs.
-
-## Parsing Pipeline
+## Pipeline
 
 ```text
-original content
-    ↓ media validation
-PyMuPDF extraction
+Document admitted
     ↓
-page/block records + normalized text
-    ↓ quality checks
-optional OCR fallback
+content retained
     ↓
-versioned derived content + provenance
+parser selected
+    ↓
+text and structure extracted
+    ↓
+quality assessed
+    ↓
+OCR fallback if justified
+    ↓
+normalized representation produced
+    ↓
+segments created
+    ↓
+lexical/vector projections scheduled
+    ↓
+Knowledge extraction optionally requested
 ```
+
+## Parser Placement
+
+Rust owns admission, content retention, job state and output commit.
+
+Python owns initial scientific parsing and extraction adapters.
+
+A parser may be replaced by a native Rust or C/C++ implementation without changing the pipeline contract.
 
 ## OCR
 
-Tesseract is an optional capability adapter.
+OCR is optional and expensive.
 
-It is activated only when deterministic extraction quality indicates image-based text.
+It is invoked only when:
 
-OCR output is always marked as derived and lower-confidence until reviewed or cross-checked.
+- normal extraction fails;
+- extracted text quality is below threshold;
+- the user explicitly requests it;
+- a document type requires it.
 
-## Scientific Structure
+OCR binaries may be packaged as optional sidecars or downloaded through an explicit component-install workflow.
 
-GROBID or another scientific-document service is deferred until ordinary extraction proves insufficient for citations, sections or bibliography.
+## Untrusted Files
 
-Its introduction must be evaluated against the same parser contract.
+Document parsers operate with minimal permissions.
 
-## Malicious Documents
+Files are treated as untrusted input. Parsing limits include:
 
-Initial parsing occurs in the worker with strict library/resource limits for trusted personal inputs.
-
-Before accepting arbitrary external uploads, parsing moves to the Isolated Runner.
+- maximum size;
+- maximum page count where appropriate;
+- bounded decompression;
+- timeouts;
+- temporary-directory isolation;
+- denial of macro/script execution;
+- explicit handling of malformed content.
 
 ---
 
-# Agent and Model Technology
+# Retrieval Architecture
 
-## Agent Framework Policy
+## Structured Retrieval
 
-ResearchOS implements the Agent Runtime contracts directly for the proving slice. A general orchestration framework is neither prohibited nor assumed.
+Rust repositories execute canonical filters and relationship queries.
 
-A framework such as a graph executor may be evaluated later only behind a ResearchOS runtime adapter and only if it demonstrates that it can:
+This channel is authoritative for:
 
-- persist authoritative execution state in ResearchOS stores;
-- expose typed Plans, Steps, Observations and checkpoints;
-- obey ResearchOS budgets, stopping conditions and approval gates;
-- avoid hidden provider or framework memory as a correctness dependency;
-- resume after process failure without replaying an opaque conversation;
-- emit complete traces and normalized model/tool records;
-- preserve Capability Registry and Command/Proposal boundaries;
-- reduce measured implementation or maintenance cost.
+- identifiers;
+- types;
+- states;
+- dates;
+- ownership;
+- relationships;
+- provenance;
+- permissions.
 
-Framework-owned domain state, implicit autonomous loops and uninspectable memory are disqualifying.
+## Lexical Retrieval
 
-## Runtime Implementation
+SQLite FTS5 indexes normalized textual projections.
 
-The Agent Runtime is implemented inside `src/researchos/cognitive/agent_runtime` using ResearchOS contracts.
+FTS records retain source and generation metadata and remain rebuildable.
 
-No general agent framework is required for the proving slice.
+## Vector Retrieval — Initial Stage
 
-Reasons:
+The initial vector projection stores:
 
-- the runtime semantics are already defined;
-- durable state belongs in ResearchOS operational records;
-- a framework must not become a second process/state authority;
-- the initial operations are bounded pipelines, not open-ended autonomous agents.
-
-A library may be adopted later for specific graph execution or provider abstraction only if it fits the contracts and reduces measured implementation cost.
-
-## Reasoning Model Adapter
-
-The first Model Gateway adapter targets Anthropic through its official Python SDK. One provider is sufficient for the proving slice; multi-provider execution is an evaluation and resilience option, not a baseline requirement.
-
-The adapter supports:
-
-- one-shot Messages-style requests;
-- structured output parsing through ResearchOS schemas;
-- tool-call proposals normalized into Capability Requests;
-- streaming only for user-visible Artifact generation, not as durable state;
-- rate-limit and transient-error classification;
-- provider/model identity and usage recording.
-
-The exact model is configuration, not hard-coded architecture.
-
-Model routing begins with explicit task-class configuration. Dynamic routing, ensembles or provider fallback are introduced only when evaluation shows a material benefit. A more prestigious or larger model is not automatically preferred.
-
-Each experiment manifest pins:
-
+- source identifier and version;
+- optional segment identifier;
 - model identifier;
-- provider API/SDK version;
-- instruction version;
-- relevant sampling parameters;
-- budget;
-- date and dataset.
-
-## Embedding Adapter
-
-The first embedding adapter may target an OpenAI-compatible hosted API.
-
-The contract remains independent of provider and records:
-
-- model identifier;
-- dimensions;
+- dimension;
 - preprocessing version;
-- usage/cost;
-- source segment digest.
+- embedding generation;
+- vector bytes;
+- access classification.
 
-A local embedding model may be evaluated later for privacy/cost, but it is not required to prove the architecture.
+For the proving corpus, Python may load an authorized candidate set and calculate similarity using NumPy.
 
-## Prompt and Instruction Storage
+This baseline is intentionally simple and must be measured before introducing an approximate-nearest-neighbor engine.
 
-Prompts/instructions are versioned repository resources, for example:
+## Graph Retrieval
+
+Canonical relationships are queried with explicit SQL and bounded recursive CTEs.
+
+For occasional algorithms, Rust `petgraph` or Python NetworkX may operate over an in-memory projection.
+
+Neither library owns canonical relationships.
+
+## Hybrid Retrieval
+
+The Context Builder coordinates:
 
 ```text
-src/researchos/cognitive/instructions/
-├── extract_knowledge/
-│   ├── v1.md
-│   └── schema_v1.json
-└── answer_with_evidence/
-    ├── v1.md
-    └── schema_v1.json
+structured filters
+    ↓
+lexical candidates
+    ↓
+vector candidates
+    ↓
+relationship expansion
+    ↓
+fusion and reranking
+    ↓
+Context Manifest
 ```
 
-Rules:
+Every included item records retrieval channel, score, source version and inclusion reason.
 
-- no critical prompt exists only in provider dashboards;
-- every invocation records instruction version;
-- prompts do not contain secrets;
-- domain policy is implemented outside prompts;
-- evaluation changes accompany prompt changes.
+## Dedicated Engine Triggers
 
-## Structured Output
+A dedicated embedded or server engine requires evidence such as:
 
-Pydantic/JSON Schema validates model output.
-
-Repair attempts are bounded.
-
-After repeated invalid output, the operation fails/replans rather than silently accepting text.
-
-## Verification Implementation
-
-Verification is implemented as a composable pipeline:
-
-1. schema and contract checks;
-2. deterministic calculations and policy rules;
-3. source-span and citation verification;
-4. cross-source checks when required;
-5. optional bounded model critic;
-6. human review for governed cases.
-
-The same provider may be used for production and critique during early experiments, but this is not considered independent verification. Multi-run voting or a second provider may be tested for high-risk tasks only after comparison with deterministic and evidence-based checks.
-
-## Runtime Experience Storage
-
-Operational experience candidates are stored in PostgreSQL operational/audit records with references to the originating operation, task class, runtime version and evaluation status.
-
-They are not injected into future operations by default. Approved experience becomes a versioned routing rule, prompt/instruction change, recovery policy or code change through the normal review path. The runtime never edits these resources autonomously.
-
-## Model Privacy
-
-Provider eligibility is configured by data classification.
-
-Restricted content is never sent to an external provider unless policy explicitly permits it.
-
-Provider retention/training controls are configuration and operational policy, not assumed.
+- corpus size exceeding acceptable brute-force latency;
+- measured query latency above the interaction budget;
+- memory pressure incompatible with local execution;
+- graph traversals that cannot be maintained in SQLite;
+- required algorithms unavailable in the baseline;
+- unacceptable rebuild duration.
 
 ---
 
-# Frontend Architecture
+# Durable Jobs and Event Processing
 
-## Baseline
+## One Local Coordinator
 
-- Node.js 24 LTS;
-- TypeScript strict mode;
-- React 19;
-- Vite;
-- browser-based Workspace;
-- generated typed API client or schema-validated equivalent.
+The Rust runtime contains a durable Job Coordinator backed by SQLite.
 
-## Workspace Scope for Proving Slice
+The initial application does not run a separate worker service.
 
-The initial UI contains:
+## Job Record
 
-1. Document import;
-2. Document processing status;
-3. extracted text/metadata preview;
-4. Knowledge candidate review;
-5. approve/reject/edit actions;
-6. evidence/source viewer;
-7. question and evidence-backed answer view;
-8. operation trace summary and failure/retry state.
+A durable Job records:
 
-It does not require:
+- identifier;
+- job type and contract version;
+- payload reference;
+- state;
+- priority;
+- attempt count;
+- availability time;
+- lease owner and expiry when required;
+- checkpoint reference;
+- progress;
+- cancellation state;
+- result or failure reference;
+- causal identifiers.
 
-- full dashboard customization;
-- general chat history;
-- calendar/Kanban;
-- graph visualization;
-- rich text collaborative editor;
-- mobile client.
+## Execution
 
-## State Management
+- asynchronous I/O runs in Tokio tasks;
+- blocking native libraries use bounded blocking pools;
+- CPU-intensive work is delegated to the Python sidecar or an ephemeral process;
+- canonical writes return through the Application path;
+- jobs checkpoint at policy-defined boundaries.
 
-- server state is queried through API resources;
-- local UI state remains non-canonical;
-- optimistic updates are used only when conflict/rejection can be represented;
-- long operations return operation identifiers and update by polling or server-sent events;
-- WebSocket infrastructure is not required initially.
+## Shutdown and Resume
 
-## Accessibility and Interaction
+On application shutdown:
 
-- semantic HTML;
-- keyboard navigation;
-- visible loading/error states;
-- evidence and AI-generated content clearly labelled;
-- approval actions display exact subject and consequences;
-- conversation is not the only route to any essential function.
+- new jobs stop being admitted;
+- running work receives a bounded graceful-cancellation window;
+- durable checkpoints are committed;
+- sidecars are asked to stop;
+- unresolved operations are marked recoverable.
+
+On restart, the coordinator reconciles interrupted jobs before accepting new background work.
+
+## Events
+
+The Rust runtime implements:
+
+```text
+Command
+    ↓
+validated transaction
+    ↓
+Domain Event + Outbox record
+    ↓
+local dispatcher
+    ↓
+projection / process / notification reactions
+```
+
+Events report committed facts. They do not replace Commands or Application orchestration.
 
 ---
 
-# API Architecture
+# Agent Runtime Technical Mapping
 
-## Versioning
+## Rust Control Plane
 
-Base path:
+Rust implements the control plane defined by `AGENT_RUNTIME.md`:
 
-```text
-/api/v1
-```
+- task admission;
+- policy evaluation;
+- budget allocation;
+- operation state;
+- execution graph;
+- tool authorization;
+- checkpointing;
+- retries;
+- cancellation;
+- stopping conditions;
+- human-approval gates;
+- result acceptance;
+- canonical proposal submission.
 
-The OpenAPI document is generated and checked into/used by CI for client compatibility where useful.
+## Python Cognitive Plane
 
-## Resource and Operation Style
+Python implements cognitive executors:
 
-The API exposes intention-revealing operations, for example:
+- Intent analysis when nondeterministic analysis is required;
+- model-assisted planning;
+- semantic extraction;
+- model and embedding calls;
+- reranking;
+- critique and synthesis;
+- output-schema validation helpers;
+- evaluation functions.
 
-```text
-POST /api/v1/documents:register
-POST /api/v1/documents/{id}:process
-POST /api/v1/knowledge-candidates/{id}:approve
-POST /api/v1/knowledge-candidates/{id}:reject
-POST /api/v1/questions:answer
-GET  /api/v1/operations/{id}
-GET  /api/v1/documents/{id}
-GET  /api/v1/knowledge/{id}
-```
+## Verification Order
 
-Exact routes belong to development specs.
+Technical verification proceeds from most independent and deterministic to least:
 
-Generic CRUD endpoints are not the default when an intention-revealing command exists.
+1. schema and type validation;
+2. authorization and policy checks;
+3. deterministic domain rules;
+4. source-span and citation verification;
+5. content and relationship consistency checks;
+6. alternate retrieval or computation;
+7. optional independent model critic;
+8. human review.
 
-## Error Contract
+A second answer from the same model is not treated as independent proof.
 
-The HTTP adapter maps stable application errors:
+## Framework Policy
 
-- validation error;
-- unauthorized/forbidden;
-- not found;
-- domain rejection;
-- concurrency conflict;
-- idempotency conflict;
-- accepted asynchronous operation;
-- rate/budget limit;
-- dependency unavailable;
-- internal correlation reference.
+No general agent framework is mandatory.
 
-Provider exceptions are never returned directly.
+LangGraph, Semantic Kernel or similar frameworks may be evaluated only behind an adapter and may not:
 
-## Long Operations
+- own canonical operation state;
+- hide checkpoints;
+- bypass budgets;
+- introduce undisclosed memory;
+- control authorization;
+- become the only representation of execution.
 
-Long operations return `202 Accepted` plus operation reference.
-
-Progress is queried through an Operation resource and optionally delivered through server-sent events.
+The default implementation should use ordinary Rust and Python components until a framework demonstrably reduces complexity.
 
 ---
 
-# Identity and Security
+# Model and Tool Integration
 
-## Deployment Assumption
+## Provider Adapters
 
-The baseline is a single-user personal system exposed through a private or authenticated public endpoint.
+Each provider adapter exposes a normalized contract for:
 
-Single-user does not mean unauthenticated.
+- model identity;
+- supported modalities;
+- structured output;
+- token/context limits;
+- streaming;
+- cancellation behavior;
+- usage and cost reporting;
+- retry classification;
+- data-retention configuration where available.
 
-## Authentication
+## Model Routing
 
-Initial authentication:
+Routing is based on operation requirements:
 
-- one local user account;
-- Argon2id password hashing through a vetted library;
-- server-side or signed session identifier;
-- Secure, HttpOnly, SameSite cookies;
-- CSRF protection for state-changing browser requests;
-- session rotation after authentication;
-- configurable inactivity and absolute expiry.
+- deterministic extraction vs open synthesis;
+- context size;
+- modality;
+- latency budget;
+- cost budget;
+- privacy classification;
+- local or remote execution policy;
+- observed evaluation performance.
 
-OAuth/OIDC is deferred until an external identity provider or multi-user need exists.
+Model prestige or size is not a routing criterion.
 
-## Authorization
+## Local Models
 
-Application policy checks still receive actor identity and autonomy scope.
+Local inference is a future adapter, not a baseline requirement.
 
-The single user may hold all human permissions, but AI/process actors remain distinct and restricted.
+A native engine such as llama.cpp or another runtime may be packaged as an optional sidecar when:
 
-## Transport
+- hardware detection is available;
+- model licenses are acceptable;
+- package/download size is explicit;
+- resource limits are enforced;
+- quality is evaluated against the operation suite.
 
-Caddy terminates HTTPS and redirects HTTP.
+## Tools
 
-Only Caddy exposes public ports.
+Tools are capability adapters with:
 
-PostgreSQL and worker ports remain on the internal Compose network.
+- explicit input and output schemas;
+- declared side effects;
+- required permissions;
+- timeout and resource budgets;
+- audit metadata;
+- deterministic or nondeterministic classification.
+
+Unsafe code execution is deferred until a cross-platform isolation design is approved.
+
+---
+
+# Security Architecture
+
+## Trust Boundaries
+
+```text
+React WebView
+    → untrusted presentation input
+
+Rust Runtime
+    → authoritative trusted computing base
+
+Python Sidecar
+    → supervised, limited-trust cognitive executor
+
+External Models and Tools
+    → untrusted external systems
+
+Imported Documents
+    → untrusted content
+```
 
 ## Secrets
 
-Production secrets are injected through mounted secret files or another restricted mechanism, not committed `.env` files.
+Secrets are stored through an operating-system credential-store abstraction.
 
-`.env` is allowed only for non-production local development and `.env.example` contains placeholders.
+They are never stored in:
 
-Secrets include:
+- frontend state;
+- repository files;
+- ordinary SQLite configuration rows;
+- logs;
+- prompt templates;
+- diagnostic exports.
 
-- database password;
-- session signing/encryption key;
-- model/embedding API keys;
-- backup repository credentials;
-- external integration tokens.
+Python receives provider credentials only for the duration and scope required by an authorized invocation.
 
-## File Security
+## IPC Security
 
-- upload size limits;
-- media-type detection rather than extension trust;
-- path normalization;
-- no user-controlled filesystem paths;
-- restrictive file permissions;
-- parser time/memory limits;
-- future malware scanning/isolation before broader ingestion.
+- the sidecar is launched by the application;
+- protocol handles are inherited, not publicly discoverable;
+- every operation carries an unguessable identifier;
+- capability authorization occurs before dispatch;
+- messages are size-limited and schema-validated;
+- no arbitrary command execution is accepted through IPC.
 
-## Prompt, Retrieval and Memory Security
+## Prompt and Retrieval Security
 
-- retrieved documents, emails and webpages are always delimited as untrusted data;
-- capability authorization occurs outside model output;
-- projection rows retain provenance, trust class and source generation;
-- candidate Knowledge and inferred edges are excluded from validated retrieval unless explicitly requested;
-- source deletion/reclassification triggers projection invalidation or rebuild;
-- suspicious instruction-like content is observable and may force isolated processing;
-- raw provider output cannot enter approved runtime experience or canonical Knowledge directly.
+Retrieved or imported content is data, not instruction authority.
 
-## Dependency and Image Security
+The runtime preserves:
 
-CI performs:
+- source trust classification;
+- provenance;
+- content boundaries;
+- instruction hierarchy;
+- detection of suspicious tool-use requests;
+- separation of inferred and validated memory.
 
-- dependency vulnerability scan;
-- secret scan;
-- container image scan;
-- lockfile verification;
-- reproducible image build where practical.
+Repeated malicious content does not gain authority through frequency or embedding similarity.
 
-No automatic dependency update merges without tests.
+## Platform Signing
 
----
+Production installers should be code-signed.
 
-# Background Processing Implementation
+macOS releases require application signing and notarization before general distribution.
 
-## Worker Loop
-
-The worker supervises independent loops:
-
-- job claimant/executor;
-- Outbox dispatcher;
-- event consumer runner;
-- scheduler/timer activation;
-- projection builder;
-- stale lease recovery;
-- health heartbeat.
-
-A failure in one loop is isolated and restarts with bounded backoff.
-
-## Concurrency
-
-Initial defaults are conservative:
-
-- low worker concurrency;
-- per-job-type concurrency limit;
-- one active cognitive step per operation unless plan explicitly fans out;
-- provider rate-limit budget;
-- parser/model work not executed in API event loop;
-- database connection pool sized below server limits.
-
-Exact values are configuration and measured during experiments.
-
-## Process Supervision
-
-Containers use restart policies and health checks.
-
-The application itself persists work state; container restart is not the recovery mechanism by itself.
-
-## Cancellation
-
-Cancellation is cooperative:
-
-- operation/process marked cancellation requested;
-- worker checks between Steps and before effects;
-- current safe atomic step completes or times out;
-- external calls may remain ambiguous and require reconciliation;
-- result records cancelled/partial state.
+Windows signing and reputation management are part of release readiness, not optional polish.
 
 ---
 
-# Observability
+# Observability and Diagnostics
 
-## Logging
+## Local Logging
 
-Structured JSON logs include:
+Rust and Python emit structured records containing:
 
 - timestamp;
 - severity;
-- service/runtime role;
 - component;
-- operation/command/event/job/process IDs;
-- actor;
-- correlation/causation;
-- error class;
+- operation identifier;
+- causal/correlation identifiers;
+- event or job identifier;
 - duration;
-- no secret or unrestricted prompt/content body.
+- status;
+- error category;
+- model/provider metadata when permitted;
+- token and cost metrics when available.
 
-Development may use human-readable formatting.
+Prompts, document bodies, secrets and sensitive personal data are excluded by default.
 
-## Tracing
+## Log Storage
 
-OpenTelemetry traces cover:
+Logs are:
 
-- HTTP request;
-- Command handler and Unit of Work;
-- Outbox dispatch and event reaction;
-- Job/Process step;
-- Context build;
-- model/tool invocation;
-- verification;
-- Proposal/Approval;
-- resulting Command/Event.
+- local;
+- size-bounded;
+- rotated;
+- retention-governed;
+- exportable through user action.
 
-The system remains operational if no external telemetry collector is available.
+## Diagnostic Export
 
-## Metrics
+The application can create a sanitized diagnostic package containing:
 
-Initial metrics:
+```text
+application version
+platform information
+schema version
+component manifest
+redacted configuration summary
+selected structured logs
+failed-operation manifests
+migration status
+sidecar capability manifest
+```
 
-- HTTP latency/error;
-- command rejection/conflict;
-- queue depth and oldest job age;
-- job duration/retry/failure;
-- Outbox/Inbox lag;
-- projection lag;
-- cognitive operation outcome;
-- model tokens/cost/latency;
-- context size/build time;
-- verification failures;
-- candidate approval/edit/rejection;
-- database pool and storage usage;
-- backup freshness.
+The user reviews and explicitly exports this package.
 
-## Collector
+## OpenTelemetry
 
-The proving baseline may export to logs/local OTLP endpoint.
+OpenTelemetry is not required in the local baseline.
 
-A full Prometheus/Grafana/Loki stack is deferred until operations justify it.
+Instrumentation may be added behind an adapter if development or optional remote diagnostics demonstrate a concrete need.
+
+---
+
+# Backup and Recovery
+
+## Backup Scope
+
+A complete backup includes:
+
+- consistent SQLite snapshot;
+- retained content objects;
+- canonical configuration that is safe to export;
+- type and schema registries;
+- backup manifest;
+- application and schema compatibility metadata.
+
+Secrets are not exported in plaintext.
+
+## Backup Process
+
+```text
+request backup
+    ↓
+quiesce or coordinate canonical writes
+    ↓
+SQLite online backup
+    ↓
+copy referenced content and manifests
+    ↓
+verify hashes
+    ↓
+create compressed backup package
+    ↓
+record backup result
+```
+
+Projection data may be excluded because it is rebuildable.
+
+## Restore
+
+Restore executes in a controlled maintenance mode and verifies:
+
+- package integrity;
+- schema compatibility;
+- content hashes;
+- migration path;
+- available disk space;
+- target-location safety.
+
+The existing data directory is preserved until the restored application opens successfully.
+
+## User Data on Uninstall
+
+Uninstallation must not silently delete the ResearchOS data directory.
+
+Data deletion is a separate explicit user action.
+
+---
+
+# Installation, Packaging and Updates
+
+## Platform Packages
+
+The build produces platform-native artifacts, for example:
+
+```text
+Windows
+    installer executable / MSI as selected by release specification
+
+macOS
+    signed application bundle and DMG
+
+Linux
+    AppImage and/or distribution packages selected by release specification
+```
+
+One source repository supports all targets, but each production package is built and tested on its target operating system.
+
+## Sidecar Bundling
+
+Each target package includes a matching cognitive-runtime executable and native dependencies.
+
+The Tauri configuration identifies sidecars per target triple.
+
+## Build Reproducibility
+
+Release provenance records:
+
+- source commit;
+- Rust lockfile;
+- Python lockfile;
+- frontend lockfile;
+- toolchain versions;
+- sidecar checksums;
+- model/config schema versions;
+- migration set;
+- signing identity metadata;
+- generated package hashes.
+
+## Updates
+
+Initial development releases may use manual installer replacement.
+
+Automatic updates are enabled only after:
+
+- signing is operational;
+- migration rollback behavior is tested;
+- update metadata is authenticated;
+- interrupted-update recovery is validated;
+- user data is proven independent from application binaries.
+
+## First Run
+
+First launch performs:
+
+1. data-directory creation;
+2. permission checks;
+3. schema initialization or migration;
+4. content-store verification;
+5. sidecar protocol negotiation;
+6. optional provider setup;
+7. initial backup recommendation.
+
+ResearchOS must open without an AI provider configured. Deterministic capabilities remain available.
+
+---
+
+# Repository Structure
+
+```text
+researchos/
+├── apps/
+│   └── desktop/
+│       ├── frontend/                 # React + TypeScript + Vite
+│       └── src-tauri/                # Tauri entry point and commands
+│
+├── crates/
+│   ├── domain/
+│   ├── application/
+│   ├── canonical-data/
+│   ├── persistence-sqlite/
+│   ├── content-store/
+│   ├── events/
+│   ├── jobs/
+│   ├── process-runtime/
+│   ├── agent-control/
+│   ├── cognitive-client/
+│   ├── ipc-contracts/
+│   ├── security/
+│   └── diagnostics/
+│
+├── python/
+│   └── cognitive_runtime/
+│       ├── capabilities/
+│       ├── providers/
+│       ├── document_processing/
+│       ├── retrieval/
+│       ├── embeddings/
+│       ├── verification/
+│       ├── evaluation/
+│       └── worker/
+│
+├── schemas/
+│   ├── ipc/
+│   ├── canonical/
+│   ├── capabilities/
+│   └── projections/
+│
+├── migrations/
+│   └── sqlite/
+│
+├── tests/
+│   ├── architecture/
+│   ├── contract/
+│   ├── integration/
+│   ├── desktop/
+│   ├── recovery/
+│   └── evaluation/
+│
+├── packaging/
+│   ├── windows/
+│   ├── macos/
+│   └── linux/
+│
+├── docs/
+├── Cargo.toml
+├── Cargo.lock
+├── pyproject.toml
+├── uv.lock
+└── package.json / frontend lockfile
+```
+
+## Repository Rules
+
+- Rust crates do not import Python implementation details.
+- Python packages consume versioned IPC and capability schemas.
+- frontend code imports generated TypeScript contracts, not Rust internals.
+- canonical migrations are reviewed with their owning specification.
+- provider SDKs remain inside provider adapters.
+- native binaries are checksummed and declared in packaging manifests.
+- no generated artifact becomes the source of a canonical schema.
+
+---
+
+# Development Environment
+
+## Required Developer Tooling
+
+Developers require:
+
+- Rust toolchain;
+- platform prerequisites for Tauri;
+- Node.js for frontend builds;
+- `uv` for Python environments;
+- platform packaging tools when building installers.
+
+The end user requires none of these.
+
+## Local Development Modes
+
+### Integrated Desktop Mode
+
+Runs the Tauri host, frontend dev server and Python sidecar with development diagnostics.
+
+### Rust Test Mode
+
+Runs Domain, Application, persistence and runtime tests without the UI or Python where possible.
+
+### Cognitive Test Mode
+
+Runs Python capability tests against recorded fixtures and fake IPC hosts.
+
+### Contract Test Mode
+
+Runs Rust and Python against shared protocol fixtures.
+
+### Packaging Mode
+
+Builds the exact platform bundle and executes installation, launch, migration and uninstall tests in clean environments.
+
+## Docker
+
+Docker is optional for:
+
+- CI experiments;
+- reproducible external-service tests;
+- security tooling;
+- future isolated code execution.
+
+Docker is not part of the end-user runtime and not required for ordinary local development.
 
 ---
 
 # Testing Architecture
 
-## Backend Tests
+## Rust Tests
 
-### Unit
-
-- Value Objects and aggregate invariants;
-- domain lifecycle transitions;
-- Application handlers with fake ports;
-- planning/verification deterministic logic.
-
-### Property-Based
-
-Hypothesis tests:
-
-- identity/version invariants;
-- lifecycle invalid transitions;
-- idempotency;
-- parser normalization;
-- relationship cardinality;
-- retry/backoff bounds.
-
-### Architecture
-
-Import/dependency tests enforce Component Model rules.
-
-A dedicated tool such as `import-linter`, custom AST checks or equivalent is selected during bootstrap.
-
-### Integration
-
-Run against real PostgreSQL and content filesystem.
+### Unit Tests
 
 Cover:
 
-- Unit of Work + Outbox atomicity;
-- optimistic concurrency;
-- Job leasing/reclaim;
-- Inbox deduplication;
+- Domain invariants;
+- Value Objects;
+- policies;
+- deterministic transformations;
+- typed errors.
+
+### Property Tests
+
+Cover:
+
+- identity and version behavior;
+- relationship constraints;
+- serialization round trips;
+- job state machines;
+- migration invariants;
+- content hashing.
+
+### Architecture Tests
+
+Enforce:
+
+- crate dependency direction;
+- no persistence dependency in Domain;
+- no provider dependency in Application;
+- no direct frontend or Python canonical writes;
+- adapter isolation.
+
+### Integration Tests
+
+Use temporary SQLite databases and content stores to verify:
+
+- transactions;
+- Outbox behavior;
 - migrations;
-- vector/lexical query;
-- backup/restore smoke tests.
+- job recovery;
+- backup/restore;
+- projection rebuild;
+- sidecar supervision.
 
-### Contract
+## Python Tests
 
-- model adapter with recorded/fake provider responses;
-- tool/capability schemas;
-- OpenAPI compatibility;
-- event schema versioning.
+Cover:
 
-### End-to-End
+- capability schemas;
+- provider adapters;
+- parsing;
+- chunking;
+- embedding consistency;
+- retrieval;
+- output validation;
+- cancellation;
+- bounded resource behavior.
 
-One real PDF through import → processing → candidate approval → query answer.
+## IPC Contract Tests
+
+Verify:
+
+- protocol negotiation;
+- unknown-version rejection;
+- message framing;
+- progress streaming;
+- cancellation;
+- large-payload references;
+- crash and restart behavior;
+- malformed-message containment.
 
 ## Frontend Tests
 
-- Vitest for component/state logic;
-- React Testing Library for user-visible behavior;
-- Playwright for proving-slice flows;
-- accessibility checks in critical review/approval screens.
+Cover:
 
-## Non-Deterministic Tests
+- interaction behavior;
+- accessible navigation;
+- typed command invocation;
+- process progress;
+- error recovery;
+- offline behavior;
+- no-provider setup.
 
-Model-dependent evaluation is separated from deterministic CI.
+## Installer Tests
 
-CI uses:
+Each target OS validates:
 
-- fakes/fixtures for contracts;
-- optional scheduled/provider-enabled evaluation jobs;
-- versioned experiment manifests;
-- threshold reports, not brittle exact string assertions.
+- clean installation;
+- first launch;
+- sidecar discovery;
+- data-directory creation;
+- upgrade over an older version;
+- migration failure behavior;
+- uninstall without data loss;
+- package signature where configured.
 
-## Evaluation Harness
+## Evaluation Tests
 
-The repository contains a provider-neutral evaluation harness with versioned cases and rubrics for:
+The ResearchOS internal evaluation suite remains the release authority for cognitive behavior.
 
-- document extraction and source-span accuracy;
-- evidence-backed question answering;
-- retrieval precision, recall, attribution and freshness;
-- policy compliance and forbidden-action tests;
-- restart/checkpoint recovery;
-- cost, latency and budget behavior;
-- repeated-run stability;
-- comparison against deterministic, single-call and simple-RAG baselines.
-
-Public benchmarks such as GAIA, AgentBench or policy-compliance suites may run as optional diagnostic jobs. Their results are recorded with model/tool versions but do not gate a ResearchOS release unless a development specification explicitly adopts them.
-
-Sensitive evaluation corpora store references/digests and controlled fixtures rather than committing confidential source material.
+Public agent benchmarks are optional diagnostics and do not replace vertical acceptance tests.
 
 ---
 
-# Development Quality Gates
+# Quality Gates
 
-Every pull request must pass, as applicable:
+## Rust
 
-1. formatting and lint;
-2. type checking;
-3. unit/property tests;
-4. architecture dependency tests;
-5. migration consistency check;
-6. integration tests for changed adapters;
-7. frontend tests/build;
-8. OpenAPI/client compatibility;
-9. security/secret scan;
-10. documentation/spec impact check.
+A change must pass:
 
-## Python Tooling
+- formatting;
+- Clippy with project policy;
+- compilation on supported targets;
+- unit/property tests;
+- architecture tests;
+- dependency audit;
+- unsafe-code review where applicable.
 
-Baseline:
+Unsafe Rust is forbidden in first-party code unless isolated, documented and approved through an ADR.
 
-- Ruff for formatting and lint;
-- Pyright or mypy for strict-enough static checks, selected at bootstrap and used consistently;
-- pytest;
-- Hypothesis;
-- coverage reporting;
-- import-boundary tests.
+## Python
 
-## TypeScript Tooling
+A change must pass:
 
-Baseline:
+- formatting and linting;
+- static type checks for supported packages;
+- pytest suites;
+- dependency lock verification;
+- provider contract tests;
+- packaging smoke test.
 
-- TypeScript strict mode;
-- ESLint where needed beyond TypeScript/Vite defaults;
-- formatter policy consistent with repository;
-- Vitest;
-- Playwright.
+## TypeScript
 
-Exact configuration belongs to the repository bootstrap spec.
+A change must pass:
 
----
+- formatting and linting;
+- strict type checking;
+- unit/component tests;
+- accessibility checks for affected views;
+- generated-contract drift checks.
 
-# Environment Strategy
+## Cross-Language
 
-## Local Development
+A release cannot pass if:
 
-- Python/API/worker may run on host through `uv`;
-- PostgreSQL runs through Compose;
-- Vite dev server runs locally;
-- content uses a local managed directory;
-- model calls disabled or use explicit developer credentials;
-- fake adapters available for deterministic tests.
-
-## Test
-
-- ephemeral PostgreSQL database/schema;
-- temporary content directory;
-- fake model/tool adapters by default;
-- migrations applied from zero;
-- fixed clock/identifier adapters where needed.
-
-## VPS Production-Like
-
-- built images;
-- Compose-managed services;
-- Caddy HTTPS;
-- persistent volumes;
-- production secrets;
-- off-host backups;
-- provider adapters enabled by policy;
-- migration and restore runbooks.
-
-No separate staging environment is required initially; reproducible local/CI integration and a protected VPS deployment are sufficient for the personal project.
-
----
-
-# Container Architecture
-
-## Images
-
-### `researchos-api`
-
-Contains backend package and API entrypoint.
-
-### `researchos-worker`
-
-May use the same image with a different entrypoint to reduce drift.
-
-### `researchos-web`
-
-Build stage produces static assets; Caddy may serve them directly.
-
-### `postgres`
-
-Pinned PostgreSQL 17 image with pgvector extension available.
-
-### `caddy`
-
-Pinned Caddy image with mounted configuration and persistent certificate data.
-
-### `isolated-runner`
-
-Deferred and not started by default.
-
-## Build Rules
-
-- multi-stage builds;
-- non-root application user;
-- minimal runtime dependencies;
-- no build credentials in final image;
-- locked dependencies;
-- image labels include source revision and build date;
-- health checks;
-- read-only root filesystem where practical;
-- writable paths explicit.
-
----
-
-# Deployment and Release
-
-## Deployment Flow
-
-```text
-merge to main
-    ↓ CI quality gates
-build immutable images
-    ↓
-backup + migration precheck
-    ↓
-pull images on VPS
-    ↓
-run migrations
-    ↓
-restart API/worker
-    ↓
-readiness + smoke test
-    ↓
-record deployed revision
-```
-
-For the personal baseline, deployment may be manually approved and executed through a scripted SSH workflow.
-
-## Database Migration Order
-
-1. verify backup freshness;
-2. run migration in controlled job/container;
-3. validate schema version;
-4. start compatible application version;
-5. run smoke/integrity checks;
-6. enable workers;
-7. monitor queues/errors.
-
-Backward-compatible expand/switch migrations are preferred when downtime becomes material.
-
-## Rollback
-
-Application images may roll back only when compatible with the migrated schema.
-
-A database rollback is not assumed. Recovery may require a forward fix or restore according to runbook.
-
----
-
-# Backup and Disaster Recovery
-
-## Baseline Objectives
-
-For the experimental/personal deployment:
-
-- target RPO: 24 hours or better;
-- target RTO: 4 hours or better;
-- no claim of high availability;
-- recovery correctness prioritized over automatic failover.
-
-These values are reviewed after real usage and data criticality are known.
-
-## Backup Plan
-
-### Database
-
-- nightly logical dump;
-- retained migration revision and deployment metadata;
-- encrypted off-host transfer through restic;
-- more frequent dumps before migrations or major experiments.
-
-### Content
-
-- content volume backed up through restic snapshots;
-- digest verification during periodic integrity checks.
-
-### Configuration
-
-- non-secret deployment configuration in source control;
-- encrypted backup of required secret material or documented secret recreation;
-- Caddy certificate state may be backed up but remains recreatable.
-
-## Retention Baseline
-
-Example initial policy:
-
-- daily: 14;
-- weekly: 8;
-- monthly: 6;
-- pre-migration snapshots: retain until migration proven and normal retention covers it.
-
-Exact values are configuration.
-
-## Restore Test
-
-At least monthly during active development:
-
-1. restore database into isolated environment;
-2. restore content;
-3. run migrations if required;
-4. run integrity checks;
-5. rebuild projections;
-6. inspect pending jobs/processes/effects;
-7. execute proving-slice read path;
-8. record result and duration.
-
-A backup that has not been restored is unverified.
-
-## Future PITR
-
-PostgreSQL WAL archiving and point-in-time recovery are introduced when a 24-hour RPO becomes unacceptable.
-
----
-
-# Experimental Configuration and Reproducibility
-
-Every proving experiment produces a manifest containing:
-
-- source revision;
-- database schema/migration revision;
-- Python/Node/runtime versions;
-- dependency lockfile digest;
-- container image digests;
-- model and embedding identifiers;
-- instruction/prompt versions;
-- parser and preprocessing versions;
-- dataset/corpus digest;
-- configuration and budgets;
-- start/end time;
-- result metrics and report reference.
-
-Experiment output never relies on an unrecorded provider “latest” model or mutable prompt dashboard.
+- IPC schemas and implementations disagree;
+- sidecar capability manifests are incompatible;
+- migration versions do not match the desktop build;
+- installer contents differ from release provenance;
+- a cognitive capability writes canonical state outside Rust.
 
 ---
 
 # Proving-Slice Technical Mapping
 
-## Flow
+## Reference Flow
 
 ```text
-React Workspace
-    → FastAPI RegisterDocument Command
-    → PostgreSQL domain.document + eventing.outbox
-    → content-addressed filesystem
-    → worker Outbox/Event reaction
-    → PostgreSQL ops.job/process
-    → PyMuPDF extraction
-    → normalized content
-    → Agent Runtime + Anthropic adapter
-    → Knowledge candidate Proposals
-    → React review/approval
-    → CreateKnowledge Command
-    → canonical Knowledge + events
-    → PostgreSQL lexical/pgvector projections
-    → Answer request
-    → Context Builder
-    → Agent Runtime
-    → evidence-backed Answer Artifact
+User imports a paper
+        ↓
+React requests file admission
+        ↓
+Rust validates and retains content
+        ↓
+Rust creates Document and durable processing Job
+        ↓
+Rust dispatches bounded parse task to Python
+        ↓
+Python returns normalized text and structure Artifact
+        ↓
+Rust validates and persists DocumentVersion/segments
+        ↓
+Rust updates FTS and schedules embedding task
+        ↓
+Python computes embeddings and candidate Knowledge
+        ↓
+Rust stores rebuildable vector projection and Proposals
+        ↓
+User reviews candidate Knowledge
+        ↓
+Rust commits accepted Knowledge and relationships
+        ↓
+Question triggers hybrid retrieval and Context Manifest
+        ↓
+Python produces evidence-grounded answer Artifact
+        ↓
+Rust records provenance, operation result and presentation data
 ```
 
-## First Technical Milestones
+## Technical Milestones
 
-### T0 · Repository Bootstrap
+### T0 · Desktop Bootstrap
 
-- Python and frontend workspaces;
-- package boundaries;
-- lint/type/test/CI;
-- Compose PostgreSQL;
-- configuration and telemetry skeleton.
+- Tauri application opens on all target development platforms;
+- React invokes a typed Rust command;
+- local data directory is created;
+- Python sidecar negotiates protocol;
+- installer smoke build succeeds on one platform.
 
-### T1 · Canonical Command Path
+### T1 · Canonical Local State
 
-- Documents aggregate;
-- repository/Unit of Work;
-- Outbox atomicity;
-- HTTP/CLI command;
-- architecture tests.
+- SQLite migrations execute;
+- one Core Entity command path works;
+- canonical event and audit records are created;
+- backup and restore work for the empty/minimal system.
 
 ### T2 · Durable Processing
 
-- Jobs, leases, worker;
-- event reaction;
-- content storage;
-- PyMuPDF extraction;
-- operation status UI/API.
+- document content is retained atomically;
+- a durable Job survives application restart;
+- Python parsing is supervised and cancellable;
+- normalized content is committed through Rust.
 
-### T3 · Cognitive Candidate Path
+### T3 · Cognitive Proposal Path
 
-- Cognitive Operation records;
-- Context Manifest;
-- Anthropic model adapter;
-- structured candidate extraction;
-- verification;
-- Proposal/Approval.
+- a bounded extraction operation runs;
+- budgets and provider metadata are recorded;
+- candidate Knowledge and provenance return as Proposals;
+- canonical acceptance remains a human/Application action.
 
-### T4 · Retrieval and Answer
+### T4 · Hybrid Retrieval
 
-- lexical baseline;
-- pgvector generation;
-- context comparison;
-- answer Artifact with citations;
-- Experiment 2 metrics.
+- structured, FTS and vector retrieval operate;
+- canonical relationships expand context;
+- Context Manifest records inclusion reasons;
+- an answer cites retained source segments.
 
-### T5 · Recovery and Deployment
+### T5 · Cross-Platform Release
 
-- restart recovery;
-- failure injection;
-- backup/restore;
-- Docker Compose VPS;
-- Caddy HTTPS;
-- end-to-end smoke test.
+- Windows, macOS and Linux packages build;
+- at least one signed/notarized release path is validated;
+- upgrade and migration tests pass;
+- uninstall preserves data;
+- diagnostic export works.
+
+---
+
+# Technologies Explicitly Removed from the Baseline
+
+The following are not required by the local single-user product:
+
+- PostgreSQL;
+- Psycopg;
+- pgvector;
+- Caddy;
+- Docker Compose as runtime;
+- public FastAPI deployment;
+- Node.js production server;
+- external message broker;
+- separate permanent worker service;
+- Kubernetes;
+- Redis;
+- Neo4j or another graph server;
+- OpenTelemetry backend;
+- `pg_dump`;
+- Restic as mandatory backup mechanism.
+
+They may be reconsidered only if the product scope changes or measurements satisfy an extraction trigger.
 
 ---
 
 # Technologies Explicitly Deferred
 
-| Technology/class | Why deferred | Trigger for reconsideration |
-|---|---|---|
-| Microservices | no team/scale evidence; adds network consistency cost | measured isolation/scaling/release need |
-| Kubernetes | single VPS and few processes | multi-node operations requiring orchestration |
-| Kafka/RabbitMQ/NATS | PostgreSQL delivery sufficient for baseline | throughput, cross-service routing or retention needs exceed it |
-| Redis | no proven cache/queue need | measured latency/ephemeral coordination requirement |
-| Celery/Dramatiq/Temporal | internal jobs/process contracts are simple enough initially | process complexity/reliability cost exceeds custom runtime |
-| Neo4j/other graph DB | relational graph sufficient for experiment | graph query performance/algorithms justify separate store |
-| Qdrant/Weaviate/Pinecone | pgvector sufficient for initial corpus | vector scale/features/operations justify dedicated store |
-| MinIO/S3 service | local content volume simplest on one host | multi-host/off-host object requirements |
-| Elasticsearch/OpenSearch | PostgreSQL FTS sufficient initially | lexical scale/ranking/analytics requirements |
-| Local LLM serving/GPU | operational cost and hardware complexity | privacy/cost/latency evidence supports it |
-| General agent framework | runtime semantics already defined; avoid duplicate state | proven reduction in code without authority conflict |
-| WebSockets | polling/SSE sufficient for operation status | bidirectional real-time interaction need |
-| OIDC/SSO | single-user baseline | multi-user/external identity requirement |
-| Event sourcing | aggregate state is canonical | evidence that full event reconstruction is required |
-
-Deferred technologies must not be scaffolded “for later.”
+- automatic cloud synchronization;
+- multi-user collaboration;
+- public API server;
+- dedicated vector engine;
+- dedicated graph engine;
+- workflow engine;
+- multi-agent framework;
+- sandboxed arbitrary code execution;
+- bundled local foundation model;
+- plugin marketplace;
+- remote telemetry collection;
+- mobile application;
+- server deployment mode.
 
 ---
 
 # Replacement and Extraction Triggers
 
-## External Message Broker
+## SQLite to Client–Server Database
 
-Consider only when:
+Consider a server database only if:
 
-- multiple independently deployed consumers exist;
-- database dispatch load is measured as problematic;
-- retention/replay across services is required;
-- operational ownership justifies another stateful system.
+- multi-user concurrent writes become a product requirement;
+- remote access becomes canonical;
+- one local writer cannot meet measured throughput;
+- database size or maintenance exceeds acceptable desktop constraints;
+- synchronization requires a server authority.
 
-## Dedicated Vector Store
+## Embedded Vector Projection
 
-Consider when:
+Introduce an embedded ANN engine when:
 
-- corpus/query volume exceeds pgvector objectives;
-- required filtering/hybrid features are inadequate;
-- independent scaling materially reduces cost/latency;
-- benchmark evidence is reproducible.
+- measured vector search exceeds interaction budgets;
+- corpus size makes NumPy search impractical;
+- memory usage is unacceptable;
+- required filtering/reranking cannot be maintained simply.
 
-## Dedicated Graph Store
+## Dedicated Graph Engine
 
-Consider when:
+Introduce a graph engine when:
 
-- required multi-hop/graph algorithms are awkward or too slow relationally;
-- graph projection has stable semantics and rebuild pipeline;
-- operational cost is justified.
+- recurrent multi-hop queries exceed SQLite capabilities;
+- graph algorithms become continuous product behavior;
+- relationship volume and latency justify operational cost;
+- the engine remains a projection, not canonical authority.
 
-## Workflow Engine
+## Separate Background Service
 
-Consider when:
+Extract a worker process or service only when:
 
-- process definitions become numerous and complex;
-- timers/compensation/recovery code becomes a dominant maintenance burden;
-- engine state can remain operational and subordinate to ResearchOS authority;
-- integration preserves Command/Event contracts.
+- tasks must continue after the desktop application fully exits;
+- workload isolation cannot be achieved through the sidecar model;
+- resource contention harms interaction;
+- remote execution becomes a requirement.
 
-## Separate Services
+## Alternative IPC
 
-Use the extraction criteria in ADR-0002 and the Component Model.
+Replace standard streams with named pipes or domain sockets when measured concurrency or throughput requires it.
 
-The first likely candidates, if ever justified, are isolated execution, document processing or model gateway—not Domain truth ownership by default.
+## Python Capability Replacement
+
+A Python capability may move to Rust or native code when:
+
+- startup or execution latency is material;
+- memory use is unacceptable;
+- packaging is unreliable;
+- security requires a smaller trusted dependency surface;
+- the algorithm is stable and no longer benefits from Python experimentation.
+
+## Additional Language
+
+Introduce Java, C++ or another runtime only through an ADR demonstrating a unique capability and acceptable packaging cost.
 
 ---
 
 # Technical Risks and Mitigations
 
-## PostgreSQL Becomes Too Central
+## Polyglot Complexity
 
-**Risk:** canonical, jobs and projections compete for one instance.
+**Risk:** Rust, Python and TypeScript increase build and debugging complexity.
 
-**Mitigation:** logical schemas, query limits, separate pools, measured indexes, projection rebuilds, later extraction through ports.
+**Mitigation:** strict ownership, one IPC contract, only two long-lived processes, generated schemas and shared contract tests.
 
-## Custom Job Runtime Costs More Than Expected
+## Rust Development Cost
 
-**Risk:** retries, leases and process state become complex.
+**Risk:** implementing all Application and persistence behavior in Rust may slow early development.
 
-**Mitigation:** implement only proving-slice requirements; evaluate a workflow engine after metrics; preserve runtime contracts.
+**Mitigation:** keep the Domain small, use explicit crates, avoid premature abstractions and retain Python for rapidly changing cognitive algorithms.
 
-## Python Boundary Erosion
+## Python Packaging Variability
 
-**Risk:** ORM/Pydantic/framework types enter Domain.
+**Risk:** native Python dependencies may fail across targets or produce large packages.
 
-**Mitigation:** architecture tests, explicit mapping, plain Domain types, bootstrap-only composition.
+**Mitigation:** platform-native CI builds, locked dependencies, smoke-tested sidecars, optional heavy components and capability-specific adapters.
 
-## Model Provider Lock-In
+## SQLite Write Contention
 
-**Risk:** prompts/tool semantics depend on one provider.
+**Risk:** background jobs and UI commands compete for writes.
 
-**Mitigation:** Model Gateway, normalized records, structured schemas, adapter contract tests, provider-independent operation specs.
+**Mitigation:** one logical write coordinator, short transactions, WAL, bounded queues, optimistic concurrency and measured extraction triggers.
 
-## Frontend Scope Expansion
+## Sidecar Failure
 
-**Risk:** dashboard work delays architecture validation.
+**Risk:** the cognitive runtime crashes or hangs.
 
-**Mitigation:** proving-slice screens only; no generalized productivity suite before experiments.
+**Mitigation:** heartbeat, timeout, cancellation, process restart, durable checkpoints and no canonical authority in the sidecar.
 
-## Personal VPS Data Loss
+## Installer Size
 
-**Risk:** single host failure.
+**Risk:** bundled Python and native libraries create large packages.
 
-**Mitigation:** encrypted off-host backups, restore tests, content digests, migration discipline.
+**Mitigation:** optional components, platform-specific pruning, shared library review, delayed local-model packaging and size budgets.
 
-## Sensitive Research Data Sent Externally
+## Cross-Platform Differences
 
-**Risk:** confidentiality/privacy breach.
+**Risk:** filesystem, WebView, signing and credential behavior differ by OS.
 
-**Mitigation:** classification policy, provider eligibility, local deterministic processing, explicit configuration, audit and future local adapters.
+**Mitigation:** platform adapters, native CI runners, installer tests and explicit supported-platform matrix.
+
+## Secret Leakage
+
+**Risk:** credentials reach logs, IPC fixtures or diagnostics.
+
+**Mitigation:** OS credential stores, short-lived credential injection, redaction, schema-level secret classification and export review.
+
+## Local Data Loss
+
+**Risk:** a single device contains the only canonical state.
+
+**Mitigation:** first-class backup, restore testing, backup reminders, optional user-selected external backup location and no uninstall deletion.
+
+## Cognitive Runtime Becomes a Second Application
+
+**Risk:** Python accumulates canonical logic and hidden state.
+
+**Mitigation:** no writable canonical DB access, proposals only, architecture tests, capability contracts and Rust-owned operation records.
 
 ---
 
 # Technical Conformance Criteria
 
-The baseline implementation conforms only if:
+An implementation conforms to this baseline only if:
 
-1. one repository implements a modular monolith with enforceable package boundaries;
-2. Domain code has no FastAPI, SQLAlchemy, Pydantic-provider or model SDK dependency;
-3. API and worker are separate runtime entrypoints;
-4. canonical mutation and Outbox insertion are atomic in PostgreSQL;
-5. long work is represented by durable PostgreSQL Jobs/Processes rather than in-memory tasks;
-6. model and parsing calls occur outside canonical transactions;
-7. PostgreSQL schemas preserve logical data classes and ownership;
-8. content is immutable, digest-addressed and accessed through a port;
-9. lexical, vector and graph data are projection schema records and rebuildable;
-10. provider SDK code exists only in adapters;
-11. Agent Runtime state is recoverable without provider thread state;
-12. approval is enforced by Application code;
-13. HTTPS and authenticated sessions protect the VPS interface;
-14. secrets are not committed or included in prompts/logs;
-15. structured logs and correlated traces cover the proving path;
-16. exact dependency/model versions are recorded for experiments;
-17. CI enforces format, type, tests, architecture and migration checks;
-18. backup and restore are scripted and tested;
-19. no deferred infrastructure is required to run the proving slice;
-20. every selected technology can be replaced through an upstream port or component boundary.
+1. the product installs and launches without requiring external runtime installation;
+2. Tauri is the desktop lifecycle and packaging host;
+3. React communicates with Rust, never directly with Python;
+4. Rust owns all canonical mutation and authorization;
+5. SQLite is the initial canonical database;
+6. Python executes only bounded cognitive/scientific capabilities;
+7. Rust–Python communication uses a versioned, tested protocol;
+8. the cognitive sidecar can be cancelled, restarted and recovered without corrupting canonical state;
+9. durable Jobs and Process Instances survive application restart;
+10. retained content uses integrity-checked local storage;
+11. lexical, vector and graph structures remain rebuildable projections;
+12. secrets use OS-backed secure storage;
+13. the application remains usable without an AI provider configured;
+14. installers preserve user data during update and uninstall;
+15. backups can be restored in a clean environment;
+16. no general agent framework owns operation state or hidden memory;
+17. no additional language or server product is introduced without a measured need and ADR;
+18. Windows, macOS and Linux builds derive from the same canonical source and contracts.
 
 ---
 
 # Stabilization After Experiments
 
-After Experiments 0–3:
+After the proving experiments and desktop package validation, each provisional choice receives one outcome:
 
-1. compare observed needs with selected mechanisms;
-2. document failures, bottlenecks and workarounds;
-3. retain, replace or simplify each provisional choice;
-4. record significant stabilized decisions as new ADRs;
-5. update this document to v1.0;
-6. only then treat the technical stack as the production reference.
+```text
+Retain
+    evidence supports the baseline
 
-Possible outcomes include:
+Refine
+    the mechanism remains but its contract or configuration changes
 
-- keep PostgreSQL-only architecture;
-- remove pgvector if domain-grounded lexical retrieval is sufficient;
-- introduce a dedicated projection store if evidence supports it;
-- adopt a workflow library if durable-process code is excessive;
-- change model/embedding providers;
-- simplify the frontend;
-- revise the Domain Model if Experiment 0 falsifies it.
+Replace
+    another adapter better satisfies the same upstream contract
 
-Architecture stability is earned through evidence, not document completion.
+Extract
+    the local component becomes an independently packaged runtime
 
----
+Reject
+    the capability or technology is unnecessary
+```
 
-# Official Reference Basis
+The following decisions require explicit evidence before stabilization:
 
-The baseline was checked against official project documentation current at the baseline date:
-
-- [Python releases](https://www.python.org/downloads/)
-- [uv documentation](https://docs.astral.sh/uv/)
-- [FastAPI documentation](https://fastapi.tiangolo.com/)
-- [Pydantic documentation](https://pydantic.dev/docs/)
-- [SQLAlchemy 2.0 documentation](https://docs.sqlalchemy.org/en/20/)
-- [Alembic documentation](https://alembic.sqlalchemy.org/en/latest/)
-- [Psycopg 3 documentation](https://www.psycopg.org/psycopg3/docs/)
-- [PostgreSQL version support](https://www.postgresql.org/support/versioning/)
-- [pgvector](https://github.com/pgvector/pgvector)
-- [Node.js releases](https://nodejs.org/en/about/previous-releases)
-- [React documentation](https://react.dev/)
-- [Vite documentation](https://vite.dev/guide/)
-- [Docker Compose documentation](https://docs.docker.com/compose/)
-- [Caddy documentation](https://caddyserver.com/docs/)
-- [OpenTelemetry documentation](https://opentelemetry.io/docs/)
-- [Anthropic client SDK documentation](https://docs.anthropic.com/en/api/client-sdks)
-- [PyMuPDF documentation](https://pymupdf.readthedocs.io/)
-- [restic documentation](https://restic.readthedocs.io/)
-
-These references support product capability and maintenance assumptions. ResearchOS contracts remain authoritative for system behavior.
+- SQLite write and retrieval performance;
+- vector projection mechanism;
+- Rust/Python IPC throughput and failure recovery;
+- Python packaging reliability on all targets;
+- installer size and startup latency;
+- model-provider baseline;
+- OCR packaging;
+- automatic update mechanism;
+- local-model support;
+- need for a public or local integration API.
 
 ---
 
 # Final Technical Statement
 
-ResearchOS begins as a Python and PostgreSQL modular monolith with a React workspace, durable PostgreSQL-backed background processing, content-addressed file storage and provider-neutral cognitive adapters.
+ResearchOS begins as a self-contained, local-first desktop application.
 
-FastAPI exposes application contracts.
+Its technical structure is:
 
-Plain Python Domain modules own behavior and invariants.
+```text
+React + TypeScript
+        ↓
+Tauri desktop shell
+        ↓
+Rust authoritative runtime
+        ↓
+SQLite + local content store
+        ↓
+versioned IPC
+        ↓
+Python cognitive sidecar
+        ↓
+optional external or native capability adapters
+```
 
-SQLAlchemy, Psycopg and Alembic implement persistence without entering the Domain.
+Rust owns state, authority, execution and security.
 
-PostgreSQL stores canonical, operational, event and initial projection data under explicit logical separation.
+Python supplies cognitive and scientific capabilities without becoming a second source of truth.
 
-pgvector, full-text search and relational graph projections are sufficient to test retrieval assumptions before adding specialized databases.
+SQLite and the filesystem keep the product installable and operable by one user without infrastructure administration.
 
-The Agent Runtime executes in a recoverable worker and invokes models/tools only through gateways.
-
-Docker Compose and Caddy deploy the system safely to one VPS.
-
-Every choice is pinned, observable, backed up and replaceable.
-
-This baseline exists to produce evidence. The experiments, not architectural fashion, decide what becomes permanent.
+Every specialized engine, additional language or distributed service remains optional until measured product needs justify its cost.

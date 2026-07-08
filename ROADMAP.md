@@ -19,13 +19,17 @@ It does not add models. It sequences the work that carries a frozen conceptual f
 | Logical | Logical Domain Model | Stable · v1.1 |
 | **Domain breadth** | Derived Types + Use Cases across all operational domains | **Closed** |
 | **Interaction model** | System interaction modalities | **Complete** |
-| **System design** | Software Architecture and below | **Not started** |
+| **System architecture** | System Architecture | **Complete · v1.0** |
+| **Software architecture** | Software Architecture | **Complete · v1.0** |
+| **Implementation design** | Views, ADRs and Technical Architecture | **Next** |
 
-One gap remains: **execution**.
+The reference architecture is now defined. The remaining gap is **implementation evidence**.
 
 Breadth is closed. Every operational level now has Derived Types and worked Use Cases — [USE_CASES.md](USE_CASES.md) carries 52 across twelve groups. [DOMAIN_VERTICALS.md](DOMAIN_VERTICALS.md) itemizes 39 of them by ID across the six verticals (see the Phase A Deliverables table below); the remaining 13 — People, Context and Traceability — are catalogued there as cross-cutting infrastructure, not verticals, since they operate identically regardless of which vertical produced the entity they touch. The [Interaction Model](INTERACTION_MODEL.md) is also complete.
 
-What remains is the runtime architecture: although the cognitive architecture is complete, the system that executes it has not yet been designed.
+`SYSTEM_ARCHITECTURE.md` now defines authority, planes, trust boundaries and runtime invariants. `SOFTWARE_ARCHITECTURE.md` translates them into modules, ports, adapters, commands, events, processes and executable runtime roles.
+
+What remains is to derive implementation views, record the significant decisions as ADRs, select concrete technologies and execute the proving experiments.
 
 ---
 
@@ -154,6 +158,8 @@ Conceptual Models
         ↓
 Interaction Model
         ↓
+System Architecture
+        ↓
 Software Architecture
         ↓
 Application Services
@@ -209,10 +215,12 @@ The system is considered validated when this cycle executes over real data with 
 | 1 | ROADMAP.md | — | Build sequence | This document |
 | 2 | Domain verticals | A | Complete missing operational domains | Done |
 | 3 | INTERACTION_MODEL.md | B | Define every interaction modality | Done |
-| 4 | SOFTWARE_ARCHITECTURE.md | B | Translate conceptual models into runtime architecture | Next |
-| 5 | UML.md / Views | B | Derived implementation views | Pending |
-| 6 | IMPLEMENTATION_PLAN.md | B | Components, milestones, MVP | First pass |
-| 7 | DECISIONS.md (ADR) | B | Record architectural decisions | Pending |
+| 4 | SYSTEM_ARCHITECTURE.md | B | Define authority, planes, trust boundaries and system invariants | Done · v1.0 |
+| 5 | SOFTWARE_ARCHITECTURE.md | B | Translate system invariants into modules, contracts and runtimes | Done · v1.0 |
+| 6 | UML.md / Architecture Views | B | Derive structural, runtime and deployment-neutral implementation views | Next |
+| 7 | DECISIONS.md (ADR) | B | Record significant architectural decisions | Pending |
+| 8 | TECHNICAL_ARCHITECTURE.md | B | Select technologies and deployment topology | Pending |
+| 9 | IMPLEMENTATION_PLAN.md | B | Validate architectural hypotheses through proving experiments | First pass |
 
 DECISIONS.md also owns the promotion (or rejection) of the remaining candidate concepts:
 
@@ -229,8 +237,8 @@ DECISIONS.md also owns the promotion (or rejection) of the remaining candidate c
 |-----------|-------|-----------|--------|
 | M1 · Domain breadth | A | All six operational levels are represented | Achieved |
 | M2 · Interaction model | B | Manual, assisted, conversational and autonomous interactions are defined | Achieved |
-| M3 · Reference architecture | B | Software Architecture completed | Pending |
-| M4 · Implementation views | B | Logical model projected to implementation views | Pending |
+| M3 · Reference architecture | B | System and Software Architecture completed | Achieved |
+| M4 · Implementation views | B | Logical and software architecture projected to structural and runtime views | Next |
 | M5 · Build plan | B | Components, epics and MVP defined | Pending |
 | M6 · Proving slice | B | End-to-end operating cycle validated | Pending |
 
@@ -241,7 +249,7 @@ DECISIONS.md also owns the promotion (or rejection) of the remaining candidate c
 - **No new root entities.** Breadth comes from Derived Types.
 - **Frozen stays frozen.** The conceptual and logical models remain implementation-independent.
 - **Interaction precedes implementation.** The system's interaction model defines how software is structured.
-- **Technology enters only at Software Architecture.**
+- **Mechanisms enter at Software Architecture; concrete products enter only at Technical Architecture.**
 - **Conversation is not the system.** It is one interaction modality among several.
 - **Architectural decisions are recorded.** Significant technical decisions become ADRs.
 - **Thin slice first.** Prove one complete operating cycle before broadening.

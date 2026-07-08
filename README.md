@@ -84,6 +84,8 @@ ResearchOS/
 ├── EVENT_MODEL.md
 ├── LOGICAL_DOMAIN_MODEL.md
 ├── INTERACTION_MODEL.md
+├── SYSTEM_ARCHITECTURE.md
+├── SOFTWARE_ARCHITECTURE.md
 └── ROADMAP.md
 ```
 
@@ -123,13 +125,21 @@ AI Architecture ─┬─ Memory Model
 Logical Domain Model
     ↓
 Interaction Model
+    ↓
+System Architecture
+    ↓
+Software Architecture
 ```
 
 Los documentos 11–14 conforman la **Arquitectura Cognitiva**: la capa operativa de IA y los tres modelos del sustrato sobre el que opera — lo que el sistema recuerda (Memory), lo que ensambla por tarea (Context) y aquello a lo que reacciona (Events).
 
 El **Logical Domain Model** es la especificación lógica del dominio: la definición canónica y neutral respecto a la tecnología de su estructura, de la que se derivan todos los esquemas, diagramas y tipos.
 
-El **Interaction Model** cierra la documentación conceptual (la cadena 1–16): cómo colaboran el investigador y el sistema, con independencia de cualquier tecnología de interfaz. Es, además, el primer paso de la Fase B y precede a la Software Architecture.
+El **Interaction Model** cierra la arquitectura conceptual: define cómo colaboran el investigador y el sistema con independencia de cualquier tecnología de interfaz.
+
+El **System Architecture** integra todos los modelos en una única arquitectura de sistema, fija la autoridad del Domain State, las fronteras entre planos y las invariantes de ejecución.
+
+El **Software Architecture** traduce esas invariantes a módulos, puertos, adaptadores, contratos, transacciones y runtimes implementables, todavía sin elegir productos tecnológicos concretos.
 
 1. [Vision](VISION.md)
 2. [Principles](SYSTEM_PRINCIPLES.md)
@@ -147,6 +157,8 @@ El **Interaction Model** cierra la documentación conceptual (la cadena 1–16):
 14. [Event Model](EVENT_MODEL.md)
 15. [Logical Domain Model](LOGICAL_DOMAIN_MODEL.md)
 16. [Interaction Model](INTERACTION_MODEL.md)
+17. [System Architecture](SYSTEM_ARCHITECTURE.md)
+18. [Software Architecture](SOFTWARE_ARCHITECTURE.md)
 
 ---
 
@@ -191,15 +203,15 @@ Las seis verticales operativas —personal, vida diaria, investigación, docenci
 
 ## Fase B · Construir el sistema
 
-Materializar la arquitectura: Software Architecture, servicios, Memory/Context Engine, Knowledge Graph, Event Bus, capa MCP e interfaces, validados con una rebanada vertical de extremo a extremo.
+Materializar la arquitectura de referencia ya definida: derivar las vistas de implementación, registrar las decisiones arquitectónicas, seleccionar la arquitectura técnica y validar el sistema con una rebanada vertical de extremo a extremo.
 
 ---
 
 # Estado del proyecto
 
-El proyecto ha completado la definición arquitectónica y el modelado del dominio, y se dispone a iniciar la fase de diseño del sistema (Software Architecture).
+El proyecto ha completado la arquitectura conceptual, la arquitectura del sistema y la arquitectura software de referencia. El siguiente paso es derivar las vistas de implementación, registrar las decisiones mediante ADRs y seleccionar la arquitectura técnica antes de construir la primera rebanada vertical.
 
-El objetivo inicial es establecer una base sólida sobre la que construir una plataforma de investigación sostenible, extensible y orientada al conocimiento.
+El objetivo inicial de implementación es validar que la arquitectura puede operar sobre datos reales sin perder autoridad del dominio, trazabilidad, control humano ni capacidad de recuperación.
 
 ---
 

@@ -1,17 +1,15 @@
 name: Register deferred DocLang candidate
 
 on:
-  pull_request_target:
-    branches: [main]
+  issues:
     types: [opened]
-  workflow_dispatch:
 
 permissions:
   contents: write
 
-# This temporary workflow applies the deferred DocLang documentation decision.
 jobs:
-  update:
+  register:
+    if: github.event.issue.title == 'internal: register deferred DocLang candidate'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,14 +17,14 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Register candidate in architecture and catalog
+      - name: Update technical architecture
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
 
-          technical = Path('TECHNICAL_ARCHITECTURE.md')
-          text = technical.read_text()
+          path = Path('TECHNICAL_ARCHITECTURE.md')
+          text = path.read_text()
           anchor = '''## Parser Placement
 
 Rust owns admission, content retention, job state and output commit.
@@ -36,7 +34,7 @@ Python owns initial scientific parsing and extraction adapters.
 A parser may be replaced by a native Rust or C/C++ implementation without changing the pipeline contract.
 
 ## OCR'''
-          replacement = '''## Parser Placement
+          section = '''## Parser Placement
 
 Rust owns admission, content retention, job state and output commit.
 
@@ -75,85 +73,25 @@ Any retained DocLang output is a derived, rebuildable structured representation.
 Adoption requires measured benefit over the baseline and an explicit decision inside SPEC-010. It does not require a new ADR unless the choice changes an architectural authority boundary, mandatory product dependency or canonical data contract.
 
 ## OCR'''
-          if anchor not in text:
-              raise SystemExit('TECHNICAL_ARCHITECTURE.md anchor not found')
-          technical.write_text(text.replace(anchor, replacement))
-
-          catalog = Path('SPEC_CATALOG.md')
-          text = catalog.read_text()
-          old_row = '| **SPEC-010** | Document Ingestion Pipeline | platform | 2 | SPEC-005, SPEC-006, SPEC-007, SPEC-008, SPEC-009 | `CANONICAL_DATA_MODEL.md`, `DATA_ARCHITECTURE.md`, `AGENT_RUNTIME.md` | Planned |'
-          new_row = '| **SPEC-010** | Document Ingestion Pipeline | platform | 2 | SPEC-005, SPEC-006, SPEC-007, SPEC-008, SPEC-009 | `CANONICAL_DATA_MODEL.md`, `DATA_ARCHITECTURE.md`, `AGENT_RUNTIME.md`, `TECHNICAL_ARCHITECTURE.md` | Planned |'
-          if old_row not in text:
-              raise SystemExit('SPEC-010 registry row not found')
-          text = text.replace(old_row, new_row)
-
-          anchor = '''The registry status is the only authoritative source for which Spec is next. `ROADMAP.md` owns milestone ordering at a higher level.
-
----
-
-# Critical Path'''
-          replacement = '''The registry status is the only authoritative source for which Spec is next. `ROADMAP.md` owns milestone ordering at a higher level.
-
-## SPEC-010 Deferred Parser Evaluation
-
-SPEC-010 must preserve the simple PyMuPDF extraction baseline and evaluate optional rich structured representations only where the document corpus demonstrates a need.
-
-The evaluation set must include:
-
-```text
-Baseline A
-PyMuPDF → normalized text
-
-Candidate B
-Docling → native structured representation → normalized text
-
-Candidate C
-Docling or compatible adapter → DocLang → normalized text + structural anchors
-```
-
-Docling and DocLang are candidates, not preselected dependencies. Adoption requires measurable improvement in structural fidelity, evidence localization or retrieval quality that justifies runtime, packaging, security and maintenance cost.
-
-SPEC-010 must not introduce a technology-specific canonical `representation_kind`. When a rich representation is retained, the canonical record uses a semantic kind such as `structured_document` and records the concrete media type, format version, generator and generator version separately.
-
----
-
-# Critical Path'''
-          if anchor not in text:
-              raise SystemExit('SPEC_CATALOG.md insertion anchor not found')
-          catalog.write_text(text.replace(anchor, replacement))
+          if '## Rich Structured Representation Candidates' not in text:
+              if anchor not in text:
+                  raise SystemExit('Parser Placement anchor not found')
+              path.write_text(text.replace(anchor, section))
           PY
 
-      - name: Validate changes
+      - name: Validate and commit
         shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
-          for name in ('TECHNICAL_ARCHITECTURE.md', 'SPEC_CATALOG.md'):
-              text = Path(name).read_text()
-              if text.count('```') % 2:
-                  raise SystemExit(f'Unbalanced code fences in {name}')
-          technical = Path('TECHNICAL_ARCHITECTURE.md').read_text()
-          catalog = Path('SPEC_CATALOG.md').read_text()
-          required = [
-              '## Rich Structured Representation Candidates',
-              'Docling and DocLang are deferred candidates',
-              '## SPEC-010 Deferred Parser Evaluation',
-              'Candidate C',
-              '`structured_document`',
-          ]
-          combined = technical + catalog
-          missing = [value for value in required if value not in combined]
-          if missing:
-              raise SystemExit(f'Missing expected content: {missing}')
-          print('DocLang candidate registration validated')
+          text = Path('TECHNICAL_ARCHITECTURE.md').read_text()
+          assert '## Rich Structured Representation Candidates' in text
+          assert 'Docling and DocLang are deferred candidates' in text
+          assert text.count('```') % 2 == 0
           PY
-
-      - name: Commit and remove temporary workflow
-        shell: bash
-        run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git rm .github/workflows/register-doclang-candidate.yml
-          git add TECHNICAL_ARCHITECTURE.md SPEC_CATALOG.md
+          git add TECHNICAL_ARCHITECTURE.md
           git commit -m "Register DocLang as deferred ingestion candidate"
           git push origin HEAD:main

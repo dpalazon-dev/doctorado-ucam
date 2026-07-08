@@ -57,7 +57,7 @@ Each experiment below also illuminates the cost/benefit of one or more assumptio
 
 ## The mechanism map
 
-Everything below is a servant of the domain, and each is swappable. The domain is truth; each mechanism is a projection. Concrete products are chosen later, in the Software Architecture — this map fixes only *roles*, not technologies.
+Everything below is a servant of the domain, and each is swappable. The domain is truth; each mechanism is a projection. Concrete products are chosen later, in the Technical Architecture — this map fixes only *roles*, not technologies.
 
 | Concern | Mechanism (category) | What it serves |
 |---|---|---|
@@ -177,7 +177,7 @@ Keep a structured **friction log**: every time the reaction is *"I need a new en
 
 ## What "trusting the architecture" means
 
-Experiment 0 is the precondition: if the Domain Model does not survive real use, no result from the others is worth acting on. When Experiment 0 holds and the three that follow have been demonstrated — or falsified informatively — we can either build on a validated foundation or revise the model *before* committing to a technology stack. That is the point of doing this now, before the Software Architecture: to make the expensive decisions on evidence rather than on the elegance of the design.
+Experiment 0 is the precondition: if the Domain Model does not survive real use, no result from the others is worth acting on. When Experiment 0 holds and the three that follow have been demonstrated — or falsified informatively — we can either build on a validated foundation or revise the model *before* committing to a technology stack. That is the point of doing this now, before committing to the Technical Architecture and production implementation: to make the expensive decisions on evidence rather than on the elegance of the design.
 
 Concretely, this realizes the ROADMAP's **M6 · Proving slice**, reframed from "a feature running end-to-end" to "the architecture's core claims, tested." One full turn of the operating cycle appears across the three experiments: capture changes the domain (E1), a question assembles context and produces a grounded answer (E2), and change propagates through events without breaking consistency (E3).
 
@@ -187,7 +187,7 @@ Named so the boundary of this first pass is explicit; none is decided here.
 
 - **The full assumption catalogue** — beyond the three tested here, the remaining architectural assumptions and their falsification methods.
 - **Adopt / avoid decisions** — distilled into recorded ADRs (`DECISIONS.md`, reserved by the ROADMAP).
-- **Technology and dependencies** — LLM providers, the concrete stores behind each row of the mechanism map, academic-metadata sources, ingestion tooling. These belong to the Software Architecture, where technology first enters.
+- **Technology and dependencies** — LLM providers, the concrete stores behind each row of the mechanism map, academic-metadata sources, ingestion tooling. These belong to the Technical Architecture and its ADRs. The Software Architecture defines their required contracts without selecting products.
 
 ## Relationship to other documents
 

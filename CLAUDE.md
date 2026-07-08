@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repository is
 
-ResearchOS (formerly Doctorado_UCAM) is a from-scratch design of a research operating system for a PhD candidate: knowledge management, research workflow and AI assistance unified around one domain model. The repository currently contains **only the conceptual and logical architecture** — Markdown documents, no code. Per `ROADMAP.md`, Phase A (design the domain) is complete; Phase B (build the system: Software Architecture, services, Knowledge Graph, MCP layer) has not started. There is no package.json, build system, linter or test suite — don't invent one.
+ResearchOS (formerly Doctorado_UCAM) is a from-scratch design of a research operating system for a PhD candidate: knowledge management, research workflow and AI assistance unified around one domain model. The repository currently contains the conceptual, logical, system and software reference architecture — Markdown documents, no code. Phase A (design the domain) is complete. Phase B has completed `SYSTEM_ARCHITECTURE.md` and `SOFTWARE_ARCHITECTURE.md`; implementation views, ADRs, Technical Architecture and the proving slice are next. There is no package.json, build system, linter or test suite yet — do not invent one outside the roadmap.
 
 `ROADMAP.md` is the plan of record. Read it first to see what phase the project is in before making structural changes.
 
@@ -16,12 +16,15 @@ The documents form a dependency chain — each depends conceptually on the ones 
 Vision → Principles → System Model → Operational Model → Responsibilities
   → Domain Map → Domain Model → Knowledge Model → System Capabilities → Use Cases
   → AI Architecture (+ Memory / Context / Event Model) → Logical Domain Model → Interaction Model
+  → System Architecture → Software Architecture
 ```
 
-Two documents anchor everything else:
+Four documents now anchor the transition from domain definition to implementation:
 
 - **`LOGICAL_DOMAIN_MODEL.md`** — frozen at v1.0. The canonical, technology-neutral specification from which every future schema, diagram and type is derived. Its own evolution rule: additions (new Derived Types under existing Core Entities) are welcome; structural churn (touching the seven Core Entities or their relationships) is not.
 - **`USE_CASES.md`** — the single behavioral specification of the platform (52 use cases across 12 groups as of this writing). Every use case follows the same 8-part structure (Intention, Context, Operational Flow, Expected Outcome, State Changes, Capabilities, Domain Entities, Related Use Cases). New concepts enter the Domain Model only after recurring across multiple use cases (the "Domain Consistency" principle, documented in that file's own Evolution section) — never speculatively.
+- **`SYSTEM_ARCHITECTURE.md`** — the canonical authority model: Domain State as the single source of truth, Domain Kernel mutation authority, system planes, trust boundaries and runtime invariants.
+- **`SOFTWARE_ARCHITECTURE.md`** — the implementable reference architecture: modular monolith, ports and adapters, commands/queries/proposals, transactional outbox, durable processes, Cognitive Runtime and conformance tests.
 
 ## Core invariant: seven entities, no new roots
 
@@ -39,6 +42,6 @@ A vertical named "Doctorate" appears in old commit messages and in `ROADMAP.md`'
 
 ## Conventions
 
-- The repository is intentionally flat (no subfolders). `README.md` states explicitly that directory structure (`architecture/`, `platform/`, `ai/`...) arrives only when Phase B implementation begins — don't introduce folders preemptively.
+- The repository remains intentionally flat while it contains only architecture documents. The package topology in `SOFTWARE_ARCHITECTURE.md` is normative in responsibility but does not justify creating source directories before implementation begins.
 - Naming follows the suffix of what a document is: `*_MODEL.md` / `*_MAP.md` for foundational and cognitive documents, `*_VERTICAL.md` for vertical specializations, plain names (`VISION.md`, `ROADMAP.md`, `USE_CASES.md`) for singular documents.
 - Documents are written in English; conversation with the maintainer happens in Spanish. `README.md` is the one document written in Spanish, as the repo's front door.

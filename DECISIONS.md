@@ -39,7 +39,12 @@ A changed decision is superseded by a new ADR rather than silently rewritten.
 | ADR-0003 | Commands Express Intent; Events Record Committed Change | Accepted | 2026-07-08 | `EVENT_MODEL.md`, `SOFTWARE_ARCHITECTURE.md` |
 | ADR-0004 | Seven Core Entities as a Falsifiable Canonical Baseline | Accepted | 2026-07-08 | `DOMAIN_MODEL.md`, `LOGICAL_DOMAIN_MODEL.md`, `IMPLEMENTATION_PLAN.md` |
 | ADR-0005 | Resolve Decision, Artifact, Event and Curate Without New Roots | Accepted | 2026-07-08 | Domain, capability, AI and event owners |
-| ADR-0006 | Experimental Technical Baseline Before Stabilized Technical Architecture | Accepted | 2026-07-08 | `ROADMAP.md`, `IMPLEMENTATION_PLAN.md` |
+| ADR-0006 | Experimental Technical Baseline Before Stabilized Technical Architecture | Accepted | 2026-07-08 | `ROADMAP.md`, `IMPLEMENTATION_PLAN.md`, `TECHNICAL_ARCHITECTURE.md` |
+| ADR-0007 | ResearchOS Is a Local-First Single-User Desktop Application | Accepted | 2026-07-08 | `TECHNICAL_ARCHITECTURE.md`, `SYSTEM_ARCHITECTURE.md` |
+| ADR-0008 | Tauri and React Form the Cross-Platform Desktop Shell | Accepted | 2026-07-08 | `TECHNICAL_ARCHITECTURE.md` |
+| ADR-0009 | Rust Owns Authority; Python Provides Cognitive Capabilities | Accepted | 2026-07-08 | `TECHNICAL_ARCHITECTURE.md`, `AGENT_RUNTIME.md`, `COMPONENT_MODEL.md` |
+| ADR-0010 | Embedded Local Persistence Is the Initial Product Baseline | Accepted | 2026-07-08 | `TECHNICAL_ARCHITECTURE.md`, `DATA_ARCHITECTURE.md`, `CANONICAL_DATA_MODEL.md` |
+| ADR-0011 | The Canonical Data Model Governs Vertical Extensions | Accepted | 2026-07-08 | `CANONICAL_DATA_MODEL.md`, `LOGICAL_DOMAIN_MODEL.md`, `DOMAIN_VERTICALS.md` |
 
 ---
 
@@ -381,4 +386,329 @@ This distinction permits immediate empirical work without confusing a prototype 
 
 - `ROADMAP.md` — sequence and status.
 - `IMPLEMENTATION_PLAN.md` — experiment boundary and baseline rules.
-- Future `TECHNICAL_ARCHITECTURE.md` — concrete selections and maturity status.
+- `TECHNICAL_ARCHITECTURE.md` — current concrete selections, process topology and maturity status.
+
+---
+
+# ADR-0007 · ResearchOS Is a Local-First Single-User Desktop Application
+
+**Status:** Accepted  
+**Date:** 2026-07-08
+
+## Context
+
+ResearchOS is intended to behave as personal software installed on the user's own computer. The previous provisional baseline still assumed a VPS-oriented web deployment and therefore introduced server administration, network exposure and infrastructure that a single user should not need to operate.
+
+The product must remain capable of using optional remote AI providers, but those providers are capabilities consumed by the application rather than the location or authority of the application itself.
+
+## Decision
+
+ResearchOS is initially a local-first, single-user desktop application distributed through native installers for Windows, macOS and Linux.
+
+- One local application instance owns one primary local workspace.
+- Canonical state, source content, operational state and rebuildable projections are stored locally.
+- The user is not required to install or administer a database server, container runtime, reverse proxy, message broker or background daemon.
+- External AI, search or integration services are optional adapters invoked only by capabilities that require them.
+- The initial product does not provide multi-user collaboration, server-hosted workspaces, cross-device synchronization or remote administration.
+- Any later synchronization, hosted mode or multi-user authority model requires a new ADR because it changes trust, identity, consistency and conflict-resolution boundaries.
+
+## Rationale
+
+The local-first topology matches the actual product, minimizes operational burden, preserves privacy and gives the project the shortest path to an installable proving slice. It also keeps remote dependencies explicit rather than making the entire system depend on a privately operated server.
+
+## Consequences
+
+### Positive
+
+- Installation and operation resemble ordinary desktop software.
+- Canonical data remains under the user's direct control.
+- Offline operation is possible for all capabilities that do not require remote providers.
+- Deployment, backup and recovery are bounded to one local product.
+- Infrastructure decisions are evaluated against a real single-user workload.
+
+### Negative
+
+- Native packaging, signing and update flows must be implemented per platform.
+- Cross-device access and collaboration are deferred.
+- Local resource limits constrain heavy model execution and document processing.
+- Data durability depends on explicit local backup and restoration mechanisms.
+
+## Canonical specification
+
+- `TECHNICAL_ARCHITECTURE.md` — desktop target, process topology, packaging and local storage baseline.
+- `SYSTEM_ARCHITECTURE.md` — authority and trust boundaries.
+- `ROADMAP.md` — delivery sequence for the desktop product.
+
+---
+
+# ADR-0008 · Tauri and React Form the Cross-Platform Desktop Shell
+
+**Status:** Accepted  
+**Date:** 2026-07-08
+
+## Context
+
+ResearchOS requires a rich Workspace with document views, editors, dashboards, timelines, graph exploration, approval surfaces and conversational interaction. It must also expose native desktop functions such as file selection, drag-and-drop, notifications, credential storage, application lifecycle, installers and updates.
+
+A browser-hosted application would retain server assumptions. Electron would bundle an additional Chromium and Node runtime. A Python-native UI would reduce language count but would make the planned Workspace and its visual ecosystem more expensive to develop.
+
+## Decision
+
+The cross-platform desktop shell uses:
+
+```text
+Tauri 2
++
+React
++
+TypeScript
++
+Vite
+```
+
+- React and TypeScript own Workspace presentation and interaction state.
+- Tauri owns native application lifecycle, windows, menus, system integration, installer hooks and supervision of subordinate processes.
+- The application is built and packaged separately on Windows, macOS and Linux from one shared source tree.
+- Node.js is a development and build-time dependency, not a production server.
+- Platform-specific behavior remains behind Tauri commands or adapters rather than leaking into the Workspace.
+
+## Rationale
+
+This combination preserves the mature web UI ecosystem while providing a small native host, cross-platform packaging and a natural Rust boundary for the authoritative runtime.
+
+## Consequences
+
+### Positive
+
+- One Workspace codebase across the three target desktop platforms.
+- Access to modern editors, visualization libraries and frontend tooling.
+- Native packaging without a permanent local web server.
+- Clear separation between presentation and authority.
+
+### Negative
+
+- The product uses both TypeScript and Rust.
+- WebView differences require platform testing.
+- Code signing, notarization and packaging remain platform-specific.
+- IPC contracts between the Workspace and the Rust host must be versioned and tested.
+
+## Alternatives considered
+
+- **Electron:** rejected as the initial baseline because its bundled runtime and process footprint are unnecessary for the current product.
+- **PySide6 / Qt:** retained as a credible fallback, but not selected because the Workspace is expected to benefit substantially from the web UI ecosystem.
+- **Browser plus local server:** rejected because it weakens the desktop lifecycle and preserves server-shaped operational assumptions.
+
+## Canonical specification
+
+- `TECHNICAL_ARCHITECTURE.md` — desktop stack, repository layout, packaging and interface boundaries.
+
+---
+
+# ADR-0009 · Rust Owns Authority; Python Provides Cognitive Capabilities
+
+**Status:** Accepted  
+**Date:** 2026-07-08
+
+## Context
+
+ResearchOS needs both a strict local runtime and access to the strongest ecosystem for models, embeddings, document intelligence, evaluation and scientific processing. Implementing everything in Python would place canonical persistence, authorization, durable execution and desktop lifecycle in a highly dynamic runtime. Implementing everything in Rust would make cognitive experimentation and integration unnecessarily slow.
+
+A language boundary is acceptable only if authority and data ownership remain unambiguous.
+
+## Decision
+
+ResearchOS uses a controlled two-runtime architecture:
+
+```text
+React + TypeScript Workspace
+        ↓
+Tauri + authoritative Rust runtime
+        ↓ controlled, versioned IPC
+subordinate Python cognitive sidecar
+```
+
+Rust owns:
+
+- canonical state and persistence;
+- commands, queries and application use cases;
+- domain invariant enforcement;
+- authorization and approval gates;
+- durable jobs, events, retries, cancellation and checkpoints;
+- filesystem authority, secrets and process supervision;
+- validation and commitment of cognitive Proposals.
+
+Python owns bounded cognitive capabilities such as:
+
+- model-provider adapters;
+- document processing and OCR coordination;
+- embeddings and reranking;
+- extraction, classification, synthesis and critique;
+- retrieval experiments and evaluation;
+- scientific and machine-learning libraries.
+
+The following constraints are mandatory:
+
+- Python does not write directly to canonical persistence.
+- The sidecar receives typed operations with explicit authority, context and budgets.
+- The sidecar returns typed results, Artifacts, observations and Proposals.
+- Rust validates every result before any canonical mutation.
+- The LLM never controls scheduling, permissions, budget enforcement or commit authority.
+- Cognitive frameworks may be used behind adapters but cannot become a hidden state owner or second orchestration authority.
+- Additional languages enter only through a capability adapter justified by a concrete dependency or measured requirement.
+
+## Rationale
+
+Rust provides a strict native core for authority, security and durable execution. Python preserves access to the rapidly evolving AI and scientific ecosystem. The sidecar boundary contains failure and allows the cognitive runtime to evolve without transferring ownership of the system.
+
+## Consequences
+
+### Positive
+
+- Canonical authority is independent of model and Python framework behavior.
+- Cognitive capabilities remain fast to prototype and replace.
+- Python failures can be isolated, cancelled and restarted.
+- The IPC boundary makes budgets, provenance and capability contracts explicit.
+- Native or JVM tools can later enter as specialized adapters without changing the core.
+
+### Negative
+
+- Two runtime toolchains must be built, packaged and tested per platform.
+- IPC schemas, compatibility and process supervision become first-class engineering work.
+- Large payloads require reference-based exchange rather than naive serialization.
+- End-to-end debugging spans process and language boundaries.
+
+## Canonical specification
+
+- `TECHNICAL_ARCHITECTURE.md` — language ownership, process topology and IPC baseline.
+- `AGENT_RUNTIME.md` — bounded cognitive operation lifecycle and authority limits.
+- `COMPONENT_MODEL.md` — component responsibility and runtime placement.
+
+---
+
+# ADR-0010 · Embedded Local Persistence Is the Initial Product Baseline
+
+**Status:** Accepted  
+**Date:** 2026-07-08
+
+## Context
+
+A single-user desktop application does not justify a separately installed database server, broker, graph server or vector service. The system still requires transactions, migrations, full-text retrieval, durable jobs, event delivery, relationship traversal, backup and rebuildable projections.
+
+The storage baseline must therefore be embedded, locally operable and replaceable where specialized workload evidence later requires extraction.
+
+## Decision
+
+The initial physical data baseline is:
+
+```text
+SQLite
++
+content-addressed local filesystem
++
+embedded, rebuildable projections
+```
+
+- SQLite stores canonical records, relationships, provenance, operational state, durable jobs, events, audit data, configuration metadata and relational projections.
+- SQLite FTS5 provides the initial lexical-search projection.
+- Canonical graph semantics are represented by first-class relationship records; bounded traversal initially uses relational queries and recursive CTEs.
+- Original and derived content objects are stored in a content-addressed local filesystem under application-managed paths.
+- The initial vector projection may use vectors stored locally with Python/NumPy retrieval for proving work. A dedicated embedded vector adapter may be introduced only after measured volume or latency justifies it.
+- One authoritative write coordinator, short transactions, WAL mode and optimistic record versions govern local concurrency.
+- Backups use application-controlled consistent database copies plus content and manifest capture.
+- Search, vector, graph and UI projections remain rebuildable and never become canonical authority.
+
+The following are not initial product prerequisites:
+
+- PostgreSQL or `pgvector`;
+- Redis;
+- Neo4j or another graph server;
+- an external vector database;
+- Kafka, RabbitMQ or another broker;
+- Docker or a separately managed storage service.
+
+Replacement or extraction requires measured evidence such as:
+
+- concurrency that the single-writer model cannot satisfy;
+- vector volume or latency outside accepted targets;
+- relationship traversal that cannot be maintained reasonably in SQLite;
+- cross-device synchronization;
+- multi-user authority;
+- independently deployed or scaled execution.
+
+## Rationale
+
+Embedded persistence satisfies the actual product topology while preserving the logical separation among canonical, operational, event, audit and projection data. It removes installation burden without erasing future extraction boundaries.
+
+## Consequences
+
+### Positive
+
+- No database or broker administration for the user.
+- Atomic local transactions and simple backup ownership.
+- Small deployment surface and fewer failure modes.
+- The complete proving slice can run inside the installed product.
+
+### Negative
+
+- Write concurrency must remain deliberately bounded.
+- Specialized graph and vector performance may eventually require adapters.
+- Large local collections require disk-space and rebuild management.
+- Backup, migration and corruption recovery become product responsibilities.
+
+## Canonical specification
+
+- `TECHNICAL_ARCHITECTURE.md` — physical storage, local paths, concurrency and packaging.
+- `DATA_ARCHITECTURE.md` — logical data classes, ownership, lifecycle and projection rules.
+- `CANONICAL_DATA_MODEL.md` — shared structural contracts independent of physical storage.
+
+---
+
+# ADR-0011 · The Canonical Data Model Governs Vertical Extensions
+
+**Status:** Accepted  
+**Date:** 2026-07-08
+
+## Context
+
+ResearchOS spans Personal, Daily Work, Administration, Teaching, Research and Organization. Each vertical needs specialized types, fields, relationships, invariants, lifecycles and projections. Allowing every vertical to invent its own root records, identity, provenance, relationship representation or persistence authority would fragment the system into disconnected applications.
+
+The Logical Domain Model defines meaning, but implementation specifications also require one shared structural contract before physical schemas and vertical extensions are designed.
+
+## Decision
+
+`CANONICAL_DATA_MODEL.md` governs the structural form that every vertical and persistence specification must extend.
+
+- The seven Core Entities remain the only routine root entity kinds.
+- A vertical introduces Derived Types, typed extension profiles, vertical relationships, invariants, state machines and projections.
+- A vertical does not redefine root identity, entity envelopes, record versioning, provenance anchors, content-version contracts or canonical relationship structure.
+- Derived Types are registered with a namespaced owner, base entity kind, schema version and extension contract.
+- Vertical extension data must be schema-governed and versioned; unowned free-form JSON is not a valid substitute for a contract.
+- All verticals share the same canonical state, relationship graph, event mechanisms, retrieval infrastructure and cognitive runtime.
+- A vertical may own a projection or workflow but not a parallel source of truth.
+- A new Core Entity still requires the evidence and ADR process defined by ADR-0004.
+
+## Rationale
+
+One canonical structural model prevents vertical drift while allowing domain-specific richness. It also gives database, API, UI, agent and migration specifications a stable contract to target.
+
+## Consequences
+
+### Positive
+
+- Cross-vertical relationships retain one identity and provenance model.
+- Shared infrastructure can validate and operate on all vertical data.
+- Vertical Specs become smaller and focus on genuine specialization.
+- Graph, search and cognitive contexts remain connected across the user's work.
+
+### Negative
+
+- Vertical designers must work through the extension mechanism rather than choosing arbitrary schemas.
+- Changes to the canonical contract have broad downstream impact.
+- Some specialized fields require explicit extension tables or versioned schemas.
+
+## Canonical specification
+
+- `CANONICAL_DATA_MODEL.md` — entity envelopes, relationships, provenance, content segmentation and extension mechanism.
+- `LOGICAL_DOMAIN_MODEL.md` — semantic meaning, aggregates and invariants.
+- `DOMAIN_VERTICALS.md` — vertical ownership and specialization boundaries.
+- Future vertical Specs — concrete Derived Types, profiles, relationships, lifecycles and projections.

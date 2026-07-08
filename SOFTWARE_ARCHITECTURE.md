@@ -9,7 +9,7 @@
 | **Authoritative for** | Implementation-neutral software structure: modules, ports, adapters, commands, queries, proposals, transactions, event delivery, durable processes, runtimes and conformance rules. |
 | **Not authoritative for** | Product selection, concrete deployment, domain meaning, use-case scope or interface visual design. |
 | **Required reading** | `SYSTEM_PRINCIPLES.md`, `SYSTEM_ARCHITECTURE.md`, `LOGICAL_DOMAIN_MODEL.md`, `EVENT_MODEL.md`, `AI_ARCHITECTURE.md`, `CONTEXT_MODEL.md`, `INTERACTION_MODEL.md`. |
-| **Downstream documents** | `IMPLEMENTATION_CONTEXTS.md`, future Technical Architecture, source topology, code, architecture tests and deployment design. |
+| **Downstream documents** | `COMPONENT_MODEL.md`, `CANONICAL_DATA_MODEL.md`, `DATA_ARCHITECTURE.md`, `AGENT_RUNTIME.md`, `TECHNICAL_ARCHITECTURE.md`, `SPEC_CATALOG.md`, development Specs, source topology, code and architecture tests. |
 
 > Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
 
@@ -37,7 +37,7 @@ It specifies:
 - model and tool isolation;
 - security, observability and audit mechanisms;
 - test strategies that prove architectural conformance;
-- the evolution path from a personal deployment to a physically distributed system.
+- the evolution path from the local-first desktop baseline to selective physical isolation only when evidence requires it.
 
 The objective is not to maximize the number of components.
 
@@ -56,11 +56,18 @@ system-wide authority, planes and invariants
 SOFTWARE_ARCHITECTURE.md
 modules, contracts, runtimes and mechanisms
             ↓
+COMPONENT_MODEL.md · CANONICAL_DATA_MODEL.md
+DATA_ARCHITECTURE.md · AGENT_RUNTIME.md
+bounded implementation models
+            ↓
 TECHNICAL_ARCHITECTURE.md
-concrete technologies and deployment topology
+concrete local-first technologies and process topology
+            ↓
+SPEC_CATALOG.md · development Specs
+exact bounded implementation contracts
             ↓
 Implementation
-source code, schemas, configuration and operations
+source code, schemas, configuration, packaging and operations
 ```
 
 This document implements the constraints of `SYSTEM_ARCHITECTURE.md`.
@@ -78,6 +85,15 @@ It does not redefine:
 - system capabilities.
 
 Those definitions remain owned by their canonical documents.
+
+## Current technical realization
+
+The current `TECHNICAL_ARCHITECTURE.md` realizes this architecture as one installed desktop product with an authoritative Tauri/Rust host and one subordinate Python cognitive sidecar. This is a downstream placement decision, not a change to logical module ownership.
+
+- Rust hosts canonical persistence, application and domain authority, durable execution, security and process supervision.
+- Python hosts bounded cognitive and scientific capability adapters.
+- Interactive, background, scheduler and maintenance remain **runtime roles**; they do not imply four services or four independently authoritative processes.
+- A component remains governed by this document and `COMPONENT_MODEL.md` regardless of which of the two baseline processes executes it.
 
 ---
 
@@ -2150,10 +2166,10 @@ src/
 │   ├── cli/
 │   └── automation/
 └── bootstrap/
-    ├── interactive_runtime/
-    ├── worker_runtime/
-    ├── scheduler_runtime/
-    └── maintenance_runtime/
+    ├── interactive_role/
+    ├── background_role/
+    ├── scheduler_role/
+    └── maintenance_role/
 ```
 
 ## Import rules
@@ -2465,25 +2481,28 @@ The slice succeeds only when the complete authority path is preserved. A prototy
 
 # Deployment Evolution
 
-Physical architecture evolves in stages.
+Physical architecture evolves only when measured requirements justify additional boundaries.
 
-## Stage 0 — In-process validation
+## Stage 0 — Local desktop baseline
 
-- one executable may host interactive and background roles;
-- adapters may be local;
-- events may be dispatched in-process after transactional persistence;
-- architecture boundaries remain enforced in modules and tests.
+- one installed product hosts the Workspace and authoritative application runtime;
+- one subordinate cognitive sidecar provides the specialized Python execution environment;
+- interactive, background, scheduler and maintenance concerns remain runtime roles inside that product;
+- jobs and events are durable even when delivery executes locally;
+- adapters and canonical storage are local by default;
+- risky tools may use ephemeral isolated processes without gaining authority;
+- architecture boundaries remain enforced in modules, IPC contracts and tests.
 
-Purpose: falsify domain and workflow assumptions with minimal operational complexity.
+Purpose: validate the complete product topology and proving slice with minimal operational complexity.
 
-## Stage 1 — Separated worker roles
+## Stage 1 — Additional local process isolation
 
-- interactive and worker runtimes execute separately;
-- durable job and event delivery are required;
-- shared canonical state remains authoritative;
-- isolated execution is introduced for risky tools.
+- a runtime role may move to another supervised local process only for failure containment, resource control or sandboxing;
+- canonical state remains owned by the authoritative host;
+- durable job and event protocols remain unchanged;
+- process extraction does not create a new service owner or direct database writer.
 
-Purpose: support long-running work and independent recovery.
+Purpose: contain expensive or risky local work without introducing a distributed platform.
 
 ## Stage 2 — Selective physical isolation
 
@@ -2605,9 +2624,9 @@ Dependency and authority rules are executable constraints.
 
 ---
 
-# Deferred Technical Decisions
+# Technical Decisions Owned Downstream
 
-The following remain for `TECHNICAL_ARCHITECTURE.md` or dedicated ADRs.
+The following concerns are selected provisionally by `TECHNICAL_ARCHITECTURE.md` and significant choices are recorded in `DECISIONS.md`. They remain downstream of this implementation-neutral architecture and may change through evidence without rewriting its contracts.
 
 - programming language and runtime;
 - application framework;
@@ -2642,6 +2661,12 @@ A technical choice must implement the contracts in this document. It does not re
 | `DOMAIN_MAP.md` | domain-module boundaries |
 | `DOMAIN_MODEL.md` | aggregate concepts implemented by the Domain Kernel |
 | `LOGICAL_DOMAIN_MODEL.md` | attributes, invariants, relationships, lifecycles and aggregate roots |
+| `COMPONENT_MODEL.md` | logical component decomposition, state ownership and runtime-role placement |
+| `CANONICAL_DATA_MODEL.md` | structural record contracts and vertical extension mechanism |
+| `DATA_ARCHITECTURE.md` | logical data classes, lifecycle, migration and projection obligations |
+| `AGENT_RUNTIME.md` | cognitive execution semantics, verification, budgets and recovery |
+| `TECHNICAL_ARCHITECTURE.md` | current languages, desktop topology, embedded storage and packaging baseline |
+| `SPEC_CATALOG.md` | bounded development-spec inventory, dependency order and delivery state |
 | `KNOWLEDGE_MODEL.md` | Knowledge proposal, validation, provenance and lifecycle enforcement |
 | `SYSTEM_CAPABILITIES.md` | Capability Registry vocabulary |
 | `USE_CASES.md` | command, query, process and cognitive-operation handlers |

@@ -8,8 +8,8 @@
 | **Normative status** | Operational guide for coding-agent context assembly |
 | **Authoritative for** | Which documents and sections should be loaded for each class of implementation task. |
 | **Not authoritative for** | Domain behavior, architecture, software contracts, technologies or project sequencing. |
-| **Required reading** | `DOCUMENTATION_ARCHITECTURE.md`, `CLAUDE.md`, `ROADMAP.md` |
-| **Downstream documents** | Coding-agent prompts, implementation plans, pull requests and future development workflows. |
+| **Required reading** | `DOCUMENTATION_ARCHITECTURE.md`, `CLAUDE.md`, `ROADMAP.md`, `SPEC_CATALOG.md` |
+| **Downstream documents** | Development Specs, coding-agent prompts, implementation plans, pull requests and automated development workflows. |
 
 > This document selects context. It never changes the meaning of the documents it selects.
 
@@ -37,15 +37,16 @@ Before any code or structural repository change:
 
 1. Read `CLAUDE.md`.
 2. Check `ROADMAP.md` for the current phase.
-3. Select exactly one primary bundle below.
-4. Add secondary bundles only when the task genuinely crosses boundaries.
-5. Read the relevant accepted or proposed ADRs in `DECISIONS.md`; do not treat them as substitutes for canonical owners.
-6. Read authoritative documents in full.
-7. Read supporting documents only at the sections named by the task.
-8. Write down the invariants and owned concerns before implementation.
-9. Identify downstream documentation impact.
-10. Implement and test the smallest coherent change.
-11. Report conformance, open questions and any required ADR.
+3. Check `SPEC_CATALOG.md` and identify the governing Spec, status and prerequisites.
+4. Select exactly one primary bundle below.
+5. Add secondary bundles only when the task genuinely crosses boundaries.
+6. Read the governing Spec and the relevant ADRs in `DECISIONS.md`; ADRs do not replace canonical owners.
+7. Read authoritative documents in full.
+8. Read supporting documents only at the sections named by the task.
+9. Write down the invariants, authority boundary and owned state before implementation.
+10. Identify downstream documentation impact.
+11. Implement and test the smallest coherent change inside the Spec boundary.
+12. Report conformance, open questions, deferrals and any required ADR.
 
 Do not use repository-wide context as a substitute for task analysis.
 
@@ -606,16 +607,18 @@ Produce or update an ADR before implementation.
 
 ---
 
-# Bundle 16 — Technical Architecture or Deployment
+# Bundle 16 — Technical Architecture, Packaging or Deployment
 
-Use only after the roadmap authorizes concrete technology selection.
+Use when changing the current local-first technical baseline, process topology, packaging, installation or release mechanisms. Ordinary implementation of an existing choice belongs under Bundle 19.
 
 ## Load in full
 
 - `SYSTEM_ARCHITECTURE.md`
 - `SOFTWARE_ARCHITECTURE.md`
+- `TECHNICAL_ARCHITECTURE.md`
 - `ROADMAP.md`
-- relevant ADRs when present.
+- `SPEC_CATALOG.md`
+- relevant accepted ADRs.
 
 ## Load selectively
 
@@ -633,8 +636,12 @@ Use only after the roadmap authorizes concrete technology selection.
 
 ## Preserve
 
+- local-first, single-user desktop operation;
+- Tauri/React presentation and the authoritative Rust boundary;
+- Python as a subordinate cognitive sidecar with no canonical write authority;
+- embedded local persistence and rebuildable projections;
 - technology choices remain adapters to architectural ports;
-- the proving slice informs choices;
+- the proving slice informs stabilization or replacement;
 - operational simplicity is preferred until evidence demands distribution;
 - every selected product has an exit boundary.
 
@@ -678,6 +685,8 @@ Use when producing an implementable specification for one bounded component, dat
 
 ## Load in full
 
+- `SPEC_CATALOG.md`;
+- `CANONICAL_DATA_MODEL.md` when persistent or vertical data is involved;
 - `COMPONENT_MODEL.md` section for the owning component;
 - the relevant owner among `DATA_ARCHITECTURE.md`, `AGENT_RUNTIME.md` or `TECHNICAL_ARCHITECTURE.md`;
 - relevant command/query/process sections of `SOFTWARE_ARCHITECTURE.md`;
@@ -714,7 +723,7 @@ Use when producing an implementable specification for one bounded component, dat
 5. Commands, queries, events, jobs, processes, proposals and effects.
 6. Public and driven ports.
 7. Exact logical/physical data schema and migration.
-8. API/UI or worker contracts.
+8. Workspace, IPC, runtime-role or external-interface contracts.
 9. Authorization, approval and data classification.
 10. Failure, idempotency, retry and recovery.
 11. Observability and audit.
@@ -725,6 +734,51 @@ Use when producing an implementable specification for one bounded component, dat
 ## Expected output
 
 A standalone specification that a coding agent can implement without loading the entire repository or inventing architectural decisions.
+
+---
+
+# Bundle 19 — Implement an Approved Development Spec
+
+Use for production implementation after a Spec has reached `Approved` or `Implementing` in `SPEC_CATALOG.md`.
+
+## Load in full
+
+- the governing Spec;
+- its entry in `SPEC_CATALOG.md`;
+- every canonical owner named by the Spec;
+- the source modules and tests being changed.
+
+## Load selectively
+
+- dependency Specs whose public contracts are consumed;
+- ADRs explicitly referenced by the Spec;
+- experiment fixtures or acceptance datasets;
+- packaging sections when the change affects distribution.
+
+## Exclude by default
+
+- unrelated future Specs;
+- alternative technologies already rejected or deferred;
+- vertical models outside the Spec scope;
+- speculative capabilities not required by acceptance criteria.
+
+## Preserve
+
+- implementation remains inside the approved scope and non-goals;
+- dependency direction and state ownership;
+- Rust authority and Python sidecar limits;
+- exact schema and IPC versions;
+- idempotency, recovery and audit obligations;
+- every acceptance criterion has executable evidence.
+
+## Required completion report
+
+- Spec and implemented tasks;
+- files and contracts changed;
+- migrations or compatibility impact;
+- tests and acceptance evidence;
+- unresolved deferrals;
+- whether the Spec may advance to `Implemented` or `Validated`.
 
 # Combining Bundles
 

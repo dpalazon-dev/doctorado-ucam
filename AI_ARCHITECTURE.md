@@ -156,7 +156,7 @@ The complete conceptual stack.
      Shared Services        (how it runs — Software Architecture)
        Retrieval · Scheduling · Tool Access · Policy Enforcement
    ═══════════════════════════════════════════════════════
-     Technical Realization  (future Technical Architecture)
+     Technical Realization  (`TECHNICAL_ARCHITECTURE.md` and development Specs)
 ```
 
 Notice what is missing from this diagram: a layer of *agents*.

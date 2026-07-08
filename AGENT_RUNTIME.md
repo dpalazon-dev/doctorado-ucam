@@ -9,7 +9,7 @@
 | **Authoritative for** | Agent-task contracts, cognitive-operation lifecycle, planning and execution loop, context use, capability routing, model/tool invocation, verification, checkpoints, budgets, stopping conditions, human escalation, recovery and multi-agent execution patterns. |
 | **Not authoritative for** | AI Operating Layer purpose, domain authority, component ownership, data-store selection, concrete model providers, prompt content, product-specific SDK behavior or deployment technology. |
 | **Required reading** | `SYSTEM_ARCHITECTURE.md`, `SOFTWARE_ARCHITECTURE.md`, `COMPONENT_MODEL.md`, `DATA_ARCHITECTURE.md`, `AI_ARCHITECTURE.md`, `CONTEXT_MODEL.md`, `MEMORY_MODEL.md`, `EVENT_MODEL.md`, `SYSTEM_CAPABILITIES.md`, `DECISIONS.md`. |
-| **Downstream documents** | `TECHNICAL_ARCHITECTURE.md`, cognitive-operation specifications, capability/tool specifications, prompt and policy specifications, evaluation suites, runtime code and operational runbooks. |
+| **Downstream documents** | `TECHNICAL_ARCHITECTURE.md`, `SPEC_CATALOG.md`, cognitive-operation Specs, capability/tool Specs, prompt and policy Specs, evaluation suites, runtime code and operational runbooks. |
 
 > An agent is an ephemeral execution role inside the Cognitive Runtime. It is not a source of truth, a persistent identity or an authority boundary.
 
@@ -58,14 +58,25 @@ Data Architecture
 Agent Runtime
         ↓ defines execution semantics
 Technical Architecture
-        ↓ selects frameworks, models, queues and sandboxes
-Operation Specifications
-        ↓ define task-specific prompts, tools and acceptance tests
+        ↓ maps authority, cognition, IPC, model adapters and isolation to the local desktop runtime
+Development Specifications
+        ↓ define task-specific contracts, prompts, tools and acceptance tests
 ```
 
 If this document conflicts with `AI_ARCHITECTURE.md` about authority or purpose, AI Architecture owns the rule.
 
 If it conflicts with `SOFTWARE_ARCHITECTURE.md` about commands, proposals, transactions or effects, Software Architecture owns the rule.
+
+## Current process realization
+
+ADR-0009 and `TECHNICAL_ARCHITECTURE.md` split this logical runtime across two supervised processes without splitting authority:
+
+- the authoritative Rust host owns admission, policy checks, budgets, durable scheduling, checkpoints, cancellation, tool authorization and commitment of accepted Proposals;
+- the Python sidecar executes bounded cognitive and scientific steps and returns typed observations, Artifacts and Proposals;
+- a model response, Python process or agent framework never becomes a second execution authority or canonical state owner;
+- IPC failure is handled as a recoverable capability failure under the lifecycle defined here.
+
+This section adopts the technical placement decision. The lifecycle and verification semantics remain provider- and language-neutral.
 
 ---
 

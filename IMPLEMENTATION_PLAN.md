@@ -9,17 +9,17 @@
 | **Authoritative for** | The minimum proving experiments, hypotheses, acceptance criteria, metrics and falsification conditions. |
 | **Not authoritative for** | Canonical architecture, domain semantics, technology selection, production implementation sequence or project status. |
 | **Required reading** | `ROADMAP.md`, `SYSTEM_ARCHITECTURE.md`, `SOFTWARE_ARCHITECTURE.md`, `LOGICAL_DOMAIN_MODEL.md`, relevant specialized models. |
-| **Downstream documents** | Prototype tasks, experiment reports, ADRs and Technical Architecture evidence. |
+| **Downstream documents** | `SPEC_CATALOG.md`, proving-slice Specs, prototype tasks, experiment reports, ADRs and Technical Architecture stabilization evidence. |
 
 > Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
 
 ---
 
-> **Status: Living · Phase B · first pass.** This is **not** a development roadmap. It is a plan for **validating architectural hypotheses**: the smallest set of experiments that must succeed — or fail informatively — before we trust that the conceptual architecture can become a real system without losing its properties.
+> **Status: Living · proving plan · first pass.** This is **not** a development roadmap. It is a plan for **validating architectural hypotheses**: the smallest set of experiments that must succeed — or fail informatively — before we trust that the conceptual architecture can become a real system without losing its properties.
 >
 > Each entry below is an experiment designed to **falsify** a specific hypothesis, not a feature to ship. A hypothesis that fails is a result, not a setback: it tells us what to revise before we build on it.
 >
-> This first pass specifies four experiments: a gating hypothesis about whether the Domain Model survives real use, and three that build on it. Their broader assumption catalogue, the decisions they feed (ADRs), and any technology selection are named here only as *deferred*.
+> This first pass specifies four experiments: a gating hypothesis about whether the Domain Model survives real use, and three that build on it. Their broader assumption catalogue and the decisions they may confirm, revise or supersede are named here only as experiment consequences. Current technology selections are imported from `TECHNICAL_ARCHITECTURE.md` and remain provisional until evidence stabilizes them.
 
 ## Purpose
 
@@ -72,7 +72,7 @@ Each experiment below also illuminates the cost/benefit of one or more assumptio
 
 ## The mechanism map
 
-Everything below is a servant of the domain, and each is swappable. The domain is truth; each mechanism is a projection. Concrete products are chosen later, in the Technical Architecture — this map fixes only *roles*, not technologies.
+Everything below is a servant of the domain, and each is swappable. The domain is truth; each mechanism is a projection. `TECHNICAL_ARCHITECTURE.md` now supplies the current reversible product choices; this map continues to fix only roles and therefore remains valid when an adapter is replaced.
 
 | Concern | Mechanism (category) | What it serves |
 |---|---|---|
@@ -192,9 +192,9 @@ Keep a structured **friction log**: every time the reaction is *"I need a new en
 
 ## What "trusting the architecture" means
 
-Experiment 0 is the precondition: if the Domain Model does not survive real use, no result from the others is worth acting on. When Experiment 0 holds and the three that follow have been demonstrated — or falsified informatively — we can either build on a validated foundation or revise the model *before* committing to a technology stack. That is the point of doing this now, before committing to the Technical Architecture and production implementation: to make the expensive decisions on evidence rather than on the elegance of the design.
+Experiment 0 is the precondition: if the Domain Model does not survive real use, no result from the others is worth acting on. When Experiment 0 holds and the three that follow have been demonstrated — or falsified informatively — we can either stabilize the current provisional baseline or revise the model and adapters before expanding the product. The point is to make expensive stabilization and scaling decisions on evidence rather than on the elegance of the design.
 
-Concretely, this realizes the ROADMAP's **M6 · Proving slice**, reframed from "a feature running end-to-end" to "the architecture's core claims, tested." One full turn of the operating cycle appears across the three experiments: capture changes the domain (E1), a question assembles context and produces a grounded answer (E2), and change propagates through events without breaking consistency (E3).
+Concretely, this provides the falsification programme for the ROADMAP's **M12 · Proving slice**, reframed from "a feature running end-to-end" to "the architecture's core claims, tested." One full turn of the operating cycle appears across the three experiments: capture changes the domain (E1), a question assembles context and produces a grounded answer (E2), and change propagates through events without breaking consistency (E3).
 
 ## Deferred to a later pass
 
@@ -202,7 +202,7 @@ Named so the boundary of this first pass is explicit; none is decided here.
 
 - **The full assumption catalogue** — beyond the three tested here, the remaining architectural assumptions and their falsification methods.
 - **Adopt / avoid decisions** — distilled into recorded ADRs (`DECISIONS.md`, reserved by the ROADMAP).
-- **Technology and dependencies** — LLM providers, the concrete stores behind each row of the mechanism map, academic-metadata sources, ingestion tooling. These belong to the Technical Architecture and its ADRs. The Software Architecture defines their required contracts without selecting products.
+- **Technology replacement evidence** — measurements that would justify replacing the current embedded stores, model adapters, ingestion tools or process boundaries. Initial choices belong to `TECHNICAL_ARCHITECTURE.md` and ADR-0007 through ADR-0010; experiments may trigger later ADRs but do not silently rewrite them.
 
 ## Relationship to other documents
 

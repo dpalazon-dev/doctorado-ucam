@@ -8,8 +8,8 @@
 | **Normative status** | Canonical for implementation component decomposition |
 | **Authoritative for** | Logical components, component responsibilities, owned state, public contracts, allowed dependencies, runtime placement, failure boundaries and the minimum component set for the proving slice. |
 | **Not authoritative for** | Domain meaning or invariants, system-wide authority, software architectural style, logical data schemas, internal agent execution semantics, concrete technologies or deployment products. |
-| **Required reading** | `SYSTEM_PRINCIPLES.md`, `SYSTEM_ARCHITECTURE.md`, `SOFTWARE_ARCHITECTURE.md`, `LOGICAL_DOMAIN_MODEL.md`, `DECISIONS.md` (ADR-0001 through ADR-0006). |
-| **Downstream documents** | `DATA_ARCHITECTURE.md`, `AGENT_RUNTIME.md`, `TECHNICAL_ARCHITECTURE.md`, area specifications, source-tree design, architecture tests and deployment manifests. |
+| **Required reading** | `SYSTEM_PRINCIPLES.md`, `SYSTEM_ARCHITECTURE.md`, `SOFTWARE_ARCHITECTURE.md`, `LOGICAL_DOMAIN_MODEL.md`, `DECISIONS.md` (ADR-0001 through ADR-0011). |
+| **Downstream documents** | `CANONICAL_DATA_MODEL.md`, `DATA_ARCHITECTURE.md`, `AGENT_RUNTIME.md`, `TECHNICAL_ARCHITECTURE.md`, `SPEC_CATALOG.md`, foundation and area Specs, source-tree design, architecture tests and packaging manifests. |
 
 > This document derives executable components from the canonical software modules. It does not create a second software architecture.
 
@@ -768,6 +768,17 @@ The following are architecture violations:
 | Operations | Primary | Primary | Primary | Primary | Primary |
 
 This table permits placement. `TECHNICAL_ARCHITECTURE.md` decides the actual deployment topology.
+
+## Current baseline mapping
+
+Under ADR-0007 through ADR-0010, the baseline maps these logical roles into two supervised product processes:
+
+- the **authoritative Tauri/Rust host** executes Experience integration, Application, Domain, Process/Event, Operations and canonical Platform Adapter responsibilities;
+- the **subordinate Python cognitive sidecar** executes bounded Cognitive capabilities and selected document-processing adapters through versioned IPC;
+- risky tools may execute in ephemeral isolated subprocesses, but cannot own canonical state or bypass the Rust application boundary;
+- Background, Scheduler/Dispatcher and Maintenance columns remain roles, not mandatory standalone services.
+
+This mapping is provisional and replaceable downstream. It does not change component state ownership or allowed dependencies.
 
 ---
 

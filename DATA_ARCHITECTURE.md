@@ -8,8 +8,8 @@
 | **Normative status** | Canonical for logical data architecture |
 | **Authoritative for** | Data authority classes, logical data ownership, record families, transaction boundaries, relationship persistence, event and operational records, projection semantics, lifecycle, retention, migration, backup and recovery requirements. |
 | **Not authoritative for** | Domain meaning or invariants, component responsibilities, agent execution semantics, concrete database products, storage engines, cloud services or physical deployment. |
-| **Required reading** | `SYSTEM_ARCHITECTURE.md`, `LOGICAL_DOMAIN_MODEL.md`, `SOFTWARE_ARCHITECTURE.md`, `COMPONENT_MODEL.md`, `MEMORY_MODEL.md`, `CONTEXT_MODEL.md`, `EVENT_MODEL.md`, `DECISIONS.md`. |
-| **Downstream documents** | `AGENT_RUNTIME.md`, `TECHNICAL_ARCHITECTURE.md`, database specifications, schemas, migrations, repository adapters, projection specifications, retention policies and backup runbooks. |
+| **Required reading** | `SYSTEM_ARCHITECTURE.md`, `LOGICAL_DOMAIN_MODEL.md`, `SOFTWARE_ARCHITECTURE.md`, `COMPONENT_MODEL.md`, `CANONICAL_DATA_MODEL.md`, `MEMORY_MODEL.md`, `CONTEXT_MODEL.md`, `EVENT_MODEL.md`, `DECISIONS.md`. |
+| **Downstream documents** | `AGENT_RUNTIME.md`, `TECHNICAL_ARCHITECTURE.md`, `SPEC_CATALOG.md`, database and vertical Specs, schemas, migrations, repository adapters, projection specifications, retention policies and backup runbooks. |
 
 > Data mechanisms serve the canonical domain. Persistence is not authority by itself.
 
@@ -53,16 +53,18 @@ It defines **what data exists, who owns it and how it evolves**. `TECHNICAL_ARCH
 ```text
 Logical Domain Model
         ↓ defines canonical entities and invariants
+Canonical Data Model
+        ↓ defines shared record form and extension contracts
 Software Architecture
         ↓ defines transactions, ports and projections
 Component Model
         ↓ assigns component ownership
 Data Architecture
-        ↓ defines logical records and data lifecycles
+        ↓ defines logical record families, ownership and lifecycles
 Technical Architecture
-        ↓ maps them to concrete products and schemas
-Area Specifications
-        ↓ define exact fields, indexes and migrations
+        ↓ maps them to embedded local products and process boundaries
+Development and Vertical Specs
+        ↓ define exact schemas, indexes, migrations and acceptance tests
 ```
 
 This document may refine persistence semantics but may not redefine a Domain Entity, relationship or invariant.

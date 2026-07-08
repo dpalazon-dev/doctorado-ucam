@@ -54,7 +54,7 @@ Level 1 — Canonical Foundations
         ↓ constrain
 Level 2 — Specialized Models
         ↓ inform
-Level 3 — Functional and Vertical Specifications
+Level 3 — Functional, Vertical and Development Specifications
         ↓ drive
 Level 4 — Navigation, Delivery and Process
         ↓ packages context for
@@ -92,12 +92,17 @@ These documents own one bounded conceptual concern. They deepen the system witho
 | `CONTEXT_MODEL.md` | Context definition, construction inputs, lifecycle and boundaries. |
 | `EVENT_MODEL.md` | Event semantics, taxonomy and reaction discipline. |
 | `INTERACTION_MODEL.md` | Human-system collaboration, interaction channels, initiative and approval semantics. |
+| `COMPONENT_MODEL.md` | Logical component decomposition, responsibility, state ownership, dependencies and runtime-role placement. |
+| `CANONICAL_DATA_MODEL.md` | Shared structural data contract and governed extension mechanism used by every vertical and physical schema. |
+| `DATA_ARCHITECTURE.md` | Logical data classes, ownership, lifecycle, projection, migration, backup and recovery requirements. |
+| `AGENT_RUNTIME.md` | Provider-neutral cognitive-operation lifecycle, verification, budgets, recovery and escalation semantics. |
+| `TECHNICAL_ARCHITECTURE.md` | Current concrete implementation languages, desktop topology, embedded persistence, packaging and operational baseline. |
 
 A Level 2 document may be canonical within its declared scope. It may not override a Level 1 invariant.
 
-## Level 3 — Functional and Vertical Specifications
+## Level 3 — Functional, Vertical and Development Specifications
 
-These documents define behavior, vocabulary and domain breadth.
+These documents define behavior, domain breadth and bounded implementation contracts.
 
 | Document | Specification responsibility |
 |---|---|
@@ -108,8 +113,9 @@ These documents define behavior, vocabulary and domain breadth.
 | `TEACHING_VERTICAL.md` | Teaching-specific derived types and use-case mapping. |
 | `ADMINISTRATION_VERTICAL.md` | Administration-specific derived types and use-case mapping. |
 | `ORGANIZATION_VERTICAL.md` | Organization-specific derived types and use-case mapping. |
+| `specs/**/*.md` | Bounded development contracts that translate upstream architecture into exact data, interface, runtime, test and delivery obligations. |
 
-These documents drive implementation slices but do not define software modules, storage or runtime topology.
+Development Specs may be authoritative for the exact bounded implementation contract they declare. They may not override an upstream semantic, architectural or technical owner; a conflict must be resolved in that owner, and through an ADR when significant.
 
 ## Level 4 — Navigation, Delivery and Process
 
@@ -120,6 +126,8 @@ These documents help humans and agents navigate, sequence and consume the specif
 | `README.md` | Repository front door and concise navigation. |
 | `ROADMAP.md` | Plan of record: phases, order and current status. |
 | `IMPLEMENTATION_PLAN.md` | Proving experiments, acceptance criteria and falsification strategy. |
+| `DECISIONS.md` | Historical register of significant architectural decisions and supersession. |
+| `SPEC_CATALOG.md` | Registry, lifecycle, dependency order and current status of development Specs. |
 | `CLAUDE.md` | Operating instructions for coding agents working in the repository. |
 | `DOCUMENTATION_ARCHITECTURE.md` | Documentation ownership, precedence and evolution. |
 | `IMPLEMENTATION_CONTEXTS.md` | Task-specific reading bundles for implementation agents. |
@@ -142,6 +150,11 @@ The following matrix identifies the owner of recurring concerns. The owner is th
 | Software topology and module boundaries | `SOFTWARE_ARCHITECTURE.md` | Source tree, packages, components |
 | Commands, queries, proposals and runtime contracts | `SOFTWARE_ARCHITECTURE.md` | Application code and tests |
 | Transaction, outbox, inbox and process semantics | `SOFTWARE_ARCHITECTURE.md` | Persistence and event runtime implementation |
+| Logical component decomposition and runtime-role placement | `COMPONENT_MODEL.md` | Source modules, composition and architecture tests |
+| Shared canonical record form and vertical extension mechanism | `CANONICAL_DATA_MODEL.md` | Database, API, UI schema and vertical Specs |
+| Logical data classes, ownership and lifecycle | `DATA_ARCHITECTURE.md` | Persistence, migration, projection and recovery Specs |
+| Cognitive-operation lifecycle, verification and budgets | `AGENT_RUNTIME.md` | Cognitive, tool, prompt and evaluation Specs |
+| Concrete languages, desktop topology, local storage and packaging | `TECHNICAL_ARCHITECTURE.md` | Build, runtime, database, IPC and release Specs |
 | Core Entity set and logical structure | `LOGICAL_DOMAIN_MODEL.md` | Domain modules, schemas, migrations |
 | Conceptual meaning of Core Entities | `DOMAIN_MODEL.md` | Logical model, use cases, verticals |
 | Conceptual domains and responsibility boundaries | `DOMAIN_MAP.md` | Module mapping and capability allocation |
@@ -158,6 +171,8 @@ The following matrix identifies the owner of recurring concerns. The owner is th
 | Vertical-specific derived types and mappings | Corresponding `*_VERTICAL.md` | Use-case selection and domain validation |
 | Phase ordering and project status | `ROADMAP.md` | README, CLAUDE, work planning |
 | Proving experiments and falsification criteria | `IMPLEMENTATION_PLAN.md` | Prototype work and evaluation |
+| Architectural decision history and supersession | `DECISIONS.md` | Architecture reviews and downstream reconciliation |
+| Development Spec inventory, lifecycle and dependency order | `SPEC_CATALOG.md` | Spec authoring, implementation planning and milestone tracking |
 | Documentation governance | `DOCUMENTATION_ARCHITECTURE.md` | Every document |
 | Agent context bundles | `IMPLEMENTATION_CONTEXTS.md` | Coding-agent task preparation |
 
@@ -311,12 +326,13 @@ It should:
 
 1. Read `CLAUDE.md`.
 2. Check the current phase in `ROADMAP.md`.
-3. Select the matching bundle in `IMPLEMENTATION_CONTEXTS.md`.
-4. Load the authoritative owner documents in full.
-5. Load only the named sections of supporting documents.
-6. State the invariants it must preserve before changing code.
-7. Implement the smallest coherent slice.
-8. Validate code and documentation against the conformance rules in `SYSTEM_ARCHITECTURE.md` and `SOFTWARE_ARCHITECTURE.md`.
+3. Check `SPEC_CATALOG.md` and identify the approved or active Spec governing the work.
+4. Select the matching bundle in `IMPLEMENTATION_CONTEXTS.md`.
+5. Load the active Spec and its authoritative owner documents in full.
+6. Load only the named sections of supporting documents.
+7. State the invariants it must preserve before changing code.
+8. Implement the smallest coherent slice inside the Spec boundary.
+9. Validate code and documentation against the Spec acceptance criteria and the conformance rules in `SYSTEM_ARCHITECTURE.md` and `SOFTWARE_ARCHITECTURE.md`.
 
 A request such as “read all Markdown and implement ResearchOS” is invalid because it obscures authority and creates avoidable context competition.
 
@@ -388,14 +404,15 @@ The documentation architecture is conformant when:
 2. Every normative concern has one owner.
 3. Level 4 documents introduce no product or architecture rules.
 4. Specialized models defer global authority and implementation details.
-5. Functional specifications do not redefine domain structure.
+5. Functional, vertical and development specifications do not redefine upstream architecture or domain structure.
 6. Vertical documents reference use cases instead of copying them.
-7. Required-reading sets are minimal and explicit.
-8. Downstream impact can be traced.
-9. `README.md`, `ROADMAP.md` and `CLAUDE.md` report the same project state.
-10. Coding tasks can be prepared through a bounded context bundle.
-11. Local links resolve.
-12. Repeated statements cannot override their authoritative owner.
+7. Every development Spec is registered in `SPEC_CATALOG.md` and declares its upstream owners and dependencies.
+8. Required-reading sets are minimal and explicit.
+9. Downstream impact can be traced.
+10. `README.md`, `ROADMAP.md`, `SPEC_CATALOG.md` and `CLAUDE.md` report the same project state.
+11. Coding tasks can be prepared through a bounded context bundle and an approved Spec.
+12. Local links resolve.
+13. Repeated statements cannot override their authoritative owner.
 
 ---
 

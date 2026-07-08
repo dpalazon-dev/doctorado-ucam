@@ -44,7 +44,7 @@ It specifies:
 - the consistency, governance and recovery rules;
 - the quality attributes every implementation must preserve.
 
-It does **not** choose technologies, frameworks, databases, protocols, process boundaries or deployment infrastructure. Software structure is defined in `SOFTWARE_ARCHITECTURE.md`; concrete products, protocols and deployment choices belong to the future Technical Architecture.
+It does **not** choose technologies, frameworks, databases, protocols, process boundaries or deployment infrastructure. Software structure is defined in `SOFTWARE_ARCHITECTURE.md`; concrete products, protocols and deployment choices belong to `TECHNICAL_ARCHITECTURE.md` and its accepted ADRs.
 
 ---
 

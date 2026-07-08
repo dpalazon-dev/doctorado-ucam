@@ -211,7 +211,7 @@ This model fixes the concept and defers everything mechanical.
 
 Later work will define:
 
-- **Relevance strategy** — the concrete ranking and selection mechanism, owned by future Technical Architecture or implementation ADRs under the contracts in `SOFTWARE_ARCHITECTURE.md`.
+- **Relevance strategy** — the concrete ranking and selection mechanism, owned by `TECHNICAL_ARCHITECTURE.md` and the relevant development Spec under the contracts in `SOFTWARE_ARCHITECTURE.md`.
 - **Budgeting strategy** — how the bound is set and enforced for different classes of task.
 - **Context reuse** — whether, and how, a constructed context may be partially retained across closely related tasks without ever becoming a source of truth.
 - **The formal status of Policy** — governance and access control as a cross-cutting concern rather than a standalone model.

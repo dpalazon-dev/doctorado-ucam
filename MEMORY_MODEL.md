@@ -1,5 +1,20 @@
 # Memory Model
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 2 — Specialized Model |
+| **Normative status** | Canonical within memory scope |
+| **Authoritative for** | Memory taxonomy, recall, consolidation, retention and the distinction between world and operating memory. |
+| **Not authoritative for** | Global authority ownership, entity schemas, context assembly algorithms, persistence products or agent implementation. |
+| **Required reading** | `SYSTEM_PRINCIPLES.md`, `DOMAIN_MODEL.md`, `KNOWLEDGE_MODEL.md`, `AI_ARCHITECTURE.md`, `SYSTEM_ARCHITECTURE.md`. |
+| **Downstream documents** | `CONTEXT_MODEL.md`, `SOFTWARE_ARCHITECTURE.md`, `IMPLEMENTATION_CONTEXTS.md`, memory and recall implementations. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 ## Purpose
 
 This document defines how ResearchOS remembers.
@@ -87,7 +102,7 @@ It is Knowledge, exactly as defined in the Knowledge Model. This document does n
 
 Memory's contribution is recall: the faculty of surfacing the right knowledge when it bears on the moment. How knowledge is born, evolves and is represented belongs to the Knowledge Model; how it is *recalled* belongs here.
 
-Semantic memory is authoritative. It is the closest thing the system has to what it "believes."
+Semantic memory is authoritative only insofar as it recalls canonical Knowledge from the Domain State. No semantic-memory index, embedding store or generated summary is independently authoritative.
 
 ### Does NOT include
 
@@ -104,7 +119,7 @@ Its raw material already exists in the domain. An Activity (Domain Model → Act
 
 This is what Domain Map → Memory means by "transforming isolated events into long-term understanding."
 
-Episodic memory is authoritative. What happened, happened.
+Episodic memory is authoritative only when the episode is preserved as canonical or historical domain state. Derived timelines, summaries and retrieval indexes remain reconstructible views of that record.
 
 ---
 
@@ -259,6 +274,6 @@ Later work will define:
 - **Forgetting policy** — the retention and supersession rules for each memory type, including governance and the right to erasure.
 - **The boundary of procedural memory** — how learned routines are captured and reused without hardening into rigid workflows.
 
-One concept surfaced here is a candidate for the Domain Model. **Decision** recurs across episodic memory, Domain Map → Memory and System Responsibilities, yet is not a domain entity. If it continues to recur, it becomes a candidate for promotion — as Knowledge, as a specialization of Activity, or as a Derived Type of its own. That decision belongs to the Domain Model, recorded deliberately.
+**Decision** is now a formal Derived Type of Knowledge. Memory may retain the episode in which a decision occurred, while the domain retains the decision's meaning, rationale, conditions, provenance and consequences. The two records are related but not interchangeable.
 
 The concepts defined here are expected to remain stable while every mechanism beneath them evolves.

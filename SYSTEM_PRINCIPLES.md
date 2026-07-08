@@ -1,5 +1,20 @@
 # System Principles
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 1 — Canonical Foundation |
+| **Normative status** | Canonical |
+| **Authoritative for** | Permanent cross-cutting principles that constrain every model, architecture, feature and implementation. |
+| **Not authoritative for** | Detailed subsystem behavior, entity schemas, module topology, workflows or technology selection. |
+| **Required reading** | `VISION.md`. |
+| **Downstream documents** | `SYSTEM_MODEL.md`, `SYSTEM_RESPONSIBILITIES.md`, `DOMAIN_MODEL.md`, `AI_ARCHITECTURE.md`, `INTERACTION_MODEL.md`, `SYSTEM_ARCHITECTURE.md`, `SOFTWARE_ARCHITECTURE.md`. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 These principles define the permanent architectural foundations of ResearchOS.
 
 They are intentionally independent from any technology, framework or implementation.

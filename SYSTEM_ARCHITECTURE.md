@@ -1,5 +1,20 @@
 # System Architecture
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 1 — Canonical Foundation |
+| **Normative status** | Canonical |
+| **Authoritative for** | System-wide authority, state ownership, logical planes, trust boundaries, dependency rules, operating cycles, governance and runtime invariants. |
+| **Not authoritative for** | Entity attributes, specialized model semantics, concrete software components, products, protocols or deployment topology. |
+| **Required reading** | `VISION.md`, `SYSTEM_PRINCIPLES.md`, `SYSTEM_MODEL.md`, `LOGICAL_DOMAIN_MODEL.md`, `AI_ARCHITECTURE.md`, `MEMORY_MODEL.md`, `CONTEXT_MODEL.md`, `EVENT_MODEL.md`, `INTERACTION_MODEL.md`. |
+| **Downstream documents** | `SOFTWARE_ARCHITECTURE.md`, `IMPLEMENTATION_CONTEXTS.md`, `IMPLEMENTATION_PLAN.md`, `CLAUDE.md` and every implementation artifact. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 > **Status: Canonical · v1.0.** This document defines the technology-independent system architecture of ResearchOS.
 >
 > It changes only when a system-wide responsibility, authority boundary, dependency rule or runtime invariant changes. It does not change because a framework, database, model provider or deployment topology changes.
@@ -29,7 +44,7 @@ It specifies:
 - the consistency, governance and recovery rules;
 - the quality attributes every implementation must preserve.
 
-It does **not** choose technologies, frameworks, databases, protocols, process boundaries or deployment infrastructure. Those decisions belong to the future Software Architecture and Technical Architecture.
+It does **not** choose technologies, frameworks, databases, protocols, process boundaries or deployment infrastructure. Software structure is defined in `SOFTWARE_ARCHITECTURE.md`; concrete products, protocols and deployment choices belong to the future Technical Architecture.
 
 ---
 
@@ -948,7 +963,7 @@ It need not impose a meaningless global order over unrelated changes.
 
 The canonical current state remains the Domain State.
 
-Committed events provide causality, history and coordination. A future Software Architecture may choose event-sourced persistence, but this document does not require it.
+Committed events provide causality, history and coordination. `SOFTWARE_ARCHITECTURE.md` may permit event-sourced persistence as a realization, but this document does not require it.
 
 ---
 
@@ -1215,7 +1230,7 @@ The following dependency rules are mandatory.
 11. **Cross-cutting policy and observability may inspect or constrain operations but may not bypass domain rules.**
 12. **Technology-specific types must not leak into the Domain Model or its public contracts.**
 
-A future Software Architecture must make violations of these rules difficult by construction.
+`SOFTWARE_ARCHITECTURE.md` translates these rules into component contracts and conformance tests that make violations difficult by construction.
 
 ---
 
@@ -1400,9 +1415,9 @@ This document owns only the system-wide arrangement of those responsibilities.
 
 ---
 
-# Implications for Software Architecture
+# Relationship to Software Architecture
 
-The future `SOFTWARE_ARCHITECTURE.md` must translate this specification into implementable structures.
+`SOFTWARE_ARCHITECTURE.md` translates this specification into implementable, technology-neutral structures.
 
 It must define, at minimum:
 

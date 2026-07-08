@@ -1,5 +1,20 @@
 # Interaction Model
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 2 — Specialized Model |
+| **Normative status** | Canonical within interaction scope |
+| **Authoritative for** | Workspace concept, interaction channels, human/system initiative, feedback, notification and approval semantics. |
+| **Not authoritative for** | Visual design system, frontend framework, API shape, domain mutation internals or model-provider interaction. |
+| **Required reading** | `VISION.md`, `SYSTEM_PRINCIPLES.md`, `SYSTEM_MODEL.md`, `USE_CASES.md`, `AI_ARCHITECTURE.md`, `SYSTEM_ARCHITECTURE.md`. |
+| **Downstream documents** | `SOFTWARE_ARCHITECTURE.md`, `IMPLEMENTATION_CONTEXTS.md`, interface design and inbound adapters. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 > **Status: Canonical.** This document defines how the researcher and the system collaborate.
 >
 > The Domain Model defines *what exists*.

@@ -1,5 +1,20 @@
 # Domain Verticals
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 3 — Functional and Vertical Specification |
+| **Normative status** | Canonical vertical index and specialization policy |
+| **Authoritative for** | The operational vertical taxonomy, the rule that verticals specialize one shared domain, and the mapping from verticals to derived types and use cases. |
+| **Not authoritative for** | Use-case prose, Core Entity structure, software modules or separate vertical data models. |
+| **Required reading** | `RESEARCHER_OPERATIONAL_MODEL.md`, `DOMAIN_MAP.md`, `DOMAIN_MODEL.md`, `USE_CASES.md`. |
+| **Downstream documents** | `RESEARCH_VERTICAL.md`, `TEACHING_VERTICAL.md`, `ADMINISTRATION_VERTICAL.md`, `ORGANIZATION_VERTICAL.md`, `ROADMAP.md`. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 > This document is the index of every vertical in the domain.
 >
 > The Domain Model defines the universal concepts.
@@ -119,7 +134,7 @@ Represents operational execution: meetings, email, decisions, documents.
 
 ## Typical Knowledge
 
-- Decision *(not yet formalized in the Domain Model — under observation, see USE_CASES.md → Evolution)*
+- Decision *(formal Derived Type of Knowledge)*
 
 Daily Work introduces no Project of its own — it attaches to whatever project the work serves. (Administrative Process, sketched here in earlier drafts, is now owned by [ADMINISTRATION_VERTICAL.md](ADMINISTRATION_VERTICAL.md).)
 

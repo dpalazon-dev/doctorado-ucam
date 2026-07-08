@@ -1,5 +1,20 @@
 # Software Architecture
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 1 — Canonical Foundation |
+| **Normative status** | Canonical |
+| **Authoritative for** | Implementation-neutral software structure: modules, ports, adapters, commands, queries, proposals, transactions, event delivery, durable processes, runtimes and conformance rules. |
+| **Not authoritative for** | Product selection, concrete deployment, domain meaning, use-case scope or interface visual design. |
+| **Required reading** | `SYSTEM_PRINCIPLES.md`, `SYSTEM_ARCHITECTURE.md`, `LOGICAL_DOMAIN_MODEL.md`, `EVENT_MODEL.md`, `AI_ARCHITECTURE.md`, `CONTEXT_MODEL.md`, `INTERACTION_MODEL.md`. |
+| **Downstream documents** | `IMPLEMENTATION_CONTEXTS.md`, future Technical Architecture, source topology, code, architecture tests and deployment design. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 > **Status: Canonical · v1.0.** This document translates the technology-independent System Architecture of ResearchOS into implementable software structures.
 >
 > It defines logical modules, runtime roles, contracts, transaction boundaries, ports, adapters, coordination mechanisms and conformance rules. It does not select programming languages, frameworks, databases, model providers, message brokers, deployment platforms or cloud products.

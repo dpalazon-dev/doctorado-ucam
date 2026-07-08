@@ -1,5 +1,20 @@
 # Administration Vertical
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 3 — Functional and Vertical Specification |
+| **Normative status** | Canonical within Administration vertical scope |
+| **Authoritative for** | Administration-specific scope, derived types, distinction from Research and Organization, and mapping to canonical use cases. |
+| **Not authoritative for** | Copied use-case definitions, Core Entity changes, institutional integration design or workflow implementation. |
+| **Required reading** | `DOMAIN_VERTICALS.md`, `DOMAIN_MODEL.md`, `USE_CASES.md`. |
+| **Downstream documents** | Administration implementation slices, `LOGICAL_DOMAIN_MODEL.md` impact reviews and `ROADMAP.md` status. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 > Not present in the original six-vertical sketch in [DOMAIN_VERTICALS.md](DOMAIN_VERTICALS.md). It emerged directly from the Use Case catalogue and is formalized here.
 >
 > The institutional obligations that surround the doctorate without directly advancing it.
@@ -46,7 +61,7 @@ Administration is distinct from [ORGANIZATION_VERTICAL.md](ORGANIZATION_VERTICAL
 - Training (UC-AD03)
 
 ## Knowledge
-- Decision *(not yet formalized in the Domain Model — under observation, see Use Cases → Evolution)*
+- Decision *(formal Derived Type of Knowledge)*
 
 Reuses Activity (Meeting) and Person (Supervisor, Coordinator) without specialization.
 

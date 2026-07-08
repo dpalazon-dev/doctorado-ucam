@@ -1,5 +1,20 @@
 # Use Cases
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 3 — Functional and Vertical Specification |
+| **Normative status** | Canonical behavioral specification |
+| **Authoritative for** | Recurring researcher intentions, operational flows, expected outcomes, state changes, capabilities and entity participation. |
+| **Not authoritative for** | UI sequences, component choreography, data schemas, runtime topology or technology choices. |
+| **Required reading** | `VISION.md`, `SYSTEM_RESPONSIBILITIES.md`, `DOMAIN_MODEL.md`, `KNOWLEDGE_MODEL.md`, `SYSTEM_CAPABILITIES.md`. |
+| **Downstream documents** | `DOMAIN_VERTICALS.md`, all `*_VERTICAL.md` files, `LOGICAL_DOMAIN_MODEL.md`, `INTERACTION_MODEL.md`, `IMPLEMENTATION_CONTEXTS.md`, acceptance tests. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 ## Purpose
 
 This document defines the canonical use cases of ResearchOS.
@@ -1698,7 +1713,7 @@ Across this catalogue, **Hypothesis**, **Experiment** and **Evidence** recur as 
 
 **Interaction** (currently modelled as a specialization of Activity) is under observation: its centrality in UC-C03 and UC-C04, connecting People, Projects, Knowledge and Tasks, may justify promoting it to a first-class concept in the future. Teaching Session (UC-TE01, UC-TE02, UC-TE06, UC-TE07) is a second witness to the same shape — "work that occurred with people" — recorded in a different vertical. It is not promoted yet.
 
-**Decision** is a further concept under observation: it is produced in UC-R03, UC-C04 and UC-AD04, and consumed by the Traceability use cases, so its recurrence may soon justify formalization. It is not promoted yet.
+**Decision** recurs across research, communication, administration and traceability and is now formalized as a Derived Type of Knowledge. Its use cases continue to supply the evidence needed to refine decision-specific attributes and lifecycle rules without creating a new root.
 
 **Evaluation** (currently modelled as a specialization of Knowledge, in Teaching) is under observation: UC-TE04 and UC-TE05 both produce it as the interpreted, justified result of assessing a Submission against a Rubric — the same structural role Evidence plays for an Experiment in the Research Spine (Domain Model → The Research Spine). This assessment-spine parallel (Rubric/Exam/Assignment → Submission → Evaluation, mirroring Hypothesis → Experiment → Evidence) is noted but not promoted yet.
 

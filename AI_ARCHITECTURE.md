@@ -1,5 +1,20 @@
 # AI Architecture
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 2 — Specialized Model |
+| **Normative status** | Canonical within AI Operating Layer scope |
+| **Authoritative for** | AI roles, responsibilities, operating loop, autonomy semantics, artifacts, agent coordination and improvement behavior. |
+| **Not authoritative for** | Global state authority, domain mutation rules, concrete runtime modules, model providers, prompts or storage. |
+| **Required reading** | `SYSTEM_PRINCIPLES.md`, `SYSTEM_MODEL.md`, `SYSTEM_CAPABILITIES.md`, `KNOWLEDGE_MODEL.md`, `MEMORY_MODEL.md`, `CONTEXT_MODEL.md`, `EVENT_MODEL.md`, `SYSTEM_ARCHITECTURE.md`. |
+| **Downstream documents** | `SOFTWARE_ARCHITECTURE.md`, `IMPLEMENTATION_CONTEXTS.md`, cognitive runtime code and AI-assisted use cases. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 ## Purpose
 
 This document defines the **AI Operating Layer** of ResearchOS: the intelligence that operates the Research Operating System.
@@ -52,9 +67,9 @@ Use Cases
 │   Event Model          (complete)            │
 └──────────────────────────────────────────────┘
     ↓
-Software Architecture   (future)
+Software Architecture   (complete · implementation-neutral)
     ↓
-Infrastructure          (future)
+Technical Architecture  (future)
 ```
 
 The documents above the cognitive cluster answer three questions.
@@ -69,7 +84,7 @@ The cognitive cluster answers a fourth.
 
 The prior documents modelled the *world* — its entities, its knowledge, its use cases. They did not model the system's *cognition* at the same depth. The cognitive architecture corrects that, applying to the intelligent behaviour of the platform the same rigour the Domain Model applied to its structure: model the concepts first, decide the implementation later.
 
-This cluster sits above the future Software Architecture, which will define how it is implemented. It defines *what* the intelligence is and needs. It does not define *how* the intelligence runs.
+`SOFTWARE_ARCHITECTURE.md` now translates this cluster into implementation-neutral runtimes, ports and contracts. This document remains the owner of *what* the intelligence is and needs; it does not define provider, framework or deployment mechanics.
 
 ---
 
@@ -138,10 +153,10 @@ The complete conceptual stack.
        Capture · Curate · Link · Reason
        Plan  · Write  · Audit · Notify
    ═══════════════════════════════════════════════════════
-     Shared Services        (how it runs — Software Architecture, future)
+     Shared Services        (how it runs — Software Architecture)
        Retrieval · Scheduling · Tool Access · Policy Enforcement
    ═══════════════════════════════════════════════════════
-     Infrastructure         (future)
+     Technical Realization  (future Technical Architecture)
 ```
 
 Notice what is missing from this diagram: a layer of *agents*.
@@ -188,9 +203,9 @@ The AI never assumes it already holds the relevant state. It assembles it — de
 
 The quality of any intelligent action is bounded by the quality of the context constructed for it. How that construction works is defined in the Context Model.
 
-### 5. The world-model is the single source of truth
+### 5. The AI Operating Layer adopts the system authority model
 
-This principle extends System Principle 6.
+Global state authority is owned by `SYSTEM_ARCHITECTURE.md`. This section defines only its consequence for the intelligent layer.
 
 The intelligent layer operates over the domain entities defined in the Domain Model. It never maintains a private, parallel representation of the researcher's knowledge.
 
@@ -259,15 +274,15 @@ Each responsibility is a *lens* on the intelligent layer's work. Each is realize
 | Responsibility | Purpose                                                        | Primary Capabilities         |
 |----------------|----------------------------------------------------------------|------------------------------|
 | **Capture**    | Bring new information into the system on the researcher's behalf | Acquire, Process             |
-| **Curate**     | Improve and maintain existing knowledge                         | Organize *(+ Curate¹)*       |
+| **Curate**     | Improve and maintain existing knowledge                         | Understand, Organize, Reason |
 | **Link**       | Build and strengthen relationships between entities             | Organize (Relate)            |
 | **Reason**     | Produce insight, comparison, synthesis and recommendation       | Reason                       |
 | **Plan**       | Turn intent and state into scheduled, trackable work            | Operate (Plan, Schedule)     |
 | **Write**      | Produce artifacts that communicate and document work            | Produce                      |
-| **Audit**      | Inspect the knowledge base for inconsistency and decay          | Reason, Organize *(+ Curate¹)* |
+| **Audit**      | Inspect the knowledge base for inconsistency and decay          | Understand, Organize, Reason |
 | **Notify**     | Surface what the researcher needs to know                        | Operate (Notify)             |
 
-*¹ Curate is not yet part of the Capability Model. See below.*
+Curate is intentionally a composite responsibility rather than a separate capability family. See below.
 
 Two responsibilities that earlier drafts placed here have deliberately moved out of the layer, into the cognitive substrate:
 
@@ -276,13 +291,11 @@ Two responsibilities that earlier drafts placed here have deliberately moved out
 
 The layer acts. The substrate remembers, focuses and detects. Keeping these apart is what the cognitive architecture is for.
 
-## Curate — A Candidate Capability
+## Curate — A Composite Responsibility
 
-System Capabilities defines eight capabilities: Acquire, Process, Understand, Organize, Retrieve, Reason, Produce, Operate.
+System Capabilities defines eight stable capability families: Acquire, Process, Understand, Organize, Retrieve, Reason, Produce and Operate.
 
-None of them fully describes one recurring behaviour of the AI Operating Layer: the improvement of knowledge that already exists.
-
-This behaviour is not Retrieve. It is not Search. It is not Reason — it produces no new knowledge. It operates on the knowledge already present and makes it better:
+The AI Operating Layer repeatedly improves knowledge that already exists:
 
 - reorganize knowledge
 - detect and merge duplicates
@@ -292,15 +305,21 @@ This behaviour is not Retrieve. It is not Search. It is not Reason — it produc
 - remove redundancy
 - detect and resolve inconsistencies
 
-We name this behaviour **Curate**.
+We name this responsibility **Curate**.
 
-Curate does not create knowledge. It increases the value of existing knowledge.
+Curate does not require a ninth capability family. It composes:
 
-Because Curate appears across multiple responsibilities of the intelligent layer (it underlies both *Curate* and *Audit*), it satisfies the Domain Consistency test used throughout this project: a concept that recurs across behaviour is a candidate for promotion.
+```text
+Understand
+    +
+Organize
+    +
+Reason
+    =
+Curate
+```
 
-> **Curate is a candidate for promotion into System Capabilities.**
-
-This document does not formalize it there — System Capabilities owns the capability vocabulary, and promotion is a deliberate act recorded through a decision. This document only identifies the gap and names it, exactly as the Domain Model treats recurring concepts as candidate Derived Types.
+This keeps the capability vocabulary atomic while allowing the AI layer to name a durable operational responsibility. Curate may produce proposals for domain change, but it does not bypass validation, provenance or human-control rules.
 
 ---
 
@@ -413,19 +432,17 @@ These are not configuration defaults. They are architectural invariants. No futu
 
 # Generated Artifacts
 
-The intelligent layer produces outputs: reports, briefings, literature reviews, summaries, drafts, proposals.
+The intelligent layer produces outputs: reports, briefings, literature reviews, summaries, drafts and proposals.
 
-These outputs are neither Documents nor Knowledge.
+A generated output is represented first as an **Artifact**: a typed Cognitive Runtime result with explicit provenance — what produced it, from which Context, under which model and instruction version, and when.
 
-- A **Document** is an imported or authored source (see Domain Model → Document).
-- **Knowledge** is validated meaning the system holds (see Knowledge Model).
-- A generated output is neither. It is a *product* of reasoning, not a source and not yet validated understanding.
+Artifact is not an eighth Core Entity and is not automatically Knowledge.
 
-This recurring third category — the generated product — is a distinct concept. Provisionally, it is named an **Artifact**.
+- While transient, it is an operating result of reasoning.
+- When the researcher chooses to retain it, it persists as a `Document` with provenance.
+- When its meaning is accepted, it may produce a Knowledge candidate and enter the human-gated Knowledge lifecycle.
 
-> **Artifact is a candidate for promotion into the Domain Model.**
-
-Whether it becomes a Derived Type of Document or a new Core Entity is a decision for the Domain Model, to be recorded deliberately. Until then, an Artifact is treated as a generated Document carrying explicit provenance: what produced it, from what context, when.
+This boundary preserves a complete output lifecycle without creating a parallel source of truth.
 
 ## The Improvement Loop
 
@@ -469,11 +486,9 @@ The cognitive substrate is defined in three companion models, now complete:
 
 Later work will also define:
 
-- **The formal status of Curate** — its promotion, or not, into System Capabilities.
-- **The formal status of Artifact** — its promotion, or not, into the Domain Model.
 - **The status of Policy** — governance, access control and the constraints that bound autonomy, as a cross-cutting concern rather than a standalone model.
-- **Agent decomposition** — the specific responsibilities carved out as agents, and their coordination.
-- **Software Architecture** — the Shared Services (retrieval, scheduling, tool access, policy enforcement) and the systems that implement this layer.
+- **Agent Runtime decomposition** — planning, context assembly, tool routing, execution, verification, recovery and coordination, in `AGENT_RUNTIME.md`.
+- **Technical realization** — provider, storage, execution and deployment choices, in `TECHNICAL_ARCHITECTURE.md`.
 
 The conceptual commitments made here are expected to remain stable.
 

@@ -1,6 +1,23 @@
 # Logical Domain Model
 
-> **Status: Stable · v1.1.** This model changes only when the *domain* changes — never for implementation, AI, storage or tooling. Additions (an attribute, an enum, a Derived Type) are welcome; structural churn is not.
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 1 — Canonical Foundation |
+| **Normative status** | Canonical |
+| **Authoritative for** | Technology-neutral domain structure: Core Entities, attributes, logical types, relationships, cardinalities, lifecycles, aggregate boundaries and invariants. |
+| **Not authoritative for** | Conceptual motivation, use-case behavior, runtime components, persistence products or interface design. |
+| **Required reading** | `SYSTEM_PRINCIPLES.md`, `DOMAIN_MAP.md`, `DOMAIN_MODEL.md`, `KNOWLEDGE_MODEL.md`, `USE_CASES.md`. |
+| **Downstream documents** | `SYSTEM_ARCHITECTURE.md`, `SOFTWARE_ARCHITECTURE.md`, `IMPLEMENTATION_CONTEXTS.md`, schemas, migrations, domain code and tests. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
+> **Status: Stable · v1.2.** This model changes only when the *domain* changes — never for implementation, AI, storage or tooling. Additions (an attribute, an enum, a Derived Type) are welcome; structural churn is not.
+>
+> **v1.2** — formalized Decision as a Derived Type of Knowledge; resolved Artifact, Event and Curate as non-root boundary concepts under ADR-0005; made the seven-root baseline explicitly falsifiable through governed evidence. No new Core Entity.
 >
 > **v1.1** — added Vertical Lifecycle Extensions (Administrative Process, Submission, Final Project) so the Teaching, Administration and Organization verticals have canonical states to reuse instead of inventing their own; fixed Experiment's Block 3 casing to match its own specialized-lifecycle convention. No structural change.
 
@@ -317,7 +334,7 @@ Three Derived Types — **Hypothesis**, **Experiment** and **Evidence** — spec
 
 ## Other Derived Types in use
 
-The Use Cases already exercise further specializations through the `Entity (Specialization)` notation: **Draft** and **Chapter** (Document), **Bibliography** and **Research Journal** (Document), **Meeting** (Activity), and **Decision** (Knowledge). These inherit their base entity's structure. Those recurring enough to warrant formal promotion are tracked under *Scope and Boundaries*; **Decision** is currently modelled as `Knowledge (Decision)`.
+The Use Cases exercise further specializations through the `Entity (Specialization)` notation: **Draft** and **Chapter** (Document), **Bibliography** and **Research Journal** (Document), **Meeting** (Activity), and **Decision** (Knowledge). These inherit their base entity's structure. **Decision is a formal Derived Type of Knowledge**: it remains Knowledge while adding a decision-specific semantic contract — rationale, conditions, provenance and consequences — to be refined without creating a new root.
 
 ---
 
@@ -655,16 +672,16 @@ These three additions follow this document's own evolution rule: new Derived Typ
 
 # Scope and Boundaries
 
-**In scope.** The seven Core Entities, the formalized Research Spine (Hypothesis, Experiment, Evidence), and the Vertical Lifecycle Extensions (Administrative Process, Submission, Final Project), specified to logical precision.
+**In scope.** The seven Core Entities, the formalized Research Spine (Hypothesis, Experiment, Evidence), Decision as a Derived Type of Knowledge, and the Vertical Lifecycle Extensions (Administrative Process, Submission, Final Project), specified to logical precision.
 
-**Pending promotion.** Four concepts surfaced by the architecture are candidates for the Domain Model but are not yet promoted, and so are not fully specified here:
+**Resolved boundary concepts.** ADR-0005 closes four recurring ambiguities without adding a Core Entity:
 
-- **Decision** — currently modelled as `Knowledge (Decision)`; produced in UC-R03 and UC-C04, consumed across Traceability (Use Cases).
-- **Artifact** — the generated product (AI Architecture); until promoted, a `Document` with provenance (Block 7).
-- **Event** — a recorded domain change (Event Model); its promotion to a persisted record would make the system's reactive history queryable.
-- **Curate** — a candidate *capability*, not an entity (System Capabilities pending).
+- **Decision** — a formal Derived Type of `Knowledge`. It represents a traceable conclusion or commitment with rationale, conditions, provenance and consequences.
+- **Artifact** — a generated output contract of the Cognitive Runtime. It is transient by default; when retained, it persists as a `Document` with explicit provenance and may enter Knowledge only through the human-gated Improvement Loop.
+- **Event** — a committed runtime and audit record, not a domain root. Event logs and queryable projections may be persisted operationally without changing the seven-entity ontology.
+- **Curate** — a composite AI responsibility realized through `Understand + Organize + Reason`, not a ninth canonical capability and not an entity.
 
-Each awaits a deliberate, recorded decision before being specified. Until then they are named, never half-specified.
+These boundaries are deliberate. New evidence may reopen them only through an ADR and a change to the authoritative owner.
 
 **Out of scope.** Everything physical: storage, indexing, database choice, language, service boundaries. Those belong to the Software Architecture, which treats this model as its specification.
 
@@ -689,8 +706,8 @@ The Logical Domain Model owns one thing: the exact structure of the domain, from
 
 This specification refines as the entities are exercised, but along stable lines.
 
-- Attributes and states may be added; the seven roots and their meanings should not change.
-- Candidate concepts enter only through promotion, recorded as a decision.
+- Attributes, states and Derived Types may be added; the seven roots and their meanings remain the canonical baseline.
+- A root change requires falsifying operational evidence, an ADR and an explicit update to the authoritative domain documents.
 - Every physical realization — relational, graph, document, type — is derived from this document and re-derived when it changes.
 
 The model is expected to grow in precision while remaining, in its shape, as stable as the Domain Model it specifies.

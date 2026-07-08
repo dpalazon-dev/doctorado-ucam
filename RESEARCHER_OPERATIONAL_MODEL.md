@@ -1,5 +1,20 @@
 # Researcher Operational Model
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 2 — Specialized Model |
+| **Normative status** | Canonical within operational-reality scope |
+| **Authoritative for** | The researcher’s recurring operational domains, pressures, interruptions, information flows and sources of cognitive load. |
+| **Not authoritative for** | System features, entities, modules, UI behavior or implementation priorities. |
+| **Required reading** | `VISION.md`, `SYSTEM_PRINCIPLES.md`. |
+| **Downstream documents** | `SYSTEM_RESPONSIBILITIES.md`, `DOMAIN_MAP.md`, `DOMAIN_VERTICALS.md`, `USE_CASES.md`. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 ## Purpose
 
 This document describes the operational reality of a researcher.

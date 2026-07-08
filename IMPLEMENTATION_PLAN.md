@@ -1,5 +1,20 @@
 # Implementation Plan
 
+## Document Contract
+
+| Concern | Contract |
+|---|---|
+| **Level** | Level 4 — Navigation, Delivery and Process |
+| **Normative status** | Proving-plan specification |
+| **Authoritative for** | The minimum proving experiments, hypotheses, acceptance criteria, metrics and falsification conditions. |
+| **Not authoritative for** | Canonical architecture, domain semantics, technology selection, production implementation sequence or project status. |
+| **Required reading** | `ROADMAP.md`, `SYSTEM_ARCHITECTURE.md`, `SOFTWARE_ARCHITECTURE.md`, `LOGICAL_DOMAIN_MODEL.md`, relevant specialized models. |
+| **Downstream documents** | Prototype tasks, experiment reports, ADRs and Technical Architecture evidence. |
+
+> Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
+
+---
+
 > **Status: Living · Phase B · first pass.** This is **not** a development roadmap. It is a plan for **validating architectural hypotheses**: the smallest set of experiments that must succeed — or fail informatively — before we trust that the conceptual architecture can become a real system without losing its properties.
 >
 > Each entry below is an experiment designed to **falsify** a specific hypothesis, not a feature to ship. A hypothesis that fails is a result, not a setback: it tells us what to revise before we build on it.
@@ -35,15 +50,15 @@ ResearchOS must orbit **none** of these. Its center is the **Domain Model**; mem
 
 Not everything this document scrutinizes is falsifiable in weeks, and pretending otherwise would be dishonest. There are two kinds of claim, evaluated differently — conflating them is how projects fool themselves into "validating" a decision that was never on the table.
 
-**Irreversible assumptions.** A few decisions are not hypotheses at all — they are architectural bets, already made, that shape everything else and cannot be settled by a single two-week experiment:
+**Imported architectural commitments.** The following decisions are owned by the canonical architecture documents, not by this plan. This document treats them as constraints whose consequences can be tested, but does not redefine them:
 
 - **Domain-first** — the Domain Model is the center; everything else is a mechanism serving it.
-- **Single Source of Truth** — the domain is the only authoritative state; no shadow store is ever authoritative over it.
+- **Single Source of Truth** — adopt the state-authority model defined in `SYSTEM_ARCHITECTURE.md`; no derived mechanism becomes an authoritative shadow of domain facts.
 - **Event-driven** — components coordinate through domain events, not by calling one another.
 - **AI as an operational layer** — the intelligence operates over the domain; it never owns a private copy of it, nor controls the high-level flow.
 - **Capabilities before tools** — the system speaks in abstract verbs; concrete tools are implementation detail.
 
-These are not tested; they are *committed*. What an experiment can reveal is not whether a bet is "true," but whether **its consequences justify their cost**. Experiment 2 is exactly this: it does not prove Domain-first is correct — it measures whether the cost of the graph, memory and context (the consequences of Domain-first) buys more than a cheaper alternative. If the consequences never justify the cost, the bet was wrong even though no experiment "failed."
+These are not created or settled here; they are *imported commitments*. What an experiment can reveal is not whether a bet is "true," but whether **its consequences justify their cost**. Experiment 2 is exactly this: it does not prove Domain-first is correct — it measures whether the cost of the graph, memory and context (the consequences of Domain-first) buys more than a cheaper alternative. If the consequences never justify the cost, the bet was wrong even though no experiment "failed."
 
 **Falsifiable hypotheses.** Everything in the numbered experiments below is a claim that can be put at risk and killed by a concrete observation within weeks. This is where the discipline of the document lives.
 
@@ -191,6 +206,8 @@ Named so the boundary of this first pass is explicit; none is decided here.
 
 ## Relationship to other documents
 
+- **DOCUMENTATION_ARCHITECTURE** — owns this document's bounded authority and the rule that experiments cannot redefine architecture.
+- **IMPLEMENTATION_CONTEXTS** — defines the context bundles used to implement each proving experiment.
 - **ROADMAP** — owns the phase sequence and the Proving Milestone this document turns into experiments. It remains the plan of record.
 - **Use Cases** — the experiments are minimal realizations of UC-K03, UC-K04, UC-K05; they invent no new use case.
 - **System Capabilities** — the verbs each experiment composes.

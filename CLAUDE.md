@@ -8,67 +8,92 @@
 | **Normative status** | Coding-agent operating instructions |
 | **Authoritative for** | How coding agents should orient themselves, select context, preserve repository conventions and report work. |
 | **Not authoritative for** | System behavior, architecture, domain meaning, roadmap status beyond what it references or technology selection. |
-| **Required reading** | `DOCUMENTATION_ARCHITECTURE.md`, `IMPLEMENTATION_CONTEXTS.md`, `ROADMAP.md`. |
+| **Required reading** | `DOCUMENTATION_ARCHITECTURE.md`, `IMPLEMENTATION_CONTEXTS.md`, `ROADMAP.md`, `SPEC_CATALOG.md`. |
 | **Downstream documents** | Every coding-agent session, implementation prompt and automated repository workflow. |
 
 > Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
 
 ---
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to coding agents working in the ResearchOS repository.
 
 ## What this repository is
 
-ResearchOS (formerly Doctorado_UCAM) is a from-scratch design of a research operating system for a PhD candidate: knowledge management, research workflow and AI assistance unified around one domain model. The repository currently contains the conceptual, logical, system and software reference architecture — Markdown documents, no code. Phase A (design the domain) is complete. Phase B has completed `SYSTEM_ARCHITECTURE.md` and `SOFTWARE_ARCHITECTURE.md`; implementation views, ADRs, Technical Architecture and the proving slice are next. There is no package.json, build system, linter or test suite yet — do not invent one outside the roadmap.
+ResearchOS is a local-first, single-user desktop operating environment for knowledge work, research and operational continuity. The canonical architecture is complete through `CANONICAL_DATA_MODEL.md`, `AGENT_RUNTIME.md` and the provisional `TECHNICAL_ARCHITECTURE.md` baseline.
 
-`ROADMAP.md` is the plan of record. Read it before structural changes. For implementation work, select the appropriate bounded reading bundle in `IMPLEMENTATION_CONTEXTS.md` before loading any architectural documents.
+The current phase is **Development Specifications**. `SPEC_CATALOG.md` is the registry and dependency order for those Specs. Do not introduce production code, source directories, build systems or dependencies outside an approved Spec. Explicit proving experiments may create disposable code only within the boundary defined by `IMPLEMENTATION_PLAN.md`.
 
-## Documentation and context protocol
+The current product baseline is:
 
-The repository uses a governed four-level documentation architecture. `DOCUMENTATION_ARCHITECTURE.md` owns document scope, authority, precedence and downstream-impact rules. `IMPLEMENTATION_CONTEXTS.md` owns the task-specific reading bundles used by coding agents.
+```text
+Tauri + React + TypeScript Workspace
+        ↓
+authoritative Rust runtime
+        ↓ controlled, versioned IPC
+subordinate Python cognitive sidecar
+        ↓
+SQLite + content-addressed filesystem + rebuildable projections
+```
 
-Do **not** load every Markdown file by default. For every task:
+Rust owns canonical state, commands, policies, durable execution and commitment. Python performs bounded cognitive and scientific operations and must not write canonical state directly.
+
+## Mandatory task protocol
+
+Before any code or structural repository change:
 
 1. Read this file.
-2. Check the current phase in `ROADMAP.md`.
-3. Select one primary bundle in `IMPLEMENTATION_CONTEXTS.md`.
-4. Load the concern-owner documents in full.
-5. Load only the named sections of supporting documents.
-6. State the invariants to preserve before editing code or architecture.
-7. Review the downstream documents declared by any changed owner.
-8. End with the completion report required by `IMPLEMENTATION_CONTEXTS.md`.
+2. Read `ROADMAP.md` and identify the active phase.
+3. Read `SPEC_CATALOG.md` and identify the governing Spec and its status.
+4. Do not implement a Spec whose prerequisites are incomplete or whose status is not `Approved` or `Implementing`.
+5. Select one primary context bundle in `IMPLEMENTATION_CONTEXTS.md`.
+6. Load the governing Spec and its authoritative owner documents in full.
+7. Load supporting sections only when named by the Spec or bundle.
+8. State the invariants, authority boundaries and owned state before editing.
+9. Implement the smallest coherent change inside the Spec scope.
+10. Run the Spec's tests and architectural conformance checks.
+11. Update the Spec and catalog status only when their completion criteria are actually met.
+12. Report changed owners, downstream documents reviewed, tests run, deferrals and ADR needs.
 
-The four documentation levels are:
+Do not load every Markdown file by default. Do not use broad repository context as a substitute for identifying concern ownership.
 
-- **Level 1 — Canonical Foundations:** `VISION.md`, `SYSTEM_PRINCIPLES.md`, `SYSTEM_ARCHITECTURE.md`, `LOGICAL_DOMAIN_MODEL.md`, `SOFTWARE_ARCHITECTURE.md`.
-- **Level 2 — Specialized Models:** System, operational, responsibility, domain, knowledge, AI, memory, context, event and interaction models.
-- **Level 3 — Functional and Vertical Specifications:** capabilities, use cases, domain vertical index and vertical files.
-- **Level 4 — Navigation, Delivery and Process:** README, roadmap, implementation plan, agent guidance and documentation/context governance.
+## Documentation levels
 
-A document is authoritative only for the concerns declared in its Document Contract. Repeated statements elsewhere are summaries or local consequences, not competing definitions.
+- **Level 1 — Canonical Foundations:** vision, principles, system authority, logical domain and implementation-neutral software architecture.
+- **Level 2 — Specialized Models:** conceptual models plus Component Model, Canonical Data Model, Data Architecture, Agent Runtime and Technical Architecture.
+- **Level 3 — Functional, Vertical and Development Specifications:** capabilities, use cases, vertical definitions and bounded Specs under `specs/`.
+- **Level 4 — Navigation, Delivery and Process:** README, roadmap, ADR register, Spec catalog, proving plan and agent/documentation guidance.
 
-## Core invariant: seven entities, no new roots
+A document is authoritative only for the concerns declared in its Document Contract. A Spec translates upstream authority into an exact implementation contract; it does not replace that authority.
 
-The entire domain — every operational reality of the researcher — is described with exactly seven Core Entities: **Project, Document, Knowledge, Task, Activity, Person, Resource**. Breadth comes exclusively from *Derived Types* (specializations of those seven) and *Use Cases* (behavioral compositions), never from adding an eighth root entity. The authoritative definition lives in `LOGICAL_DOMAIN_MODEL.md`; `DOMAIN_VERTICALS.md` applies it and `ROADMAP.md` reports it. Treat it as load-bearing when proposing any new concept.
+## Load-bearing invariants
 
-## The vertical layer
+### One canonical authority
 
-`DOMAIN_VERTICALS.md` is the index of how the seven entities specialize across six operational verticals (Personal, Daily Work, Administration, Research, Teaching, Organization). Four verticals have enough real content to carry their own document (`RESEARCH_VERTICAL.md`, `TEACHING_VERTICAL.md`, `ADMINISTRATION_VERTICAL.md`, `ORGANIZATION_VERTICAL.md`); Personal and Daily Work stay inline in the index because they're intentionally thin, not because they're incomplete. Each `*_VERTICAL.md` file holds Purpose, Scope, Derived Types and a table of its Use Cases **referenced by ID** — it never copies use case prose out of `USE_CASES.md`. Follow that pattern for any new vertical: it graduates to its own file only once it has real use cases, and the file references rather than duplicates them.
+Committed domain state is authoritative. Search indexes, embeddings, graph projections, context bodies, model outputs and external systems are derived or mediated mechanisms.
 
-A vertical named "Doctorate" appears in old commit messages and in `ROADMAP.md`'s history notes but no longer exists: it never gained its own use cases, and dissolved into Research (thesis chapters are just Writing, UC-W01) and Administration (progress reports, committee decisions, deadlines). If you're tracing an old reference to "Doctorate," that's where it went.
+### Seven Core Entities
 
-## Keeping documents in sync
+The routine roots are **Project, Document, Knowledge, Task, Activity, Person and Resource**. Breadth comes from Derived Types, Value Objects, typed relationships, process state and projections. A new root requires Experiment 0 evidence and an ADR.
 
-Every document declares its authority, required reading and downstream documents in its Document Contract. Follow the change-impact protocol in `DOCUMENTATION_ARCHITECTURE.md` rather than updating files by intuition.
+### One model, many verticals
 
-`USE_CASES.md` remains the owner of full use-case prose. Vertical files and roadmap tables reference or summarize it; they never become competing catalogues. When a canonical use case changes, review the affected vertical mapping and status documents in the same change.
+Personal, Daily Work, Administration, Teaching, Research and Organization extend `CANONICAL_DATA_MODEL.md`. A vertical does not create an independent database, graph, memory, event runtime or AI authority.
 
-Do not copy global invariants into specialized or process documents. Import them through a short attributed statement and preserve the authoritative definition in its owner.
+### Rust authority, Python cognition
 
-## Conventions
+Python receives typed, budgeted operations and returns Artifacts, observations or Proposals. Rust validates and commits. No model or framework controls permissions, scheduling, budgets or canonical mutation.
 
-- The repository remains intentionally flat while it contains only architecture documents. The package topology in `SOFTWARE_ARCHITECTURE.md` is normative in responsibility but does not justify creating source directories before implementation begins.
-- Naming follows the suffix of what a document is: `*_MODEL.md` / `*_MAP.md` for foundational and cognitive documents, `*_VERTICAL.md` for vertical specializations, plain names (`VISION.md`, `ROADMAP.md`, `USE_CASES.md`) for singular documents.
-- Documents are written in English; conversation with the maintainer happens in Spanish. `README.md` is the one document written in Spanish, as the repo's front door.
-- Every Markdown file must keep an accurate Document Contract.
-- Coding agents must use `IMPLEMENTATION_CONTEXTS.md`; repository-wide prompt loading is an exception that requires explicit justification.
+### Local-first product
+
+The installed application must not require the user to administer PostgreSQL, Docker, a broker, a reverse proxy, a graph server or a vector database server. Specialized engines enter only through adapters and measured replacement triggers.
+
+## Repository and naming conventions
+
+- Architecture and process documents remain at the repository root.
+- Development Specs are registered in `SPEC_CATALOG.md` and will live under `specs/` in the category assigned by the catalog.
+- Source topology is introduced by `SPEC-001`; do not invent an alternative tree beforehand.
+- Documents are written in English. Maintainer conversation and `README.md` are in Spanish.
+- Every Markdown document must keep an accurate Document Contract.
+- Vertical documents reference use-case IDs instead of copying use-case prose.
+- Significant architecture changes require an ADR and downstream reconciliation.
+- Never treat a framework's internal state, agent graph or memory store as ResearchOS authority.

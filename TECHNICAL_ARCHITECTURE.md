@@ -966,6 +966,36 @@ Python owns initial scientific parsing and extraction adapters.
 
 A parser may be replaced by a native Rust or C/C++ implementation without changing the pipeline contract.
 
+## Rich Structured Representation Candidates
+
+The mandatory proving baseline remains PyMuPDF-based text and metadata extraction with OCR fallback when justified.
+
+Docling and DocLang are deferred candidates for documents whose value depends on preserving richer structure, including:
+
+- multi-column reading order;
+- complex tables;
+- formulas;
+- figures and captions;
+- page geometry and bounding boxes;
+- evidence anchors that must return to an exact source region.
+
+They are not mandatory dependencies and are not adopted as canonical formats by this baseline.
+
+`SPEC-010 Document Ingestion Pipeline` must evaluate them against the simpler baseline before adoption. The comparison must measure at least:
+
+- extraction fidelity and reading order;
+- table, formula and figure preservation;
+- evidence localization and citation quality;
+- downstream retrieval quality;
+- processing time, memory and disk cost;
+- cognitive-sidecar and installer size;
+- Windows, macOS and Linux packaging reliability;
+- behavior on malformed or hostile input.
+
+Any retained DocLang output is a derived, rebuildable structured representation. It must be described semantically as a structured document representation and carry explicit format, format-version, generator and generator-version metadata. The original content bytes and canonical ResearchOS records retain authority.
+
+Adoption requires measured benefit over the baseline and an explicit decision inside SPEC-010. It does not require a new ADR unless the choice changes an architectural authority boundary, mandatory product dependency or canonical data contract.
+
 ## OCR
 
 OCR is optional and expensive.

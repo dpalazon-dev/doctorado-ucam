@@ -211,7 +211,7 @@ The system is considered validated when this cycle executes over real data with 
 | 3 | INTERACTION_MODEL.md | B | Define every interaction modality | Done |
 | 4 | SOFTWARE_ARCHITECTURE.md | B | Translate conceptual models into runtime architecture | Next |
 | 5 | UML.md / Views | B | Derived implementation views | Pending |
-| 6 | IMPLEMENTATION_PLAN.md | B | Components, milestones, MVP | Pending |
+| 6 | IMPLEMENTATION_PLAN.md | B | Components, milestones, MVP | First pass |
 | 7 | DECISIONS.md (ADR) | B | Record architectural decisions | Pending |
 
 DECISIONS.md also owns the promotion (or rejection) of the remaining candidate concepts:

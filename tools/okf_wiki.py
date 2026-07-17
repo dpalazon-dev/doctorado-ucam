@@ -317,6 +317,74 @@ def build(cor: Corpus, out: Path) -> None:
 
 
 # --------------------------------------------------------------------------- #
+# Queries — the Final Principle's three questions as commands
+# (DOCUMENTATION_ARCHITECTURE.md: owner? / what to read? / what to review?)
+# --------------------------------------------------------------------------- #
+def transitive_required(cor: Corpus, doc: str) -> list[str]:
+    """Everything that must be read to safely change `doc`, closure over
+    required-reading. Breadth-first, cycle-safe, excludes `doc` itself."""
+    seen: set[str] = set()
+    order: list[str] = []
+    queue = list(cor.real(cor.required.get(doc, [])))
+    while queue:
+        d = queue.pop(0)
+        if d in seen or d == doc:
+            continue
+        seen.add(d)
+        order.append(d)
+        for r in cor.real(cor.required.get(d, [])):
+            if r not in seen:
+                queue.append(r)
+    return order
+
+
+def dependents(cor: Corpus, doc: str) -> list[str]:
+    """Docs that list `doc` as required reading (i.e. depend on it)."""
+    return sorted(n for n in cor.docs if doc in cor.real(cor.required[n]))
+
+
+def run_query(cor: Corpus, who_owns: str | None, reading: str | None,
+              impact: str | None) -> int:
+    if who_owns:
+        q = who_owns.lower()
+        hits = [(concern, owners) for concern, owners in cor.authority if q in concern.lower()]
+        owned = {o for _, os_ in hits for o in os_}
+        hits += [(f"(Authoritative for) {n}", [n]) for n in cor.docs
+                 if q in cor.contracts[n].get("authoritative_for", "").lower() and n not in owned]
+        if not hits:
+            print(f"No owner found for '{who_owns}'.")
+            return 1
+        print(f"Owner(s) matching '{who_owns}':")
+        for concern, owners in hits:
+            print(f"  {concern}  ->  {', '.join(owners)}")
+        return 0
+
+    if reading:
+        if reading not in cor.existing:
+            print(f"Unknown doc: {reading}")
+            return 1
+        direct = cor.real(cor.required[reading])
+        indirect = [d for d in transitive_required(cor, reading) if d not in direct]
+        print(f"To safely change {reading}, read:")
+        print(f"  direct required reading : {', '.join(direct) or '—'}")
+        print(f"  + transitively          : {', '.join(indirect) or '—'}")
+        return 0
+
+    if impact:
+        if impact not in cor.existing:
+            print(f"Unknown doc: {impact}")
+            return 1
+        declared = cor.real(cor.downstream[impact])
+        deps = dependents(cor, impact)
+        print(f"If {impact} changes, review:")
+        print(f"  declared downstream        : {', '.join(declared) or '—'}")
+        print(f"  docs that require it (deps) : {', '.join(deps) or '—'}")
+        return 0
+
+    return 0
+
+
+# --------------------------------------------------------------------------- #
 # CLI
 # --------------------------------------------------------------------------- #
 def run_check(cor: Corpus) -> int:
@@ -349,9 +417,15 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument("--build", action="store_true", help="Emit the OKF bundle.")
     ap.add_argument("--repo", default=None, help="Repository root (default: git toplevel).")
     ap.add_argument("--out", default="wiki", help="Output dir for --build (default: ./wiki).")
+    ap.add_argument("--who-owns", metavar="TEXT", help="Print the owner doc(s) of a concern.")
+    ap.add_argument("--reading", metavar="DOC", help="Transitive required-reading to change DOC.")
+    ap.add_argument("--impact", metavar="DOC", help="Docs to review if DOC changes.")
     args = ap.parse_args(argv)
 
     cor = Corpus(repo_root(args.repo))
+
+    if args.who_owns or args.reading or args.impact:
+        return run_query(cor, args.who_owns, args.reading, args.impact)
 
     if args.build:
         out = Path(args.out).resolve()

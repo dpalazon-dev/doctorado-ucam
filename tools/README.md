@@ -54,6 +54,22 @@ python3 tools/okf_wiki.py --check
 python3 tools/okf_wiki.py --build --out wiki
 ```
 
+### Queries — the three questions of the Final Principle
+
+`DOCUMENTATION_ARCHITECTURE.md` asks that a maintainer be able to answer three
+questions without loading the whole repo. Each is a command:
+
+```sh
+# 1. Which document owns this concern?
+python3 tools/okf_wiki.py --who-owns "Memory"
+
+# 2. What must I read to change a document safely? (transitive closure)
+python3 tools/okf_wiki.py --reading MEMORY_MODEL.md
+
+# 3. What else must I review if a document changes?
+python3 tools/okf_wiki.py --impact KNOWLEDGE_MODEL.md
+```
+
 No third-party dependencies — Python 3.9+ standard library only.
 
 ## Design notes
@@ -70,7 +86,6 @@ No third-party dependencies — Python 3.9+ standard library only.
 
 ## Possible extensions
 
-- Transitive closure of required-reading ("everything I must read to change X").
 - Cross-check that `README.md`, `ROADMAP.md`, `SPEC_CATALOG.md` and `CLAUDE.md`
   report the same project state (Conformance Checklist item 10).
-- A query mode (`--who-owns <concern>`, `--impact <doc>`).
+- Extend the corpus glob to `specs/**` once `SPEC-001` introduces it.

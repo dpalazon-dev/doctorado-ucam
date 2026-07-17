@@ -45,6 +45,7 @@ A changed decision is superseded by a new ADR rather than silently rewritten.
 | ADR-0009 | Rust Owns Authority; Python Provides Cognitive Capabilities | Accepted | 2026-07-08 | `TECHNICAL_ARCHITECTURE.md`, `AGENT_RUNTIME.md`, `COMPONENT_MODEL.md` |
 | ADR-0010 | Embedded Local Persistence Is the Initial Product Baseline | Accepted | 2026-07-08 | `TECHNICAL_ARCHITECTURE.md`, `DATA_ARCHITECTURE.md`, `CANONICAL_DATA_MODEL.md` |
 | ADR-0011 | The Canonical Data Model Governs Vertical Extensions | Accepted | 2026-07-08 | `CANONICAL_DATA_MODEL.md`, `LOGICAL_DOMAIN_MODEL.md`, `DOMAIN_VERTICALS.md` |
+| ADR-0012 | OKF as a Candidate Knowledge Projection and Interchange Format | Accepted | 2026-07-17 | `DATA_ARCHITECTURE.md`, `CANONICAL_DATA_MODEL.md`, `AI_ARCHITECTURE.md` |
 
 ---
 
@@ -712,3 +713,59 @@ One canonical structural model prevents vertical drift while allowing domain-spe
 - `LOGICAL_DOMAIN_MODEL.md` — semantic meaning, aggregates and invariants.
 - `DOMAIN_VERTICALS.md` — vertical ownership and specialization boundaries.
 - Future vertical Specs — concrete Derived Types, profiles, relationships, lifecycles and projections.
+
+---
+
+# ADR-0012 · OKF as a Candidate Knowledge Projection and Interchange Format
+
+**Status:** Accepted  
+**Date:** 2026-07-17
+
+## Context
+
+The Knowledge graph is an internal mechanism: `INTERACTION_MODEL.md` states the researcher never interacts with it directly. It is stored as canonical records plus typed relationships, with the graph, lexical and vector views held as rebuildable projections (`DATA_ARCHITECTURE.md`, `CANONICAL_DATA_MODEL.md`). There is today no human-readable, navigable, portable rendering of what the system knows.
+
+Two external developments describe exactly such a rendering. The "LLM-wiki" pattern compiles sources into an interlinked Markdown knowledge base that is maintained over time rather than re-derived on every query. The Open Knowledge Format (OKF) is an external open specification that packages such a base as a directory of Markdown files with YAML frontmatter — portable, model-agnostic and readable by ordinary tools.
+
+`AI_ARCHITECTURE.md` already anticipates this shape and pre-classifies it: no document folder, index, vector store or generated wiki is ever the source of truth; any such structure is a projection of the domain, reconstructible from it, never authoritative over it. `SPEC_CATALOG.md` and `TECHNICAL_ARCHITECTURE.md` already establish how to evaluate an external format as a deferred, measured candidate without a mandatory dependency: DocLang, for Document representations. OKF is the analogous candidate one layer up — for the Knowledge projection rather than the Document representation.
+
+A naive adoption of the pattern would let a model edit the Markdown wiki as the source of truth. That directly violates ADR-0001 and ADR-0009. This decision adopts the useful half and forecloses the harmful half.
+
+## Decision
+
+OKF is adopted as a **deferred candidate** for a human-readable Knowledge projection and interchange format, evaluated within `SPEC-011` (Retrieval and Projection System) on the same terms the DocLang candidate is evaluated within SPEC-010.
+
+- The OKF bundle is a **rebuildable, non-authoritative projection**. Canonical Knowledge (ADR-0001, ADR-0010) remains the single source of truth; the bundle is derived from committed Knowledge and reconstructible from it.
+- It is **generated from** committed Knowledge, never **edited into** it. Consistent with ADR-0009 and the human-gated Improvement Loop, any agent-originated change to Knowledge flows through a typed Proposal that Rust validates and the researcher accepts. The cognitive sidecar never writes the projection as authority.
+- OKF introduces **no technology-specific canonical `representation_kind`**. A retained projection is described semantically and carries explicit `format`, `format_version`, `generator` and `generator_version` metadata, mirroring the DocLang rule in `TECHNICAL_ARCHITECTURE.md`.
+- **Bidirectional editing** — reconciling human edits of OKF files back into canonical Knowledge — is **out of scope** and requires its own future ADR, because it changes the mutation and authority boundary owned by ADR-0001 and ADR-0009.
+- Adoption is **evidence-gated**. It requires measured benefit — human legibility, cheaper agent context assembly, or portability — over the baseline of the existing graph and retrieval projections, sufficient to justify the runtime, packaging and maintenance cost of a second Knowledge rendering. Absent that evidence it remains deferred.
+
+This decision changes no upstream invariant. It reinforces ADR-0001 and ADR-0009 and gives the generated-wiki-as-projection principle of `AI_ARCHITECTURE.md` a concrete, named, deferred realization.
+
+## Rationale
+
+The Knowledge graph is authoritative and machine-oriented but not legible; a wiki projection is legible and portable but must not be authoritative. Separating the two lets the system gain a human- and agent-facing surface without a second source of truth. The pattern's documented failure modes — drift, stale contradictions, lossy compression — are precisely what the human gate, supersession-not-overwrite and retained source evidence already prevent, and the local-first single-user topology (ADR-0007) is the context in which the pattern is strongest. Treating OKF as a measured candidate rather than a mandatory dependency matches the discipline already applied to DocLang.
+
+## Consequences
+
+### Positive
+
+- A legible, navigable, exportable rendering of canonical Knowledge becomes possible without introducing new authority.
+- The projection is a natural, low-cost context body for the cognitive runtime — starting from synthesis rather than raw sources.
+- Portability and interchange through git and ordinary Markdown tools fit the local-first product.
+- The authority boundary is stated explicitly, so the useful pattern cannot silently become a second source of truth.
+
+### Negative
+
+- A second Knowledge rendering adds generation and maintenance cost that the evidence gate must justify.
+- A read-only projection forgoes the edit-the-wiki-directly affordance until a separate ADR addresses reconciliation.
+- Projection consistency depends on disciplined rebuilds tied to Knowledge change.
+
+## Canonical specification
+
+- `DATA_ARCHITECTURE.md` — projection families, ownership and the rebuild contract that would carry an OKF Knowledge-projection family.
+- `CANONICAL_DATA_MODEL.md` — projection source contract and the rule that projections never become authoritative.
+- `AI_ARCHITECTURE.md` — the generated-wiki-as-projection principle and the human-gated Improvement Loop.
+- `SPEC_CATALOG.md` — `SPEC-011` Retrieval and Projection System, the evaluation home for the candidate.
+- `KNOWLEDGE_MODEL.md` — Knowledge forms and evolution that the projection renders.

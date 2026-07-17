@@ -647,6 +647,10 @@ Chronological view derived from Activities, Events, Documents, Tasks and process
 
 Short-lived computed values with explicit invalidation or expiry.
 
+### Human-Readable Knowledge Projection
+
+A legible, navigable, portable rendering of canonical Knowledge as interlinked documents; the Open Knowledge Format (OKF) is the candidate encoding. A **candidate** family — deferred and evidence-gated, evaluated in `SPEC-011` — generated from committed Knowledge and never edited back into it. Like every projection here it is non-authoritative and rebuildable; a retained bundle records its concrete `format`, `format_version`, `generator` and `generator_version`. See ADR-0012.
+
 ## Projection Record Requirements
 
 Every projection record includes or can resolve:

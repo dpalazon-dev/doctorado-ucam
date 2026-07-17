@@ -45,7 +45,7 @@ A changed decision is superseded by a new ADR rather than silently rewritten.
 | ADR-0009 | Rust Owns Authority; Python Provides Cognitive Capabilities | Accepted | 2026-07-08 | `TECHNICAL_ARCHITECTURE.md`, `AGENT_RUNTIME.md`, `COMPONENT_MODEL.md` |
 | ADR-0010 | Embedded Local Persistence Is the Initial Product Baseline | Accepted | 2026-07-08 | `TECHNICAL_ARCHITECTURE.md`, `DATA_ARCHITECTURE.md`, `CANONICAL_DATA_MODEL.md` |
 | ADR-0011 | The Canonical Data Model Governs Vertical Extensions | Accepted | 2026-07-08 | `CANONICAL_DATA_MODEL.md`, `LOGICAL_DOMAIN_MODEL.md`, `DOMAIN_VERTICALS.md` |
-| ADR-0012 | OKF as a Candidate Knowledge Projection and Interchange Format | Proposed | 2026-07-17 | `DATA_ARCHITECTURE.md`, `CANONICAL_DATA_MODEL.md`, `AI_ARCHITECTURE.md` |
+| ADR-0012 | OKF as a Candidate Knowledge Projection and Interchange Format | Accepted | 2026-07-17 | `DATA_ARCHITECTURE.md`, `CANONICAL_DATA_MODEL.md`, `AI_ARCHITECTURE.md` |
 
 ---
 
@@ -718,7 +718,7 @@ One canonical structural model prevents vertical drift while allowing domain-spe
 
 # ADR-0012 · OKF as a Candidate Knowledge Projection and Interchange Format
 
-**Status:** Proposed  
+**Status:** Accepted  
 **Date:** 2026-07-17
 
 ## Context

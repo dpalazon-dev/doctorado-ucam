@@ -243,7 +243,7 @@ Author vertical Specs only after the shared extension mechanism and proving slic
 | **SPEC-008** | Rust–Python IPC Protocol | cognitive | 1 | SPEC-001, SPEC-002, SPEC-003 | `TECHNICAL_ARCHITECTURE.md`, `AGENT_RUNTIME.md`, ADR-0009 | Planned |
 | **SPEC-009** | Python Cognitive Sidecar | cognitive | 2 | SPEC-001, SPEC-008 | `AGENT_RUNTIME.md`, `TECHNICAL_ARCHITECTURE.md`, `COMPONENT_MODEL.md` | Planned |
 | **SPEC-010** | Document Ingestion Pipeline | platform | 2 | SPEC-005, SPEC-006, SPEC-007, SPEC-008, SPEC-009 | `CANONICAL_DATA_MODEL.md`, `DATA_ARCHITECTURE.md`, `AGENT_RUNTIME.md`, `TECHNICAL_ARCHITECTURE.md` | Planned |
-| **SPEC-011** | Retrieval and Projection System | cognitive | 2 | SPEC-004, SPEC-005, SPEC-010 | `DATA_ARCHITECTURE.md`, `CONTEXT_MODEL.md`, `TECHNICAL_ARCHITECTURE.md` | Planned |
+| **SPEC-011** | Retrieval and Projection System | cognitive | 2 | SPEC-004, SPEC-005, SPEC-010 | `DATA_ARCHITECTURE.md`, `CONTEXT_MODEL.md`, `TECHNICAL_ARCHITECTURE.md`, ADR-0012 | Planned |
 | **SPEC-012** | Proposal and Approval Flow | platform | 2 | SPEC-005, SPEC-007, SPEC-008, SPEC-009, SPEC-010 | `SOFTWARE_ARCHITECTURE.md`, `INTERACTION_MODEL.md`, `AGENT_RUNTIME.md` | Planned |
 | **SPEC-013** | Workspace Shell | workspace | 2 | SPEC-002, SPEC-003, SPEC-005, SPEC-007, SPEC-012 | `INTERACTION_MODEL.md`, `COMPONENT_MODEL.md`, `TECHNICAL_ARCHITECTURE.md` | Planned |
 
@@ -269,6 +269,14 @@ Docling or compatible adapter → DocLang → normalized text + structural ancho
 Docling and DocLang are candidates, not preselected dependencies. Adoption requires measurable improvement in structural fidelity, evidence localization or retrieval quality that justifies runtime, packaging, security and maintenance cost.
 
 SPEC-010 must not introduce a technology-specific canonical `representation_kind`. When a rich representation is retained, the canonical record uses a semantic kind such as `structured_document` and records the concrete media type, format version, generator and generator version separately.
+
+## SPEC-011 Deferred Knowledge-Projection Evaluation
+
+Beyond the retrieval projections SPEC-011 must deliver (relational, lexical, vector, graph), it evaluates an optional **human-readable Knowledge projection** only where the Knowledge corpus demonstrates a need for a legible, navigable, portable rendering.
+
+The Open Knowledge Format (OKF) is the candidate encoding, not a preselected dependency. Adoption requires measurable benefit — human legibility, cheaper context assembly or portability — over the graph and retrieval projections, sufficient to justify its runtime, packaging and maintenance cost.
+
+The projection is rebuildable and non-authoritative: it is generated from committed Knowledge and never edited back into it. SPEC-011 must not introduce a technology-specific canonical `representation_kind`; a retained bundle is described semantically and records its concrete format, format version, generator and generator version separately. Bidirectional editing is out of scope and requires a new ADR. See ADR-0012.
 
 ---
 

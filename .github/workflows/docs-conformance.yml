@@ -1,0 +1,25 @@
+name: docs-conformance
+
+# Mechanizes the Conformance Checklist owned by DOCUMENTATION_ARCHITECTURE.md.
+# See tools/okf_wiki.py. Fails the build if a doc contract is incomplete or a
+# local link breaks.
+
+on:
+  push:
+    paths:
+      - "**.md"
+      - "tools/**"
+      - ".github/workflows/docs-conformance.yml"
+  pull_request:
+    paths:
+      - "**.md"
+      - "tools/**"
+      - ".github/workflows/docs-conformance.yml"
+
+jobs:
+  conformance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Documentation conformance check
+        run: python3 tools/okf_wiki.py --check

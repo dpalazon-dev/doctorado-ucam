@@ -1,0 +1,7 @@
+# Rebuildable OKF documentation projection (see tools/okf_wiki.py).
+# Derived output — never authoritative. Run `python3 tools/okf_wiki.py --build`.
+/wiki/
+
+# Python
+__pycache__/
+*.pyc

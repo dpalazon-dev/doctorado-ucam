@@ -42,7 +42,7 @@ The current objective is not to add more general models. It is to convert the ex
 | Technical baseline | Technical Architecture | Provisional canonical baseline · v0.3 |
 | Documentation governance | Documentation Architecture + Implementation Contexts + document contracts | Complete · v1.0 |
 | Significant decisions | ADR-0001 through ADR-0011 | Closed for the current baseline |
-| Development specifications | `SPEC_CATALOG.md` active; bounded implementation contracts | **In progress · SPEC-001 Ready** |
+| Development specifications | `SPEC_CATALOG.md` active; bounded implementation contracts | **In progress · SPEC-001 Review** |
 | Executable product | Desktop foundation and proving slice | Pending |
 
 The architecture is closed far enough to begin development specifications. The baseline is intentionally provisional where experiments must still produce evidence, but no additional cross-cutting architecture document is required before specification work begins.
@@ -173,7 +173,7 @@ The product topology, runtime ownership, local data baseline and vertical-extens
 
 # Phase D — Development Specifications
 
-**Status:** In progress · `SPEC_CATALOG.md` active · `SPEC-001` Ready
+**Status:** In progress · `SPEC_CATALOG.md` active · `SPEC-001` Review
 
 ## Objective
 

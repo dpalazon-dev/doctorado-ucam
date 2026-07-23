@@ -15,7 +15,7 @@
 
 ---
 
-> **Status: Active · v1.0.** Architecture Closure is complete. `SPEC-001` is the next specification to author.
+> **Status: Active · v1.0.** Architecture Closure is complete. `SPEC-001` is in Review.
 
 ## Purpose
 
@@ -233,7 +233,7 @@ Author vertical Specs only after the shared extension mechanism and proving slic
 
 | ID | Title | Category | Wave | Prerequisites | Primary owners | Status |
 |---|---|---|---:|---|---|---|
-| **SPEC-001** | Repository and Build System | foundation | 1 | — | `TECHNICAL_ARCHITECTURE.md`, `SOFTWARE_ARCHITECTURE.md` | **Ready** |
+| **SPEC-001** | Repository and Build System | foundation | 1 | — | `TECHNICAL_ARCHITECTURE.md`, `SOFTWARE_ARCHITECTURE.md` | **Review** |
 | **SPEC-002** | Desktop Application Lifecycle | foundation | 1 | SPEC-001 | `TECHNICAL_ARCHITECTURE.md`, `COMPONENT_MODEL.md` | Planned |
 | **SPEC-003** | Rust Module Boundaries | foundation | 1 | SPEC-001 | `SOFTWARE_ARCHITECTURE.md`, `COMPONENT_MODEL.md`, ADR-0009 | Planned |
 | **SPEC-004** | SQLite Canonical Persistence | platform | 1 | SPEC-001, SPEC-003 | `DATA_ARCHITECTURE.md`, `TECHNICAL_ARCHITECTURE.md`, ADR-0010 | Planned |
@@ -368,10 +368,10 @@ A pull request changing implementation code and catalog status should state why 
 
 # Immediate Next Action
 
-Author:
+Review and approve:
 
 ```text
 specs/foundation/SPEC-001_REPOSITORY_AND_BUILD_SYSTEM.md
 ```
 
-Its purpose is to establish the reproducible cross-platform repository, toolchains, dependency boundaries, CI matrix and architecture-enforcement foundation required by every later Spec. It must not implement product features that belong to SPEC-002 or later.
+The review must confirm repository topology, toolchain and lockfile policy, root command contracts, the native CI matrix, architecture enforcement, security boundaries, tests and explicit deferrals. Production implementation may begin only after the Spec reaches `Approved`.

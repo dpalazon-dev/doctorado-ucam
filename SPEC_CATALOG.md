@@ -272,9 +272,23 @@ SPEC-010 must not introduce a technology-specific canonical `representation_kind
 
 ## SPEC-011 Deferred Knowledge-Projection Evaluation
 
-Beyond the retrieval projections SPEC-011 must deliver (relational, lexical, vector, graph), it evaluates an optional **human-readable Knowledge projection** only where the Knowledge corpus demonstrates a need for a legible, navigable, portable rendering.
+Beyond the retrieval projections SPEC-011 must deliver (relational, lexical, vector, graph), it evaluates an optional **human-readable Knowledge projection** only where the Knowledge corpus demonstrates a need for a legible, navigable, portable rendering. This registration fixes the evaluation set, the benefit dimensions and the adoption gate; concrete metrics, thresholds, corpus and procedure are fixed inside SPEC-011 when it is authored (its status and prerequisites are tracked in the registry above).
 
-The Open Knowledge Format (OKF) is the candidate encoding, not a preselected dependency. Adoption requires measurable benefit — human legibility, cheaper context assembly or portability — over the graph and retrieval projections, sufficient to justify its runtime, packaging and maintenance cost.
+The evaluation set must include:
+
+```text
+Baseline A
+canonical Knowledge + graph/retrieval projections → context body and graph view
+
+Candidate B
+canonical Knowledge → OKF projection (read-only, rebuilt on change) → human view and context body
+```
+
+The Open Knowledge Format (OKF) is the candidate encoding, not a preselected dependency. Adoption requires measurable benefit of Candidate B over Baseline A along at least one dimension, sufficient to justify the runtime, packaging and maintenance cost of a second Knowledge rendering:
+
+- **Legibility** — a person reaches the owning Knowledge and its evidence faster or more reliably than through the graph and retrieval baseline.
+- **Context cost** — assembling a task context from the projection is cheaper or lower-latency than re-deriving it from canonical Knowledge and retrieval each time, at equal answer quality.
+- **Portability** — the bundle is usable, inspectable and version-controllable in ordinary external Markdown tooling without the application.
 
 The projection is rebuildable and non-authoritative: it is generated from committed Knowledge and never edited back into it. SPEC-011 must not introduce a technology-specific canonical `representation_kind`; a retained bundle is described semantically and records its concrete format, format version, generator and generator version separately. Bidirectional editing is out of scope and requires a new ADR. See ADR-0012.
 

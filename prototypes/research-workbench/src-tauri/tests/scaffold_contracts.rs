@@ -75,18 +75,18 @@ fn required_nullable_fields_cannot_be_omitted() {
 fn closed_registry_matches_normative_contract_and_permissions() {
     let source = include_str!("../../docs/architecture/CONTRACTS.md");
     let section = source
-        .split("## Registro de comandos Tauri")
+        .split("## Tauri command registry")
         .nth(1)
         .unwrap()
         .split("\n##")
         .next()
         .unwrap();
-    let mut expected: Vec<&str> = section
+    let inventory = section.split("Unimplemented commands").next().unwrap();
+    let mut expected: Vec<&str> = inventory
         .split('`')
         .enumerate()
         .filter(|(i, _)| i % 2 == 1)
         .map(|(_, s)| s)
-        .filter(|s| s.contains('_'))
         .collect();
     expected.sort();
     let mut actual = research_workbench_core::transport::commands::COMMANDS.to_vec();

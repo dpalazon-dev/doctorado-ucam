@@ -63,7 +63,7 @@ export function useLibrary(api: LibraryApi) {
       .catch(() => {
         if (current)
           setError(
-            "No se pudo cargar la biblioteca. Puedes volver a intentarlo.",
+            "Could not load the library. You can try again.",
           );
       })
       .finally(() => {

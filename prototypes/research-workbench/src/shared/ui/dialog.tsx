@@ -18,7 +18,7 @@ export function DialogContent({
       <DialogPrimitive.Content className="dialog-content" {...props}>
         {children}
         {showClose && (
-          <DialogPrimitive.Close aria-label="Cerrar" className="dialog-close">
+          <DialogPrimitive.Close aria-label="Close" className="dialog-close">
             ×
           </DialogPrimitive.Close>
         )}

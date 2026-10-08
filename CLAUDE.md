@@ -96,7 +96,7 @@ The installed application must not require the user to administer PostgreSQL, Do
 - Architecture and process documents remain at the repository root.
 - Development Specs are registered in `SPEC_CATALOG.md` and will live under `specs/` in the category assigned by the catalog.
 - Source topology is introduced by `SPEC-001`; do not invent an alternative tree beforehand.
-- Documents are written in English. Maintainer conversation and `README.md` are in Spanish.
+- Repository prose, README files, source comments, help text and interface copy are written in English. Maintainer conversation follows the human user's language. Preserve technical identifiers and exact immutable serialized historical data.
 - Every Markdown document must keep an accurate Document Contract.
 - Vertical documents reference use-case IDs instead of copying use-case prose.
 - Significant architecture changes require an ADR and downstream reconciliation.

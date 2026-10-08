@@ -1,159 +1,159 @@
-# Tutorial y configuración científica del Research Workbench
+# Research Workbench Tutorial and Scientific Configuration
 
-Fecha: 7 de octubre de 2026. Estado: **propuesta de diseño e investigación. No implementada y no sustituye todavía los contratos vigentes**. Petición humana: tutorial útil ejecutable desde un botón. Configurar revista, temática/dominio, símbolos de notas y ontología de relaciones y sus significados. La autorización general de desarrollo continúa. Esta ampliación necesita cerrar contratos antes de activar sus implementadores.
+Date: October 7, 2026. Status: **design and research proposal. Not implemented and not yet a replacement for the current contracts.** Human request: a useful tutorial accessible from a button, plus configuration for publication venues, subject areas/domains, note symbols, and relationship ontology and meanings. General development authorization remains in effect. This extension requires contracts to be closed before its implementers are activated.
 
-## 1. Objetivo y supuestos
+## 1. Objective and assumptions
 
-La aplicación debe enseñar el trabajo real de investigación y permitir adaptar el vocabulario personal sin alterar el significado de datos antiguos. Conserva Windows local/offline, un usuario, SQLite canónico, trazabilidad y ausencia de LLM. El tutorial no evalúa competencia científica ni certifica veracidad.
+The application should teach the actual research workflow and allow users to adapt their personal vocabulary without changing the meaning of older data. Retain local/offline Windows operation, one user, canonical SQLite, traceability, and no LLM. The tutorial does not assess scientific competence or certify truth.
 
-Supuesto explícito ante «tipo de revista»: cubrir **revista/medio de publicación y tipo de artículo/revisión como campos distintos**. Se preguntó por esta ambigüedad. No se recibió respuesta en el contexto recuperado. Ambos campos son útiles independientemente y no deben mezclarse. La propuesta es corregible sin cambiar datos existentes.
+Explicit assumption about “journal type”: cover **publication venue and article/review type as distinct fields**. This ambiguity was raised as a question. No answer was present in the recovered context. Both fields are independently useful and must not be conflated. The proposal can be corrected without changing existing data.
 
-Estado comprobado: producto5d35f03, esquema2. Onboarding de bienvenida, Library/Reader y PRE/P1. No existen tutorial repetible, preferencias semánticas configurables ni implementación Knowledge/ontología0003. DOMAIN define doce tipos y trece relaciones cerradas, y excluye editor genérico de ontologías. La petición nueva amplía ese alcance. No basta añadir colores en Settings. Preflight archivado junto a este diseño.
+Verified state: product `5d35f03`, schema 2. Welcome onboarding, Library/Reader, and PRE/P1 exist. There is no repeatable tutorial, configurable semantic preference, or Knowledge/ontology implementation for 0003. DOMAIN defines twelve types and thirteen closed relationships and excludes a generic ontology editor. The new request expands that scope. Adding colors in Settings is not sufficient. The preflight is archived alongside this design.
 
-## 2. Interpretación científica y fuentes
+## 2. Scientific interpretation and sources
 
-Estas fuentes justifican distinciones, no una validación científica de nuestra interfaz ni un vocabulario universal de símbolos.
+These sources support distinctions. They do not scientifically validate our interface or establish a universal symbol vocabulary.
 
-| Fuente primaria consultada | Aportación | Límite de uso aquí |
+| Primary source consulted | Contribution | Limit on its use here |
 |---|---|---|
-| [W3C Web Annotation](https://www.w3.org/TR/annotation-model/) - principios y motivaciones | Separa cuerpo, objeto anotado e intención: destacar, comentar, clasificar o evaluar. | Inspiración para separar marca y contenido. No se afirma conformidad con JSON-LD por usar estos conceptos. |
-| [W3C SKOS](https://www.w3.org/TR/skos-reference/) - etiquetas, notaciones, notas y relaciones | Distingue identidad conceptual, etiqueta, definición y relaciones. `related` es simétrica. | Un icono UI no equivale automáticamente a skos:notation. `part_of` tampoco equivale sin más a `broader`. No importar inferencias ajenas. |
-| [CiTO](https://sparontologies.github.io/cito/current/cito.html) - citesAsEvidence, citesAsPotentialSolution, citesAsRecommendedReading | Permite distinguir la función de una cita. | Una relación de citación expresa cómo se usa una fuente. No garantiza que el resultado citado sea verdadero. Nuestros enlaces Evidence→Claim no son automáticamente equivalentes a CiTO. |
-| [W3C PROV Overview](https://www.w3.org/TR/prov-overview/) | Procedencia sobre entidades, actividades y agentes facilita evaluar fiabilidad. | Registrar quién afirma algo, de dónde sale y cómo se transforma no demuestra por sí solo su validez. |
-| [Cochrane Handbook, capítulo14](https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-14) | La certeza se valora sobre un cuerpo de evidencia y un resultado. Considera sesgo, inconsistencia, indirectitud, imprecisión y sesgo de publicación. | GRADE pertenece a un contexto metodológico específico. No trasladar una puntuación automática a papers de IA/ingeniería ni equiparar nuestra confianza personal a GRADE. |
-| [PRISMA2020, artículo original](https://www.bmj.com/content/372/bmj.n71), [sitio oficial](https://www.prisma-statement.org/prisma-2020) | Guía de reporte de revisiones sistemáticas. El artículo advierte que no es una herramienta para evaluar calidad metodológica. | Completar un checklist o un workflow no convierte una revisión en correcta ni un claim en probado. El artículo se recuperó por resultado indexado. Apertura completa BMJ falló. |
-| [W3C WAI, formularios por pasos](https://www.w3.org/WAI/tutorials/forms/multi-page/) | Orientación, pasos identificables y progreso comprensible. | Se adapta al tutorial por decisión de diseño. No es un estudio que demuestre eficacia de nuestro tutorial. |
+| [W3C Web Annotation](https://www.w3.org/TR/annotation-model/) - principles and motivations | Separates body, annotated target, and intent, such as highlighting, commenting, classifying, or assessing. | Inspiration for separating a marker from content. Using these concepts does not establish JSON-LD conformance. |
+| [W3C SKOS](https://www.w3.org/TR/skos-reference/) - labels, notations, notes, and relationships | Distinguishes conceptual identity, label, definition, and relationships. `related` is symmetric. | A UI icon is not automatically equivalent to `skos:notation`. `part_of` is not automatically equivalent to `broader`. Do not import external inferences. |
+| [CiTO](https://sparontologies.github.io/cito/current/cito.html) - citesAsEvidence, citesAsPotentialSolution, citesAsRecommendedReading | Allows the role of a citation to be distinguished. | A citation relationship expresses how a source is used. It does not guarantee that the cited result is true. Our Evidence→Claim links are not automatically equivalent to CiTO. |
+| [W3C PROV Overview](https://www.w3.org/TR/prov-overview/) | Provenance about entities, activities, and agents helps assess reliability. | Recording who asserts something, where it came from, and how it was transformed does not by itself prove validity. |
+| [Cochrane Handbook, Chapter 14](https://www.cochrane.org/authors/handbooks-and-manuals/handbook/current/chapter-14) | Certainty is assessed over a body of evidence and an outcome. Consider risk of bias, inconsistency, indirectness, imprecision, and publication bias. | GRADE belongs to a specific methodological context. Do not transfer an automatic score to AI/engineering papers or equate personal confidence with GRADE. |
+| [PRISMA 2020, original article](https://www.bmj.com/content/372/bmj.n71), [official site](https://www.prisma-statement.org/prisma-2020) | Reporting guideline for systematic reviews. The article warns that it is not a tool for assessing methodological quality. | Completing a checklist or workflow does not make a review correct or prove a claim. The article was retrieved through an indexed result. Full access to BMJ failed. |
+| [W3C WAI, multi-page forms](https://www.w3.org/WAI/tutorials/forms/multi-page/) | Guidance, identifiable steps, and understandable progress. | Adapted to the tutorial as a design decision. It is not a study demonstrating the effectiveness of our tutorial. |
 
-**Decisión recomendada:** conservar ejes separados. Tipo del contenido, origen, localización/procedencia, confianza humana e importancia para el lector no se deducen entre sí.
+**Recommended decision:** keep the axes separate. Content type, origin, location/provenance, human confidence, and importance to the reader are not inferred from one another.
 
-| Marca inicial propuesta, configurable | Significado operativo | Representación recomendada |
+| Proposed configurable starter marker | Operational meaning | Recommended representation |
 |---|---|---|
-| `!` Importante | Merece atención para mi objetivo de lectura. | Marca personal independiente, compatible con cualquier tipo. No aumenta confianza. |
-| `REF` Referencia | Fuente que quiero citar, localizar o leer. | Reference y su identificador bibliográfico. No Evidence por existir DOI. |
-| `C` Afirmación | Proposición expresada por la fuente o por el investigador. | Claim, origen explícito y procedencia cuando exista. |
-| `OBS` Resultado observado/reportado | Medición o resultado con método, condiciones y límites. | Evidence, distinguiendo resultado reportado por autores de reproducción propia. |
-| `FACT` Hecho documentado | Expresión del usuario que necesita contexto y fuente. | Acceso guiado a Claim o Evidence según contenido. Nunca asigna «verdadero» o confianza suficiente automáticamente. Etiqueta visible recomendada: «Hecho reportado». |
-| `H` Hipótesis | Proposición propia pendiente de contrastar. | Claim con origin=researcher_hypothesis. No nuevo tipo incompatible. |
-| `?` Pregunta | Incertidumbre o acción de investigación. | Question. |
-| `LIM` Límite | Restricción explícita de una afirmación o método. | Limitation. |
-| `IDEA` Interpretación/síntesis | Lectura propia que conecta resultados. | Insight con origen investigador. |
+| `!` Important | Deserves attention for my reading objective. | Independent personal marker, compatible with any type. Does not increase confidence. |
+| `REF` Reference | A source I want to cite, locate, or read. | Reference and its bibliographic identifier. It is not Evidence merely because a DOI exists. |
+| `C` Claim | A proposition stated by a source or researcher. | Claim, explicit origin, and provenance when available. |
+| `OBS` Observed/reported result | A measurement or result with method, conditions, and limits. | Evidence, distinguishing author-reported results from our own reproduction. |
+| `FACT` Documented fact | A user's statement that needs context and a source. | Guided entry as Claim or Evidence depending on its content. Never automatically assigns “true” or sufficient confidence. Recommended visible label: “Reported fact.” |
+| `H` Hypothesis | An original proposition awaiting testing. | Claim with `origin=researcher_hypothesis`. No incompatible new type. |
+| `?` Question | Uncertainty or a research action. | Question. |
+| `LIM` Limitation | An explicit constraint on a claim or method. | Limitation. |
+| `IDEA` Interpretation/synthesis | An original reading that connects results. | Insight with researcher origin. |
 
-Los doce tipos core siguen disponibles. Esta tabla es una paleta inicial abreviada, no su reemplazo. Los símbolos son convenciones del producto elegidas por usabilidad, no estándares científicos universales. No basta color: siempre etiqueta textual y descripción accesible.
+The twelve core types remain available. This table is an abbreviated starter palette, not a replacement. Symbols are product conventions selected for usability, not universal scientific standards. Color alone is insufficient. Always provide a text label and accessible description.
 
-Ejemplo **ficticio**: «F1=0,94 en el conjunto X con partición temporal Y» se captura como resultado reportado con página/tabla, condiciones y límites. «El método generaliza a cualquier planta» es otra afirmación, con respaldo pendiente. `!` puede marcar ambas por relevancia. Una arista supports expresa el respaldo interpretado para un contexto. No transforma el segundo texto en un hecho establecido.
+**Fictional example:** “F1=0.94 on dataset X with temporal split Y” is captured as a reported result with page/table, conditions, and limitations. “The method generalizes to any plant” is a separate claim with support pending. `!` may mark both as relevant. A `supports` edge expresses interpreted support in a context. It does not turn the second statement into an established fact.
 
-## 3. Tutorial ejecutable
+## 3. Executable tutorial
 
-**Botón persistente `Tutorial` en el shell**, también accesible desde Ayuda. Abre un índice con duración orientativa, módulos disponibles y progreso local. Acciones Empezar, Reanudar y Reiniciar progreso. No depender del diálogo de primera apertura. Funcionamiento íntegro offline, texto en español.
+A **persistent `Tutorial` button in the shell**, also available from Help. It opens an index with an estimated duration, available modules, and local progress. Actions: Start, Resume, and Reset Progress. Do not depend on the first-run dialog. It works fully offline, with English text.
 
-Dos modos complementarios:
+Two complementary modes:
 
-1. **Guía sobre mi espacio:** explica la vista actual, muestra el siguiente paso y permite regresar al índice. No ejecuta mutaciones de negocio al pulsar Siguiente ni cambia de biblioteca. Cerrar/repetir la guía conserva borradores. Ante una acción real de guardar/archivar, sólo la acción explícita del usuario usa el flujo normal.
-2. **Práctica con ejemplo:** biblioteca de demostración claramente rotulada, PDF sintético y entidades separadas. Usa los servicios reales, no mocks que aparenten persistencia. La entrada/salida pasa por el coordinador de biblioteca. Guarda el contexto anterior y permite recuperarlo al reiniciar. Sólo se habilita cuando switch/recovery y aislamiento estén implementados y probados. No copiar ni modificar contenido personal para practicar.
+1. **Guide in my workspace:** explains the current view, shows the next step, and lets the user return to the index. Pressing Next does not perform business mutations or change libraries. Closing or repeating the guide preserves drafts. For a real save/archive action, only the user's explicit action uses the normal workflow.
+2. **Practice with an example:** a clearly labeled demonstration library, synthetic PDF, and separate entities. Use real services, not mocks that appear to persist data. Entry and exit go through the library coordinator. Save the previous context and allow it to be restored on restart. Enable this mode only after library switching/recovery and isolation have been implemented and tested. Do not copy or modify personal content for practice.
 
-Módulos de la entrega completa: (a) biblioteca y metadatos. (b) PDF/localizadores. (c) PRE/P1 y guardar frente a completar. (d) Claim/Evidence/Reference/importancia. (e) conceptos compartidos, relaciones y contexto. (f) revisión P2 y pendientes. (g) búsqueda/export/backup/restauración. (h) personalizar perfiles/símbolos/definiciones. Se puede abrir un módulo directamente.
+Modules in the complete delivery: (a) library and metadata, (b) PDF/locators, (c) PRE/P1 and save versus complete, (d) Claim/Evidence/Reference/importance, (e) shared concepts, relationships, and context, (f) P2 review and pending items, (g) search/export/backup/restore, and (h) customize profiles/symbols/definitions. A module can be opened directly.
 
-Cada lección explica objetivo, acción concreta, resultado observable, error habitual y forma de recuperarse. Ejercicio clave: crear una afirmación y una evidencia distintas, localizar la fuente y enlazarlas con contexto, distinguiendo cita y explicación propia. «Lección terminada» significa que se recorrió el ejercicio, nunca «paper validado».
+Each lesson explains an objective, a concrete action, an observable result, a common error, and how to recover. Key exercise: create distinct claim and evidence records, locate the source, and link them with context while distinguishing a quotation from an original explanation. “Lesson completed” means the exercise was completed, never “paper validated.”
 
-Especificación funcional TU-01…08:
+Functional specification TU-01…08:
 
-- TU-01: disponible por botón tras primera ejecución. Repetir no necesita reiniciar la app.
-- TU-02: Anterior/Siguiente/Salir, índice y paso actual. Teclado, foco restaurado, lector de pantalla y zoom. Ningún overlay tapa la acción que explica. Alternativa panel lateral.
-- TU-03: progreso por lessonId/tutorialVersion, independiente de phases/answers. Reiniciar tutorial sólo reinicia ese progreso.
-- TU-04: selección de lecciones por capacidades reales. Función aún ausente se describe como pendiente y no se usa para acreditar ejercicio completado.
-- TU-05: resolver objetivos mediante identificadores estables de UI, no coordenadas. Si falta objetivo, ofrecer explicación/volver sin bloquear la app.
-- TU-06: guardar/reabrir confirma datos reales. Cerrar guía preserva borradores. Ninguna escritura automática en la biblioteca personal.
-- TU-07: práctica con aislamiento y regreso recuperable. Nunca borrar una raíz arbitraria ni reutilizar la biblioteca personal.
-- TU-08: contenido y glosario empaquetados/versionados. Ejemplos usan el perfil seleccionado y las definiciones históricas correctas.
+- TU-01: available from a button after first run. Reopening it does not require restarting the app.
+- TU-02: Previous/Next/Exit, index, and current step. Keyboard support, restored focus, screen reader, and zoom. No overlay covers the action it explains. A side-panel alternative is available.
+- TU-03: progress keyed by `lessonId/tutorialVersion`, independent of `phases/answers`. Resetting the tutorial resets only that progress.
+- TU-04: select lessons according to actual capabilities. Describe a missing feature as pending and do not use it to certify a completed exercise.
+- TU-05: resolve targets by stable UI identifiers, not coordinates. If a target is missing, offer an explanation or return path without blocking the app.
+- TU-06: saving/reopening confirms real data. Closing the guide preserves drafts. No automatic writes to the personal library.
+- TU-07: practice is isolated and return is recoverable. Never delete an arbitrary root or reuse the personal library.
+- TU-08: content and glossary are packaged and versioned. Examples use the selected profile and historically correct definitions.
 
-## 4. Metadatos y perfiles configurables
+## 4. Configurable metadata and profiles
 
-Configuración ofrece secciones **Bibliografía**, **Áreas y temas**, **Símbolos**, **Tipos y relaciones**, **Tutorial**. Formularios específicos, no editor de JSON o SQL.
+Settings offers **Bibliography**, **Areas and Topics**, **Symbols**, **Types and Relationships**, and **Tutorial** sections. Use purpose-built forms, not a JSON or SQL editor.
 
-Separar:
+Keep these concepts separate:
 
-- **Venue:** revista/congreso/repositorio, nombre e identificador cuando se conozca. Editar catálogo no inventa cuartil, indexación ni calidad. Desconocidos explícitos.
-- **Tipo documental/editorial:** artículo, revisión, preprint, tesis, informe, etc. Catálogo local con IDs estables, etiquetas/definiciones y archivado. Esto no es el tipo del venue.
-- **Tipo de revisión:** survey, SLR, mapping, etc. Conservar ReviewType vigente para las reglas de PRE. Un subtipo personal debe mapear explícitamente a un tipo canónico o a other. No inferir que un artículo experimental satisface un workflow diseñado para reviews. Describir esta limitación en la UI y mantener una futura ampliación de workflow como decisión separada.
-- **Dominio y temas:** dominio principal más temas múltiples seleccionables. Definiciones y alias para evitar duplicados léxicos. Ejemplo: sistemas de agua. Temas: detección de anomalías, OT, series temporales. Tags temáticos no crean Concept científicos automáticamente.
+- **Venue:** journal, conference, or repository, with name and identifier when known. Editing the catalog does not invent quartile, indexing, or quality. Unknown values remain explicit.
+- **Document/editorial type:** article, review, preprint, thesis, report, and so on. A local catalog with stable IDs, labels/definitions, and archiving. This is not the venue type.
+- **Review type:** survey, SLR, mapping, and so on. Preserve the current ReviewType for PRE rules. A personal subtype must map explicitly to a canonical type or `other`. Do not infer that an experimental article satisfies a workflow designed for reviews. Describe this limitation in the UI and keep any future workflow expansion as a separate decision.
+- **Domain and topics:** one primary domain plus multiple selectable topics. Provide definitions and aliases to avoid lexical duplicates. Example: water systems. Topics: anomaly detection, OT, time series. Topic tags do not automatically create scientific Concepts.
 
-Un **perfil de investigación** agrupa vocabularios disponibles, símbolos, orden/favoritos y ayudas de captura. El perfil inicial es general. Un perfil IA/agua puede ajustar presentación y ejemplos. No añadir tipos Dataset/Metric/System a los doce tipos sin contrato propio.
+A **research profile** groups available vocabularies, symbols, ordering/favorites, and capture aids. The initial profile is general. An AI/water profile may adjust presentation and examples. Do not add Dataset/Metric/System types to the twelve types without their own contract.
 
-Al cambiar perfil, los registros conservan sus IDs y definiciones de origen. Los nuevos defaults afectan a futuras capturas. Renombrar etiquetas no recategoriza papers. Cambiar clasificación de un paper es una edición real con revisión/auditoría e invalidación cuando corresponde. Archivar un término lo retira de nuevas selecciones, manteniendo legibles sus usos históricos.
+When the profile changes, records retain their IDs and source definitions. New defaults affect future captures. Renaming labels does not recategorize papers. Changing a paper's classification is a real edit with revision/audit and invalidation where applicable. Archiving a term removes it from new selections while keeping historical uses readable.
 
-## 5. Ontología configurable con historia
+## 5. Configurable ontology with history
 
-| Alternativa | Ventaja | Coste/decisión |
+| Option | Benefit | Cost/decision |
 |---|---|---|
-| Sólo iconos y alias del núcleo | Cambio reducido. | Insuficiente para definir nuevas relaciones y significados solicitados. |
-| Núcleo estable + extensiones declarativas versionadas | Personalización real, validación y registros históricos interpretables. | **Recomendada**. Requiere ampliar contratos/persistencia/export y los consumidores. |
-| Editor OWL/RDF e inferencia general | Máxima expresividad. | Complejidad fuera de la necesidad actual. No recomendado para v0.1. |
+| Core icons and aliases only | Small change. | Insufficient for defining the requested new relationships and meanings. |
+| Stable core plus versioned declarative extensions | Real customization, validation, and interpretable historical records. | **Recommended.** Requires extending contracts, persistence, export, and consumers. |
+| OWL/RDF editor and general inference | Maximum expressiveness. | Complexity beyond the current need. Not recommended for v0.1. |
 
-La UI de una relación muestra nombre, definición, dirección, extremos permitidos, ejemplo válido, contraejemplo y si es simétrica. El usuario puede ordenar/ocultar/favoritar relaciones, personalizar su presentación y crear relaciones propias entre tipos core. Ejemplo: `evalúa_en` Method→Condition, con contexto obligatorio según la definición. No admitir código ejecutable ni reglas libres.
+The relationship UI shows its name, definition, direction, allowed endpoints, valid example, counterexample, and whether it is symmetric. Users can order, hide, or favorite relationships, customize their presentation, and create their own relationships between core types. Example: `evaluates_in` Method→Condition, with context required by its definition. Do not allow executable code or free-form rules.
 
-**Identidad semántica:** DefinitionRef=(namespace, code, version). Core conserva core: supports, contradicts, etc.. Una definición personal tiene identidad separada. Cada relación guardada referencia exactamente una versión. Cambio de significado, dirección o matriz crea nueva versión. Registros antiguos siguen apuntando a la anterior. El usuario puede escribir notas explicativas personales sin editar la definición canónica. Si quiere cambiar la semántica core, crea una variante propia con vínculo descriptivo al término origen, no sobrescribe core.
+**Semantic identity:** `DefinitionRef=(namespace, code, version)`. Core retains `core: supports`, `contradicts`, and so on. A personal definition has a separate identity. Each saved relationship references exactly one version. A change in meaning, direction, or matrix creates a new version. Older records continue to reference the previous version. Users may write personal explanatory notes without editing the canonical definition. To change core semantics, create a personal variant with a descriptive link to the source term. Do not overwrite core.
 
-No activar transitividad o inversión inferidas por defecto. `similar_to`, `part_of`, `causes` y `supports` no son intercambiables. Una definición permite una arista, pero no prueba su contenido. El núcleo conserva sus validaciones específicas. Las extensiones no satisfacen automáticamente requisitos de P2 ni reciben confianza por parecerse léxicamente a supports. Usan revisión humana genérica hasta aprobar un mapping explícito de política.
+Do not enable inferred transitivity or inversion by default. `similar_to`, `part_of`, `causes`, and `supports` are not interchangeable. A definition permits an edge but does not prove its content. Core retains its specific validations. Extensions do not automatically satisfy P2 requirements or receive confidence because their names resemble `supports`. They use generic human review until an explicit policy mapping is approved.
 
-Publicación local de una definición: borrador → validar → publicar versión inmutable. Preview del cambio y conteo de usos, sin reescritura masiva. Reaplicar nueva definición a relaciones existentes exige operación futura separada con preview y auditoría. No conversión silenciosa. Retirar una definición bloquea usos nuevos, no rompe los viejos.
+Local definition publication: draft → validate → publish an immutable version. Preview the change and count of uses without bulk rewriting. Applying a new definition to existing relationships requires a separate future operation with preview and audit. No silent conversion. Retiring a definition blocks new uses without breaking old ones.
 
-## 6. Arquitectura y contratos que deben cerrarse
+## 6. Architecture and contracts to close
 
-Las decisiones de alcance, identidad e intercambio/backup se concretan en §9 tras revisión independiente. Esta sección enumera responsabilidades. Siguen pendientes las firmas ejecutables, los límites y la migración SQL coordinada.
+Scope, identity, and exchange/backup decisions are made concrete in §9 after independent review. This section lists responsibilities. Executable signatures, limits, and coordinated SQL migration remain pending.
 
-Sin nuevo servidor ni harness. Dominio Rust valida vocabulario. Casos de uso transaccionales coordinan revisión optimista, receipt/auditoría y referencias. Adaptador SQLite en el actor existente. Rust sigue generando DTO TypeScript. UI sólo comandos tipados y capacidades declaradas.
+No new server or harness. The Rust domain validates vocabulary. Transactional use cases coordinate optimistic revision checks, receipt/audit, and references. The SQLite adapter runs in the existing actor. Rust continues to generate TypeScript DTOs. The UI uses only typed commands and declared capabilities.
 
-| Responsabilidad | Datos propuestos | Contratos de aplicación por concretar |
+| Responsibility | Proposed data | Application contracts to define |
 |---|---|---|
-| Tutorial | tutorialVersion, lessonId, status/lastStep. Contenido empaquetado | Consultar/reanudar/reiniciar progreso. Entrada/salida de práctica mediante biblioteca existente. |
-| Perfil/presentación | profileId/revision, preferencias. MarkerDefinition con código/etiqueta/glifo/ayuda/targetSemántico | Leer/editar perfil, validar colisiones de atajos, archivar marca. Presets no cambian confidence/origin sin selección explícita. |
-| Clasificación | términos versionados con categoría venueKind/documentKind/domain/topic. Asociaciones paper–término | CRUD acotado, búsqueda y asignación con CAS. Conservar valores legacy sin adivinar equivalencias. |
-| Definiciones de relación | DefinitionRef, definición, matriz core, simetría, contexto requerido, estado | Listar/ver, guardar borrador, validar/publicar, retirar. Crear/leer relación con referencia versionada. |
+| Tutorial | `tutorialVersion`, `lessonId`, `status/lastStep`. Packaged content | Query/resume/reset progress. Practice entry/exit through the existing library mechanism. |
+| Profile/presentation | `profileId/revision`, preferences. `MarkerDefinition` with code/label/glyph/help/semantic target | Read/edit profile, validate shortcut collisions, archive marker. Presets do not change confidence/origin without explicit selection. |
+| Classification | Versioned terms with category `venueKind/documentKind/domain/topic`. Paper-term associations | Bounded CRUD, search, and assignment with CAS. Preserve legacy values without guessing equivalence. |
+| Relationship definitions | `DefinitionRef`, definition, core matrix, symmetry, required context, status | List/view, save draft, validate/publish, retire. Create/read relationship with a versioned reference. |
 
-`!` necesita asociación de marca a item, con identidad estable. No se incrusta como prefijo de body. Un preset FACT orienta la captura, no añade un booleano de verdad. Cita y comentario permanecen campos distintos. No se añadirá un segundo almacén canónico frontend.
+`!` requires a marker-to-item association with stable identity. Do not embed it as a body prefix. A FACT preset guides capture but does not add a truth boolean. Citation and comment remain separate fields. Do not add a second canonical frontend store.
 
-Las tablas concretas y firmas ABI no se declaran cerradas en este documento. T05a aún no implementó0003: resolver el esquema ampliado antes de asignarlo. Nunca editar0001/0002 publicadas. Separar versión de esquema, ontología, tutorial y formato de export. Una ampliación de DTO exige regeneración/verificación de ambos extremos y decidir compatibilidad explícita. No asumir que cambiar contractVersion del sobre soluciona la semántica.
+Concrete tables and ABI signatures are not closed by this document. T05a has not implemented 0003. Resolve the expanded schema before assigning it. Never edit published 0001/0002 migrations. Keep schema, ontology, tutorial, and export-format versions separate. Extending a DTO requires regeneration/verification at both ends and an explicit compatibility decision. Do not assume changing the envelope's `contractVersion` resolves semantic compatibility.
 
-Export debe incluir definiciones semánticas históricas referenciadas y asociaciones nuevas. Revisar su allowlist y versión antes de añadir records. Preferencias visuales/progreso del tutorial no se mezclan con evidencia científica compartida. Backup local conserva configuración pertinente para recuperar la experiencia. Un importador que desconozca una definición no debe reinterpretarla como una core conocida: mostrar limitación explícita o rechazar atómicamente según el contrato de import aprobado. No se afirma import genérico ya disponible.
+Export must include referenced historical semantic definitions and new associations. Review the allowlist and version before adding records. Visual preferences/tutorial progress are not mixed with shared scientific evidence. Local backup retains the relevant configuration needed to restore the experience. An importer that encounters an unknown definition must not reinterpret it as a known core definition. It should show an explicit limitation or reject atomically, as specified by the approved import contract. No generic import capability is claimed.
 
-Migración de datos: preservar UUID, código/tipo core, texto y confianza. domain/venue antiguos se mantienen. Crear términos sólo con equivalencia textual explícita y sin fusionar sentidos. Verificar forward upgrade, reopen, backup/restore y downgrade en modo diagnóstico. El historial científico no depende de que el perfil visual original siga activo.
+Data migration: preserve UUID, core code/type, text, and confidence. Retain existing domain/venue values. Create terms only when textual equivalence is explicit and meanings are not merged. Verify forward upgrade, reopen, backup/restore, and downgrade in diagnostic mode. Scientific history must not depend on the original visual profile remaining active.
 
-## 7. Orden de ejecución y ADR propuesto
+## 7. Execution order and proposed ADR
 
-**ADR-024 propuesto:** configuración mediante perfiles, marcas independientes y ontología declarativa versionada. Tutorial repetible separado del workflow científico. Afecta ADR-008, DOMAIN, CONTRACTS, DATA, SPECS, QUALITY, TASK05_PORTS, TASK06_DECISIONS y T07/T08/T09. Aún no aceptar ni implementar interfaces incompatibles a partir de esta propuesta.
+**Proposed ADR-024:** configuration through profiles, independent markers, and a versioned declarative ontology. Repeatable tutorial separated from the scientific workflow. Affects ADR-008, DOMAIN, CONTRACTS, DATA, SPECS, QUALITY, TASK05_PORTS, TASK06_DECISIONS, and T07/T08/T09. Do not yet accept or implement incompatible interfaces based on this proposal.
 
-1. Conservar y cerrar T04c como hito independiente. QA4 fue interrumpida: no hay resultado agregado/exit final recuperado, ni procesos app/driver presentes en la inspección del7octubre. No se acredita PASS. Merge sigue preparado sin confirmar.
-2. Revisar esta propuesta y cerrar ADR-024 + matriz de requisitos/contratos/migración con revisión independiente. Rebasar el diseño sobre integración final antes de despachar producto.
-3. Corte configuración base y tutorial Biblioteca/Reader/PRE-P1. Autor único, perfiles/metadata/presentación y contratos probados.
-4. Replanificar T05/T06/T07 para captura/marcas/definiciones y consultas históricas. No crear una migración0003 que ignore este cambio aprobado cuando se cierre.
-5. Extender tutorial a Knowledge/P2 cuando existan capacidades. Práctica completa después de switch/recovery. T08 incorpora cierre de referencias/definiciones en export y backup. T09 prueba recorrido completo.
-6. Gate instalado final incluye tutorial offline, configuración/reinicio, cambios de perfil y lectura de registros antiguos. No sustituirlo con tests web.
+1. Preserve and close T04c as a separate milestone. QA4 was interrupted: no aggregate/final exit result was recovered, and no app/driver processes were present in the October 7 inspection. PASS is not established. The merge remains prepared but uncommitted.
+2. Review this proposal and close ADR-024 plus the requirements/contracts/migration matrix with independent review. Rebase the design on the final integration before dispatching product work.
+3. Deliver baseline configuration and the Library/Reader/PRE-P1 tutorial slice. One author, with profiles, metadata/presentation, and tested contracts.
+4. Replan T05/T06/T07 for capture, markers/definitions, and historical queries. Do not create a 0003 migration that ignores this approved change once it is closed.
+5. Extend the tutorial to Knowledge/P2 when those capabilities exist. Complete practice mode after switch/recovery. T08 incorporates provenance/definition closure into export and backup. T09 tests the complete workflow.
+6. The final installed gate includes offline tutorial, settings/restart, profile changes, and reading old records. Do not substitute web tests.
 
-Aceptación de configuración SC-01…08: guardar/reabrir perfiles. Revista/tipo/tema distintos. ! no cambia tipo/confianza. FACT no certifica. Relación inválida revierte sin receipt parcial. Publicar v2 conserva lectura v1. Retirar términos conserva enlaces. Export/restore mantiene IDs y definiciones. Tests de selección de símbolos, teclado/contraste y conflicto de atajos son funcionales, no snapshots decorativos.
+Configuration acceptance SC-01…08: save/reopen profiles, distinguish venue/type/topic, ensure `!` does not change type/confidence and FACT does not certify, ensure an invalid relationship rolls back without a partial receipt, preserve v1 reads after publishing v2, preserve links when terms are retired, and preserve IDs/definitions through export/restore. Symbol selection, keyboard/contrast, and shortcut-conflict tests must exercise behavior, not decorative snapshots.
 
-## 8. Resultado y límites de esta investigación
+## 8. Findings and limits of this research
 
-La revisión posterior cerró conceptualmente las tres decisiones principales mediante D1–D3 en §9. El diseño recomendado está definido. Su aceptación como contrato implementable exige todavía actualizar las normas y los consumidores afectados.
+The later review conceptually resolved the three main decisions through D1–D3 in §9. The recommended design is defined. Acceptance as an implementable contract still requires updating the affected standards and consumers.
 
-La recomendación combina estándares de anotación/procedencia con distinciones de evaluación de evidencia. No existe una justificación en las fuentes consultadas para declarar universal nuestra simbología ni para calcular verdad desde una etiqueta. Tutorial y configuración son requisitos nuevos registrados. Este documento no afirma que estén implementados, probados con usuarios o científicamente validados. El alcance original de aplicación instalable y su ejecución por fases se mantiene.
+The recommendation combines annotation/provenance standards with distinctions in evidence assessment. The consulted sources do not justify declaring our symbols universal or calculating truth from a label. Tutorial and configuration are newly recorded requirements. This document does not claim they are implemented, user-tested, or scientifically validated. The original scope of an installable application and phased execution remains.
 
-## 9. Resoluciones propuestas tras revisión independiente
+## 9. Proposed resolutions after independent review
 
-La revisión detectó tres decisiones necesarias antes de convertir la investigación en un brief implementable. Se concretan aquí. **son el diseño recomendado, pendiente de traslado coordinado a las normas**, no permiso para que un worker mezcle contratos viejos y nuevos.
+The review identified three decisions needed before turning the research into an implementable brief. They are specified here. **This is the recommended design, pending coordinated transfer into the standards**, not permission for a worker to combine old and new contracts.
 
-**D1 / H1 ,  alcance.** Recomiendo incluir relaciones personales declarativas en la entrega ampliada solicitada, sin relegarlas a colores. Las trece relaciones core pasan a ser el catálogo inicial obligatorio, no el máximo del catálogo de usuario. Se mantienen los doce tipos de item. La ampliación permite nuevas relaciones entre ellos, no nuevos tipos/atributos ejecutables ni razonamiento OWL. T05a no se activa hasta revisar su migración/contratos contra esta decisión. El catálogo core sigue verificándose exactamente. Otra prueba separada valida extensiones. Esta decisión responde a la nueva petición humana y exige sustituir expresamente la restricción antigua de ADR-008/DOMAIN.
+**D1 / H1, scope.** I recommend including declarative personal relationships in the requested expanded delivery, rather than relegating them to colors. The thirteen core relationships become the required initial catalog, not the maximum user catalog. Keep the twelve item types. The extension permits new relationships between them, not new types/executable attributes or OWL reasoning. Do not activate T05a until its migration/contracts are reviewed against this decision. Continue to verify the core catalog exactly. A separate test validates extensions. This decision responds to the new human request and explicitly requires replacing the former ADR-008/DOMAIN restriction.
 
-**D2 / H2 ,  identidad, lectura e intercambio.** Propuesta concreta para el ADR/ABI:
+**D2 / H2, identity, reading, and exchange.** Concrete proposal for the ADR/ABI:
 
-- Definición publicada con PK compuesta `(namespace, code, version)`, donde namespace es `core` o un UUID de vocabulario personal conservado por backup. Code es estable y version es una versión semántica explícita. Campos: etiqueta, definición, ejemplos/contraejemplos, matriz de extremos, simetría, requisito de contexto y hash backend de su contenido canónico. La versión publicada y su hash son inmutables. Estado de disponibilidad para nuevas selecciones se guarda aparte de su contenido semántico.
-- Cada Relation referencia esas tres columnas con FK compuesta. El DTO nuevo usa `typeRef:{namespace,code,version}` en lugar de un `typeCode` libre. No mantener dos campos capaces de contradecirse. Publicar v2 añade una fila de la misma familia namespace/code. No mueve la FK de relaciones anteriores. Cambiar de familia usa otro code. Retirar una versión no la elimina.
-- Lectura resuelve siempre la referencia exacta, incluso retirada. Una referencia ausente o hash inconsistente en la biblioteca es IntegrityFailure visible. No sustituir por la última versión ni por una relación del mismo nombre. Definición personal válida se renderiza mediante el mismo formulario declarativo y validación de matriz. No exige código por cada término.
-- Preparar formato de export **2.0**: Relation recordVersion2 con typeRef y nuevo recordType relationDefinition para las versiones exactas necesarias. Exportar relaciones exige incluir sus definiciones y todos sus extremos. Manifest incluye archivos/hashes y las referencias exactas exportadas, no una sola versión por namespace. Renombrar perfil no altera identidad. Esta es una propuesta de evolución de formato, no un export ya implementado.
-- Restore de backup exige todas las definiciones/FKs/hash y compatibilidad de esquema. Cualquier ausencia/corrupción rechaza antes del switch. Una definición personal con estructura soportada se admite aunque su namespace sea nuevo. Una estructura/versión de esquema no soportada se rechaza, sin descartar campos ni reinterpretar datos.
-- No incorporar import JSONL general al alcance por esta investigación. Si se implementa después, v1 sólo podrá mapear los trece códigos conocidos a core1.0.0 mediante adaptación explícita. Códigos desconocidos rechazan antes de escribir. El backup mantiene su camino independiente y conserva todas las definiciones históricas, referenciadas o no.
+- A published definition has a composite primary key `(namespace, code, version)`, where namespace is `core` or a personal-vocabulary UUID retained in backup. Code is stable and version is an explicit semantic version. Fields: label, definition, examples/counterexamples, endpoint matrix, symmetry, context requirement, and backend hash of canonical content. The published version and its hash are immutable. Store availability for new selections separately from semantic content.
+- Each Relation references those three columns through a composite FK. The new DTO uses `typeRef:{namespace,code,version}` instead of a free `typeCode`. Do not retain two fields that can contradict each other. Publishing v2 adds a row in the same namespace/code family. It does not move existing Relation FKs. Changing families uses a different code. Retiring a version does not delete it.
+- Reads always resolve the exact reference, even when retired. A missing reference or inconsistent hash in the library is a visible IntegrityFailure. Do not substitute the latest version or a relationship with the same name. A valid personal definition is rendered using the same declarative form and matrix validation. No code is required for each term.
+- Prepare export format **2.0**: Relation `recordVersion2` with `typeRef` and a new `recordType relationDefinition` for the exact required versions. Exporting relationships requires their definitions and all endpoints. The manifest includes files/hashes and the exact exported references, not just one version per namespace. Renaming a profile does not change identity. This is a proposed format evolution, not an implemented export.
+- Backup restore requires all definitions/FKs/hashes and schema compatibility. Any absence/corruption rejects before the switch. A personal definition with a supported structure is accepted even if its namespace is new. An unsupported structure/schema version is rejected without dropping fields or reinterpreting data.
+- Do not include general JSONL import in scope based on this research. If implemented later, v1 may map only the thirteen known codes to `core1.0.0` through an explicit adapter. Unknown codes are rejected before writing. Backup keeps its separate path and retains all historical definitions, whether referenced or not.
 
-**D3 / H3 ,  qué se recupera.** Los perfiles, catálogos, definiciones, marcas aplicadas y preferencias visuales del perfil pertenecen a la biblioteca y viajan en su snapshot de backup. Restore a una raíz nueva recupera exactamente ese estado, sin fusionarlo con otra biblioteca. El export científico incluye marcas aplicadas y las definiciones necesarias para interpretarlas, además de clasificaciones/relaciones. Omite favoritos, atajos, colores y progreso de aprendizaje. Deberán añadirse sus records cerrados al contrato2.0, no incrustarlos libremente en JSON.
+**D3 / H3, what is restored.** Profiles, catalogs, definitions, applied markers, and profile visual preferences belong to the library and travel in its backup snapshot. Restore to a new root recovers exactly that state without merging it with another library. Scientific export includes applied markers and the definitions required to interpret them, in addition to classifications/relationships. It omits favorites, shortcuts, colors, and learning progress. Add their closed records to contract 2.0 rather than embedding them freely in JSON.
 
-El progreso tutorial es también por biblioteca y se incluye en backup para reanudar. No viaja en export científico. Se identifica por tutorialVersion y lessonId. Al restaurar con otra versión de la app se conserva el historial, pero sólo se reanuda automáticamente una versión de lección compatible. Las incompatibles se muestran como «realizadas en una versión anterior» y ofrecen empezar la nueva. Ningún paso antiguo acredita una lección nueva automáticamente. La biblioteca de práctica tiene progreso independiente. No se mezcla con el de investigación. El regreso desde práctica usa el mecanismo recuperable de cambio de biblioteca y sus rutas locales, que no forman parte del export compartible.
+Tutorial progress is also per-library and included in backup for resumption. It is not included in scientific export. It is identified by `tutorialVersion` and `lessonId`. When restored with another app version, preserve the history, but automatically resume only a compatible lesson version. Show incompatible lessons as “completed in an earlier version” and offer to start the new one. An old step never automatically credits a new lesson. The practice library has independent progress. It is not mixed with research progress. Returning from practice uses the recoverable library-switch mechanism and its local paths, which are not part of shareable export.
 
-Quedan por redactar como contratos ejecutables las firmas exactas, límites/validaciones, records de marcas/clasificación y migración SQL. Este cierre conceptual resuelve las tres decisiones de diseño. No afirma que el documento sea todavía un brief de implementación completo.
+Exact executable signatures, limits/validation, marker/classification records, and SQL migration remain to be written as contracts. This conceptual closure resolves the three design decisions. It does not claim that this document is already a complete implementation brief.

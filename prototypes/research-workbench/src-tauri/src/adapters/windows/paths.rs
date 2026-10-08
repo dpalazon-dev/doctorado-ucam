@@ -65,7 +65,7 @@ impl LibraryRoot {
             .join("logs"))
     }
     pub fn display_label(&self) -> &'static str {
-        "Biblioteca local de Research Workbench"
+        "Local Research Workbench library"
     }
 }
 pub fn resolve_data_root() -> Result<LibraryRoot, AppError> {

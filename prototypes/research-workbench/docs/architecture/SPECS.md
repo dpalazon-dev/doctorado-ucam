@@ -1,189 +1,187 @@
-# Research Workbench — requisitos funcionales
+# Research Workbench — functional requirements
 
-Estado: especificación de la baseline de ejecución v0.2, adoptada el 1 de octubre de 2026. Define comportamiento esperado; no certifica código, instalador ni funciones implementadas. La arquitectura y firmas normativas de esta propuesta pertenecen a `ARCHITECTURE.md`, `DOMAIN.md` y `CONTRACTS.md`. Ningún control de UI puede aparentar éxito: opera una función disponible o se presenta inequívocamente como futura.
+Status: specification of execution baseline v0.2, adopted on 1 October 2026. Defines expected behavior; it does not certify implemented code, an installer or delivered features. The architecture and normative signatures belong to `ARCHITECTURE.md`, `DOMAIN.md` and `CONTRACTS.md`. No UI control may simulate success: it performs an available operation or is clearly presented as a future feature.
 
-## Alcance por versión
+## Scope by version
 
-- **Piloto 0.0.1:** producto Windows 11 x64 instalado; biblioteca local, importación/copia PDF, metadatos, lector PDF, posición, continuidad, edición y archivo/restauración de papers; migración protegida y verificada.
-- **v0.1.0:** PRE/P1/P2 completos, conocimiento global trazable, búsqueda de metadatos/conocimiento, export JSONL/Markdown, backup restaurable y cambio de biblioteca. Añade archive/restore de papers, conceptos e items. No incluye P3/P4, LLM, fusión, papelera expuesta ni borrado permanente.
-- Los escenarios Gherkin son criterios requeridos, no evidencia de implementación. Fases completadas son progreso editorial, no validación científica.
+- **Pilot 0.0.1:** installed Windows 11 x64 product; local library, PDF import/copy, metadata, PDF reader, position, continuity, editing and paper archive/restore; protected, verified migration.
+- **v0.1.0:** complete PRE/P1/P2, traceable global knowledge, metadata/knowledge search, JSONL/Markdown export, restorable backup and library switching. Adds archive/restore for papers, concepts and items. Excludes P3/P4, LLM, merging, an exposed trash bin and permanent deletion.
+- Gherkin scenarios are required criteria, not implementation evidence. Completed phases represent editorial progress, not scientific validation. English is the current presentation language, following ADR-0014 in the repository root; stable identifiers and immutable historical definitions remain unchanged.
 
-## SPEC-001 — Desktop e instalación del piloto
+## SPEC-001 — Desktop and pilot installation
 
-**REQ-001-01** Distribuir `setup.exe` NSIS x64 por usuario, con entrada en Aplicaciones instaladas, acceso Inicio, escritorio opcional, ventana propia y desinstalador. **REQ-001-02** Empaquetar UI y PDF.js/worker, incluir WebView2 offline y funcionar sin Node, Rust, Git, Codex, cwd específico, dev server o red. **REQ-001-03** Mantener biblioteca separada de binarios/código. Primer inicio muestra y confirma `%LOCALAPPDATA%\ResearchWorkbench\library`, explica la copia local de PDFs. **REQ-001-04** Una sola instancia escritora por biblioteca, cierre controlado. Actualización crea copia consistente antes de migrar; esquema futuro/downgrade incompatible se rechaza sin escritura. Desinstalar conserva datos y backups.
-
-```gherkin
-Given Windows 11 x64 sin WebView2, red ni herramientas de desarrollo
-When instalo el setup.exe offline y abro desde Inicio
-Then abre la ventana propia sin servidor de desarrollo y el instalador proporciona WebView2
-
-Given una biblioteca con cambios confirmados
-When actualizo de forma compatible, desinstalo y reinstalo
-Then migración y reinstalación conservan UUID, documentos y posición; desinstalar retira binarios pero mantiene datos
-```
-
-**Errores:** runtime/instalación sin espacio o permisos, biblioteca ocupada, esquema incompatible, fallo de backup/migración, cierre con escritura pendiente. Explicar recuperación y no afirmar guardado/actualización sin commit. **Salidas:** instalador real/checksum, guía breve y evidencia de equipo limpio/offline; separar evidencia de build, mocks y QA instalado.
-
-## SPEC-002 — Biblioteca, importación y lector
-
-**REQ-002-01** Selector nativo; copiar PDF a biblioteca, UUID/hash estables, independiente del original. **REQ-002-02** Metadatos manuales título, autores opcionales, año nullable, venue, DOI, tipo de revisión/dominio; validar sin inventar desconocidos. **REQ-002-03** Detectar duplicado por DOI normalizado/hash; ofrecer abrir existente/cancelar, sin fusionar o sobrescribir silenciosamente. **REQ-002-04** Lista, búsqueda de metadatos, filtros básicos, detalle, edición, archivo/restauración, vista vacía y archivados. **REQ-002-05** Lector interno conserva página física desde uno y zoom; reanuda paper/contexto/posición confirmados. **REQ-002-06** “Guardado” solo tras respuesta persistida; error mantiene cambios pendientes visibles.
+**REQ-001-01** Distribute a per-user x64 NSIS `setup.exe`, with an Installed Apps entry, Start shortcut, optional desktop shortcut, its own window and an uninstaller. **REQ-001-02** Package the UI and PDF.js/worker, include offline WebView2 and operate without Node, Rust, Git, Codex, a specific cwd, a development server or network. **REQ-001-03** Keep the library separate from binaries/code. First launch displays and confirms `%LOCALAPPDATA%\ResearchWorkbench\library` and explains local PDF copies. **REQ-001-04** One writer instance per library, with controlled closure. Updates create a consistent copy before migration; reject an incompatible future schema/downgrade without writing. Uninstallation preserves data and backups.
 
 ```gherkin
-Given un PDF legible y metadatos revisados
-When confirmo, muevo el original, cierro la aplicación y reabro el paper
-Then abre la copia administrada con el mismo UUID y posición confirmada
+Given Windows 11 x64 without WebView2, network or development tools
+When I install setup.exe offline and launch from Start
+Then its own window opens without a development server and the installer supplies WebView2
 
-Given un candidato con DOI normalizado o hash coincidente
-When importo el archivo
-Then puedo abrir el existente o cancelar y no se crea ni fusiona sin decisión
+Given a library with committed changes
+When I perform a compatible update, uninstall and reinstall
+Then migration and reinstallation preserve UUIDs, documents and position; uninstall removes binaries but retains data
 ```
 
-**Errores:** cancelación de selector, PDF inválido/protegido, disco lleno, DOI inválido, conflicto de revisión, documento desaparecido, render/guardado fallido. Errores recuperables, sin acceso arbitrario a paths. No prometer OCR/texto PDF buscable. **Salidas:** paper/documento registrados, recuperación de importación y estados de carga/vacío/error/pendiente/éxito en español.
+**Errors:** runtime/installation lacks space or permissions, busy library, incompatible schema, backup/migration failure, closure with a pending write. Explain recovery and do not claim saving/updating without a commit. **Outputs:** actual installer/checksum, brief guide and clean-machine/offline evidence; distinguish build, mock and installed QA evidence.
 
-## SPEC-003 — PRE/P1 versionadas y gates
+## SPEC-002 — Library, import and reader
 
-**REQ-003-01** Fijar PRE/P1/P2 version=1 canónica por Paper; nuevas plantillas no reescriben historia. **REQ-003-02** Respuesta pendiente/respondida/desconocida/no aplicable según matrices JSON; UNKNOWN/NA explicado sin prosa redundante, decisión estructurada P1 ANSWERED y draft PENDING/null. **REQ-003-03 PRE** seis salidas visibles: `purpose`, `uncertainty_target`, `baseline`, `expected_outcome`, `desired_depth`, `review_type`; la sexta confirma el tipo canónico, no edita bibliografía; además título y PDF vigente disponible. Unknown default no equivale a confirmación explicada. **REQ-003-04 P1** `scope`, `out_of_scope`, `review_type`, `literature_cutoff`, `core_message`, `relevance_decision`; review_type textual caracteriza fuente/metodología; continue aceptado habilita P2. **REQ-003-05** Reevalúa bajo advance sin confiar en UI; forward exige prerequisito COMPLETED+snapshot aceptado+gate vigente, touch no acepta implícitamente. **REQ-003-06** Edición efectiva preserva historial y exige reconfirmación de fase COMPLETED/posteriores iniciadas aunque su gate de contenido aún pase. Detalle cerrado en [WORKFLOW_GATES.md](WORKFLOW_GATES.md), ADR-017.
+**REQ-002-01** Native picker; copy the PDF into the library with stable UUID/hash, independent of the original. **REQ-002-02** Manual metadata: title, optional authors, nullable year, venue, DOI, review type/domain; validate without inventing unknown values. **REQ-002-03** Detect duplicates by normalized DOI/hash; offer open existing/cancel without silently merging or overwriting. **REQ-002-04** List, metadata search, basic filters, detail, editing, archive/restore, empty and archived views. **REQ-002-05** Internal reader preserves the physical page numbered from one and zoom; resumes the committed paper/context/position. **REQ-002-06** Display “Saved” only after a persisted response; errors keep pending edits visible.
 
 ```gherkin
-Given PRE aceptada y vigente y un campo textual P1 desconocido con motivo
-When confirmo P1 con advancePhase y decisión continue
-Then cuenta como procesado y P2 queda habilitada
+Given a readable PDF and reviewed metadata
+When I confirm, move the original, close the app and reopen the paper
+Then the managed copy opens with the same UUID and committed position
 
-Given PRE tiene una salida pendiente y la UI intenta avanzar con estado obsoleto
-When el servicio procesa advancePhase
-Then rechaza la transición, devuelve pendientes y conserva fase activa
-
-Given P2 guardada y una edición P1 invalida su requisito
-When se confirma la edición
-Then P2 conserva sus datos pero queda marcada para revisión
+Given a candidate with a matching normalized DOI or hash
+When I import the file
+Then I can open the existing paper or cancel; nothing is created or merged without a decision
 ```
 
-La invalidación conserva datos, accepted snapshot y completedAt históricos; state NEEDS_REVIEW exige reconfirmación. NOT_STARTED sin iniciar y no-op conserva revisiones. Guardar decisión P1 no archiva. Continue acepta P1/activa P2; light_read completa P1 y conserva active P1/Paper ACTIVE; archive completa P1/archiva atómicamente con active P1. Ambas terminales nextPhase=null; P2 anterior conserva NEEDS_REVIEW, no se resetea. NEW→ACTIVE sólo primer advance PRE, no import/upgrade/lector/guardar borrador. goBack/touch preserva contenido/completitud y renueva token destino sólo al cambiar contexto. PDF vivo en inputs de todas las fases, proof/handle fuera TX y referencia DB revalidada dentro, sin hash masivo en DbActor. Casos exactos R1/R2 en WORKFLOW_GATES.
+**Errors:** picker cancellation, invalid/protected PDF, full disk, invalid DOI, revision conflict, missing document, rendering/saving failure. Recoverable errors, without arbitrary path access. Promise neither OCR nor searchable PDF text. **Outputs:** registered paper/document, import recovery and loading/empty/error/pending/success states in English.
 
-**Errores:** definición/version no disponible, gate incompleto, valor inválido, revisión obsoleta o fallo de persistencia. Diferenciar estados en UI y conservar borrador ante error. **Salidas:** definición versionada, respuestas, gate reproducible, fase activa y flags de revisión; no inferir verdad científica.
+## SPEC-003 — Versioned PRE/P1 and gates
 
-Escenarios obligatorios adicionales: touch(P1) bloqueado aunque PRE IN_PROGRESS tenga gate suficiente; touch(P2)/advance(P2) bloqueados con P1 sin aceptar/NEEDS_REVIEW; consulta de fases previas iniciadas preservada; PDF inaccesible tras aceptar PRE/P1 bloquea evaluate/advance posteriores sin mutación ni receipt de éxito, available cambia hash actual y snapshot aceptado se conserva. Recuperar acceso permite reevaluar; cambio DB Document renueva CAS/invalida dentro de UoW. COMPLETED reservado y ARCHIVED desde COMPLETED se conservan en upgrade/lectura/Library archive/restore; transiciones Workflow incompatibles UnsupportedCapability sin efectos.
-
-## SPEC-004 — P2, conceptos globales, procedencia y relaciones
-
-**REQ-004-01** Formularios habilitados para Concept, Claim, Evidence, Question, Gap, Assumption, Condition, Limitation, Method, Example, Insight y Reference según contrato; futuros tipos no aparecen como controles activos. `item.body` v0.1 es `plain_text`, sin editor rich text. **REQ-004-02** Concepto UUID global con preferred name, definición, alias/dominio; permitir reutilizar existente o crear otro sentido, sin unión automática. Vista por paper y concepto consulta entidades compartidas. **REQ-004-03** Todo item especifica origin (`literature`, `researcher_interpretation`, `researcher_hypothesis`); captura literaria requiere fuente y localizador o muestra pendiente. Cita y lectura interpretativa son campos separados. **REQ-004-04** Provenance admite documento, página física, sección, cita/snippet, hash y estado stale/pending/located. **REQ-004-05** Relation tipada valida extremos y semántica, conserva contexto/procedencia; conectar P2 con preguntas PRE. **REQ-004-06** Gate P2 usa la lista versionada de outputs requeridos: `main_questions_processed`, `field_synthesis`, `relevant_concepts_reviewed`, `meaningful_relations_reviewed`, `contradictions_reviewed`, `references_classified`, `p3_candidates_or_justification`. Matrices de resolución y p2ArtifactPresent por key en WORKFLOW_GATES: respuestas enlazan entidades/relaciones persistidas, síntesis como Insight, ausencia de artefactos explicada sin cuotas; candidata usa alternativa cerrada artefactos OR ausencia justificada. Justificación cero candidatos única en PhaseAnswer estructurada, selección en paper_items y proyección comprobada; cambio real de proyección incrementa answer.revision más clock P2 en misma UoW. **REQ-004-07** Ediciones preservan historial y marcan progreso posterior para revisión si invalidan salidas obligatorias; nunca borran los datos. P2 no implica P3/P4.
+**REQ-003-01** Pin canonical PRE/P1/P2 version=1 per Paper; new templates do not rewrite history. **REQ-003-02** Pending/answered/unknown/not-applicable responses follow the JSON matrices; explain UNKNOWN/NA without redundant prose, use structured P1 decisions with ANSWERED, and draft PENDING/null. **REQ-003-03 PRE** Six visible outputs: `purpose`, `uncertainty_target`, `baseline`, `expected_outcome`, `desired_depth`, `review_type`; the sixth confirms the canonical type without editing bibliography; also require a title and an available current PDF. An unknown default is not explained confirmation. **REQ-003-04 P1** `scope`, `out_of_scope`, `review_type`, `literature_cutoff`, `core_message`, `relevance_decision`; textual review_type characterizes the source/methodology; accepted continue enables P2. **REQ-003-05** Reevaluate during advance without trusting the UI; forward requires a COMPLETED prerequisite, accepted snapshot and current gate. Touch does not implicitly accept. **REQ-003-06** An effective edit preserves history and requires reconfirmation of a COMPLETED phase and started later phases even when its content gate still passes. Details are closed in [WORKFLOW_GATES.md](WORKFLOW_GATES.md), ADR-017.
 
 ```gherkin
-Given dos papers y un concepto de sentido compartido
-When enlazo una afirmación del segundo paper al concepto
-Then se reutiliza el UUID global y la afirmación conserva fuente, localizador y origen propios
+Given accepted current PRE and an unknown P1 text field with a reason
+When I confirm P1 through advancePhase with the continue decision
+Then it counts as processed and P2 is enabled
 
-Given una captura literaria sin localizador resuelto
-When la guardo como borrador
-Then figura como procedencia pendiente, no como trazable/validada
+Given PRE has a pending output and the UI attempts to advance with stale state
+When the service processes advancePhase
+Then it rejects the transition, returns pending requirements and retains the active phase
 
-Given un gate P2 sin candidatos P3 pertinentes
-When guardo la decisión razonada de ausencia
-Then el requisito se procesa sin inventar candidatos ni un conteo mínimo
+Given saved P2 and a P1 edit invalidating its prerequisite
+When the edit is committed
+Then P2 retains its data but is marked for review
 ```
 
-**Errores:** localizador inválido/stale, documento cambiado, extremo ausente, relación no permitida, conflicto y rollback. No destruir conocimiento compartido ni presentar incompatibilidades como consenso. **Salidas:** fichas por paper/concepto, procedencia, relaciones, cola P3 persistible y gate; ningún claim de validación epistemológica.
+Invalidation preserves data, the accepted snapshot and historical completedAt; NEEDS_REVIEW requires reconfirmation. Unstarted NOT_STARTED and no-op preserve revisions. Saving a P1 decision does not archive. Continue accepts P1/activates P2; light_read completes P1 and retains active P1/Paper ACTIVE; archive completes P1/archives atomically with active P1. Both terminal decisions return nextPhase=null; prior P2 retains NEEDS_REVIEW and is not reset. NEW→ACTIVE occurs only on the first PRE advance, not import/upgrade/reader/draft save. goBack/touch preserves content/completion and renews the destination token only when context changes. A live PDF is an input to all phases: proof/handle outside the transaction and DB reference revalidated inside, without large hashing in DbActor. Exact R1/R2 cases appear in WORKFLOW_GATES.
 
-Completar P2 requiere cadena aceptada/vigente, PDF vivo y resolutores reales T06/T07; capacidad requerida ausente devuelve UnsupportedCapability, aceptación final espera T07. Confirma su gate y devuelve nextPhase=null en v0.1; no se llama a un comando P3 que impediría cerrar P2. Paper permanece ACTIVE y muestra P2 completada; COMPLETED global queda reservado al workflow completo posterior. La cola P3 usa la asociación paper/item con selección, prioridad y motivo, consultable aunque el workspace P3 esté deshabilitado. Editar efectivamente artefactos usados por P2 invalida su completitud sin perderlos.
+**Errors:** unavailable definition/version, incomplete gate, invalid value, stale revision or persistence failure. Distinguish UI states and preserve a draft on error. **Outputs:** versioned definition, answers, reproducible gate, active phase and review flags; infer no scientific truth.
 
-## SPEC-005 — Búsqueda FTS5
+Additional required scenarios: touch(P1) blocked even when IN_PROGRESS PRE has sufficient content; touch(P2)/advance(P2) blocked when P1 is unaccepted/NEEDS_REVIEW; preserve queries of started previous phases; a PDF becoming inaccessible after accepting PRE/P1 blocks later evaluate/advance without mutation or a success receipt, available changes the current hash while the accepted snapshot remains intact. Restored access permits reevaluation; a DB Document change renews CAS/invalidates inside the UoW. Reserved COMPLETED and ARCHIVED from COMPLETED survive upgrade/read/Library archive/restore; incompatible Workflow transitions return UnsupportedCapability without effects.
 
-**REQ-005-01** Indexar metadatos de paper y título/cuerpo textual de KnowledgeItem; no indexar contenido PDF/OCR. **REQ-005-02** Filtros por tipo, concepto, paper, dominio, confianza y estado según contrato; archivados fuera por defecto y consultables explícitamente. TRASHED no se expone en v0.1. **REQ-005-03** Resultados identifican tipo, contexto y origen y abren objeto/localizador. **REQ-005-04** Índice derivado reconstruible y coherente con cambios confirmados, no autoridad canónica.
+## SPEC-004 — P2, global concepts, provenance and relations
+
+**REQ-004-01** Enable forms for Concept, Claim, Evidence, Question, Gap, Assumption, Condition, Limitation, Method, Example, Insight and Reference according to the contract; future types never appear as active controls. v0.1 `item.body` is `plain_text`, without a rich-text editor. **REQ-004-02** Global Concept UUID with preferred name, definition, aliases/domain; allow reuse or creation of another sense, without automatic merging. Paper and concept views query shared entities. **REQ-004-03** Every item specifies origin (`literature`, `researcher_interpretation`, `researcher_hypothesis`); literature capture requires a source and locator or is displayed as pending. Quotation and interpreted reading are separate fields. **REQ-004-04** Provenance supports document, physical page, section, quotation/snippet, hash and stale/pending/located status. **REQ-004-05** Typed Relation validates endpoints and semantics and retains context/provenance; connect P2 with PRE questions. **REQ-004-06** The P2 gate uses the versioned required-output list: `main_questions_processed`, `field_synthesis`, `relevant_concepts_reviewed`, `meaningful_relations_reviewed`, `contradictions_reviewed`, `references_classified`, `p3_candidates_or_justification`. Resolution matrices and per-key p2ArtifactPresent belong to WORKFLOW_GATES: answers link persisted entities/relations, synthesis is an Insight, absence of artifacts is explained without quotas; the candidate output has a closed alternative of artifacts OR justified absence. The sole zero-candidate justification lives in structured PhaseAnswer; selection lives in paper_items with a checked projection. A real projection change increments answer.revision and the P2 clock in the same UoW. **REQ-004-07** Edits preserve history and mark later progress for review if required outputs become invalid; never delete data. P2 does not imply P3/P4.
 
 ```gherkin
-Given paper y conocimiento capturado en índice válido
-When busco texto con filtro paper/tipo
-Then recibo solo coincidencias aplicables y cada resultado navega al objeto correcto
+Given two papers and a concept with a shared sense
+When I link a claim from the second paper to the concept
+Then the global UUID is reused and the claim retains its own source, locator and origin
 
-Given una interrupción durante actualización de FTS
-When reconstruyo desde SQLite
-Then los resultados coinciden con la fuente y se excluyen archivados por defecto
+Given literature capture without a resolved locator
+When I save it as a draft
+Then provenance is pending, not traceable/validated
+
+Given a P2 gate without relevant P3 candidates
+When I save the reasoned absence decision
+Then the requirement is processed without invented candidates or a minimum count
 ```
 
-**Errores:** índice corrupto o rebuild fallido se distingue de cero resultados y ofrece reintento; query válida sin matches da vacío. **Salidas:** resultados filtrables, estado de índice. No se ofrece búsqueda dentro del PDF.
+**Errors:** invalid/stale locator, changed document, missing endpoint, disallowed relation, conflict and rollback. Destroy no shared knowledge and present no incompatibility as consensus. **Outputs:** paper/concept records, provenance, relations, persistable P3 queue and gate; no claim of epistemological validation.
 
-## SPEC-006 — Export JSONL/Markdown
+Completing P2 requires an accepted/current chain, live PDF and real T06/T07 resolvers; missing required capability returns UnsupportedCapability, and final acceptance waits for T07. Confirm its gate and return nextPhase=null in v0.1; do not call a P3 command that would prevent closing P2. Paper remains ACTIVE and displays completed P2; global COMPLETED is reserved for the later complete workflow. The P3 queue uses the paper/item association with selection, priority and rationale, queryable even when the P3 workspace is disabled. Effective edits to artifacts used by P2 invalidate its completion without losing them.
 
-**REQ-006-01** Export versionado incluye manifest (schema/ontology versions, timestamp UTC, counts, hashes), UUIDs, entidades, relaciones, fases/respuestas, asociaciones y procedencia. **REQ-006-02** JSONL una entidad por línea; Markdown vistas por paper/concepto. **REQ-006-03** Opción explícita de incluir PDFs; export compartible excluye paths privados/logs por defecto. **REQ-006-04** Destino validado contra traversal y sobrescritura; export no muta SQLite; editar Markdown no cambia canon.
+## SPEC-005 — FTS5 search
+
+**REQ-005-01** Index paper metadata and KnowledgeItem title/text body; do not index PDF/OCR content. **REQ-005-02** Contract-defined filters by type, concept, paper, domain, confidence and state; exclude archived records by default and allow explicit queries. Do not expose TRASHED in v0.1. **REQ-005-03** Results identify type, context and origin and open the object/locator. **REQ-005-04** The derived index is rebuildable and consistent with committed changes, never canonical authority.
 
 ```gherkin
-Given dos papers comparten concepto y hay relaciones/procedencias
-When exporto sin documentos binarios
-Then referencias UUID resuelven, manifest contiene conteos/versiones/hashes y rutas locales se omiten
+Given paper and captured knowledge in a valid index
+When I search text with paper/type filters
+Then I receive only applicable matches and each result navigates to the correct object
 
-Given título malicioso o destino no escribible
-When exporto
-Then la operación rechaza o pide destino y nunca escribe fuera ni altera SQLite
+Given interruption during an FTS update
+When I rebuild from SQLite
+Then results match the source and exclude archived records by default
 ```
 
-**Errores:** cancelar destino, espacio, serialización/hash inconsistente o conflicto. Confirmar éxito solo tras cerrar y verificar el paquete. **Salidas:** paquete documentado y resultado; Markdown round-trip no incluido.
+**Errors:** distinguish a corrupt index or failed rebuild from zero results and offer retry; a valid query without matches is empty. **Outputs:** filterable results and index state. No search inside PDFs.
 
-## SPEC-007 — Backup, restore y cambio de biblioteca
+## SPEC-006 — JSONL/Markdown export
 
-**REQ-007-01** Snapshot SQLite consistente incluyendo WAL, documentos referenciados, ontología y manifest con hashes/versiones; política v0.1: backup manual y antes de migración. No ofrecer programación automática/retención configurable sin contrato. Nunca retirar última copia verificada antes de verificar otra. **REQ-007-02** Verificar integridad, FKs y hashes; escoger una copia externa con selector nativo y poder elegir otro disco como destino. **REQ-007-03** Restaurar en ubicación nueva; abrir/verificar antes del switch y mantener activa anterior recuperable hasta confirmar. **REQ-007-04** Cambiar a biblioteca existente o preparada con escritor detenido, rutas relativas, comprobación completa y operación recuperable. Trasladar automáticamente una biblioteca existente requiere contrato posterior; en v0.1 puede obtenerse en otro destino mediante backup/restore. **REQ-007-05** UI muestra ubicación activa/resultado; no hay controles ficticios.
+**REQ-006-01** Versioned export includes a manifest (schema/ontology versions, UTC timestamp, counts, hashes), UUIDs, entities, relations, phases/answers, associations and provenance. **REQ-006-02** JSONL has one entity per line; Markdown has paper/concept views. **REQ-006-03** Explicit option to include PDFs; shareable exports exclude private paths/logs by default. **REQ-006-04** Validate destinations against traversal and overwriting; export does not mutate SQLite; editing Markdown does not change the canonical store.
 
 ```gherkin
-Given backup verificado y biblioteca activa distinta
-When restauro en una carpeta nueva
-Then valido DB/FKs/hashes, abro la restaurada y solo tras confirmación la activo; la anterior sigue recuperable
+Given two papers share a concept and there are relations/provenance records
+When I export without binary documents
+Then UUID references resolve, the manifest contains counts/versions/hashes and local paths are omitted
 
-Given la biblioteca tiene escritor activo o el destino se queda sin espacio
-When cambio su ubicación
-Then se espera el cierre o falla con explicación y ninguna ruta parcial pasa a ser activa
+Given a malicious title or unwritable destination
+When I export
+Then the operation rejects or requests a destination and never writes outside it or changes SQLite
 ```
 
-**Errores:** WAL/inconsistencia, recurso ausente, hash incorrecto, versión/permisos/espacio, destino ocupado, cancelación/interrupción. Informar cuál biblioteca sigue activa. **Salidas:** backup verificado restaurable, informe de operación y ubicación activa; crear archivo no basta para llamar backup satisfactorio.
+**Errors:** destination cancellation, space, inconsistent serialization/hash or conflict. Confirm success only after closing and verifying the package. **Outputs:** documented package and result; no Markdown round-trip.
 
-## SPEC-008 — Mantenimiento reversible y progreso
+## SPEC-007 — Backup, restore and library switching
 
-**REQ-008-01** Lifecycle editorial separado de workflow. Archive/restore de paper conserva UUID, documentos, metadatos, respuestas y conocimiento. **REQ-008-02** Archive/restore de Concept y KnowledgeItem conserva relaciones y procedencia y oculta de vistas activas; restaurar no cambia UUID. **REQ-008-03** Renombrar concepto preserva identidad/enlaces. **REQ-008-04** Editar fase previa conserva historial/datos posteriores; progreso se marca para revisión si dejó de cumplir requisitos. **REQ-008-05** Retirar paper muestra dependencias y nunca cascada silenciosa sobre concepto/item global. `TRASHED` puede existir como valor reservado/legado del modelo, pero en piloto y v0.1 no se expone, no hay operación de trash/purge y no se debe inferir borrado físico. La papelera reversible requiere ADR/contrato posterior antes de habilitarla.
-
-La especificación fuente describe fusión revisada y borrado reversible; el alcance acordado con DOMAIN/CONTRACTS deja **merge, TRASHED expuesto y borrado permanente fuera de piloto/v0.1**. No crear controles para ellos. `TRASHED` reservado en un enum no implica que la operación esté implementada; cualquier papelera posterior necesita ADR, dependencias, recuperación y contrato explícitos.
+**REQ-007-01** Consistent SQLite snapshot including WAL, referenced documents, ontology and a manifest with hashes/versions; v0.1 policy: manual backup and backup before migration. Offer no automatic schedule/configurable retention without a contract. Never remove the last verified copy before verifying another. **REQ-007-02** Verify integrity, FKs and hashes; select an external copy with the native picker and allow another disk as destination. **REQ-007-03** Restore to a new location; open/verify before switching and keep the previous active library recoverable until confirmation. **REQ-007-04** Switch to an existing/prepared library with the writer stopped, relative paths, full verification and a recoverable operation. Automatic relocation of an existing library requires a later contract; v0.1 can produce it in another destination through backup/restore. **REQ-007-05** The UI shows the active location/result; no simulated controls.
 
 ```gherkin
-Given paper archivado con posición y KnowledgeItems enlazados
-When lo restauro
-Then conserva UUID/documento/datos y vuelve a su lifecycle anterior
+Given a verified backup and a different active library
+When I restore into a new folder
+Then I validate DB/FKs/hashes, open the restored library and activate it only after confirmation; the previous library remains recoverable
 
-Given concepto archivado y relaciones existentes
-When lo restauro
-Then el mismo UUID y todas sus relaciones/procedencias vuelven a vistas activas
-
-Given una edición P1 invalida una salida obligatoria posterior
-When guardo la edición
-Then historial y datos posteriores permanecen y el progreso se señala para revisión
+Given an active library writer or a destination running out of space
+When I change its location
+Then closure is awaited or failure is explained and no partial path becomes active
 ```
 
-**Errores:** revisión obsoleta, recurso dependiente, referencia global, rollback fallido o restauración no disponible. Rechazo atómico con dependencias; nunca borrar datos compartidos. **Salidas:** lifecycle/estado de fase diferenciados, impacto visible e historial; solo acciones implementadas.
+**Errors:** WAL/inconsistency, missing resource, wrong hash, version/permissions/space, occupied destination, cancellation/interruption. Explain which library remains active. **Outputs:** verified restorable backup, operation report and active location; merely creating a file is insufficient to claim successful backup.
 
-## Trazabilidad de la propuesta
+## SPEC-008 — Reversible maintenance and progress
 
-Los ADR y contratos son referencias normativas de esta propuesta. Las pruebas listadas son previstas, no ejecutadas.
+**REQ-008-01** Editorial lifecycle is separate from workflow. Paper archive/restore preserves UUID, documents, metadata, answers and knowledge. **REQ-008-02** Concept and KnowledgeItem archive/restore preserves relations and provenance and hides them from active views; restoring does not change UUID. **REQ-008-03** Renaming a concept preserves identity/links. **REQ-008-04** Editing an earlier phase preserves history/later data; mark progress for review when requirements cease to hold. **REQ-008-05** Removing a paper displays dependencies and never silently cascades over global concepts/items. `TRASHED` may exist as a reserved/legacy model value, but is not exposed in the pilot/v0.1; no trash/purge operation exists and physical deletion must not be inferred. A reversible trash bin requires a later ADR/contract before enabling it.
 
-| SPEC | ADR a reconciliar | Contratos/operaciones semánticas | Pruebas planificadas |
+The source specification describes reviewed merging and reversible deletion; scope agreed with DOMAIN/CONTRACTS places **merging, exposed TRASHED and permanent deletion outside the pilot/v0.1**. Create no controls for them. A reserved `TRASHED` enum value does not imply implementation; any later trash bin requires explicit ADRs, dependencies, recovery and contracts.
+
+```gherkin
+Given an archived paper with position and linked KnowledgeItems
+When I restore it
+Then it retains UUID/document/data and returns to its previous lifecycle
+
+Given an archived concept and existing relations
+When I restore it
+Then the same UUID and all its relations/provenance return to active views
+
+Given a P1 edit invalidating a later required output
+When I save the edit
+Then history and later data remain and progress is flagged for review
+```
+
+**Errors:** stale revision, dependent resource, global reference, failed rollback or unavailable restoration. Atomic rejection with dependencies; never delete shared data. **Outputs:** distinct lifecycle/phase state, visible impact and history; implemented actions only.
+
+## Proposal traceability
+
+ADRs and contracts are normative references for this proposal. Listed tests are planned, not executed.
+
+| SPEC | ADR to reconcile | Semantic contracts/operations | Planned tests |
 |---|---|---|---|
 | 001 | ADR-001 local; ADR-002 Tauri; ADR-011 NSIS/offline; ADR-012 single writer/recovery | `getAppInfo`, `getLibraryInfo`, `DesktopLifecycle`, `MigrationGuard` | `desktop_clean_offline_install`, `upgrade_preserves_library`, `uninstall_retains_data`, `single_writer`, `migration_failure_recovery` |
-| 002 | ADR-002; ADR-006 documentos | `LibraryService`, `openPaper`, `ReadingPosition`, `ReaderProtocol` | `import_survives_original_move`, `duplicate_decision`, `reader_resume_after_restart`, `protocol_rejects_traversal` |
+| 002 | ADR-002; ADR-006 documents | `LibraryService`, `openPaper`, `ReadingPosition`, `ReaderProtocol` | `import_survives_original_move`, `duplicate_decision`, `reader_resume_after_restart`, `protocol_rejects_traversal` |
 | 003 | ADR-005 gates | `evaluateGate`, `advancePhase`, `PhaseDefinition`, `PhaseAnswer`, `GateResult` | `unknown_requires_explanation`, `gate_rechecked_in_domain`, `invalidated_phase_marks_later_review`, `template_version_stable` |
-| 004 | ADR-003 canon SQLite; ADR-004 conceptos; ADR-005 gates; ADR-008 ontología; ADR-010 IPC versionado | `createItem/updateItem`, `createConcept/updateConcept`, `createRelation`, `attachLocator` | `concept_shared_uuid`, `literature_locator_or_pending`, `relation_endpoints_valid`, `p2_no_arbitrary_minimum`, `plain_text_roundtrip` |
-| 005 | ADR-003 canon SQLite; ADR-009 monolito modular | `searchLibrary`, `searchKnowledge`, FTS projection | `fts_reference_match`, `fts_rebuild_matches_source`, `archived_excluded_by_default` |
+| 004 | ADR-003 SQLite authority; ADR-004 concepts; ADR-005 gates; ADR-008 ontology; ADR-010 versioned IPC | `createItem/updateItem`, `createConcept/updateConcept`, `createRelation`, `attachLocator` | `concept_shared_uuid`, `literature_locator_or_pending`, `relation_endpoints_valid`, `p2_no_arbitrary_minimum`, `plain_text_roundtrip` |
+| 005 | ADR-003 SQLite authority; ADR-009 modular monolith | `searchLibrary`, `searchKnowledge`, FTS projection | `fts_reference_match`, `fts_rebuild_matches_source`, `archived_excluded_by_default` |
 | 006 | ADR-003; ADR-006 | `exportLibrary`, `exportPaper` | `export_references_resolve`, `private_paths_omitted`, `export_hashes_verify`, `failed_export_not_success` |
 | 007 | ADR-003; ADR-006; ADR-012 | `createBackup`, `verifyBackup`, `restoreBackup`, `switchLibrary` | `backup_restore_fixture`, `wal_snapshot_consistent`, `restore_failure_keeps_active`, `move_reconciles_paths`, `retain_last_verified_backup` |
 | 008 | ADR-003; ADR-004; ADR-005; ADR-012 | `archiveConcept/restoreConcept`, archive/restore paper/item; `evaluateGate` | `archive_restore_preserves_links`, `archive_paper_no_cascade`, `phase_edit_marks_review`, `trash_not_exposed_v01` |
 
-## Definition of Ready antes de implementar
+## Definition of Ready before implementation
 
-1. `ARCHITECTURE.md`, `DOMAIN.md` y `CONTRACTS.md` concuerdan en autoridad canónica, límites, IDs, DTO, errores, versión IPC y transacciones; IDs ADR coinciden con arquitectura revisada.
-2. Cada REQ tiene dueño de servicio, persistencia/DTO, resultado observable, error y prueba; referencias cruzadas pendientes se etiquetan, nunca se inventan como contratos cerrados.
-3. Se distinguen gates del piloto 0.0.1 y v0.1.0; se acuerdan labels para fases, unknown, decisiones P1 y progreso invalidado.
-4. PRE/P1/P2 tienen campos obligatorios exactos, `PhaseDefinition` versionada, gate reproducible, política de historial y revalidación de dominio; P2 admite ausencia justificada de candidatos sin mínimos arbitrarios.
-5. Restore/switch y migraciones especifican WAL, archivos, manifest, bloqueo, retención, fallo/interrupción y recuperación. Archive/restore especifica dependencias. `TRASHED` está reservado y no expuesto; no se habilitan papelera, merge ni borrado permanente en v0.1.
-6. Límite del lector/protocolo/rutas, capacidades Tauri/CSP, sanitización, logs privados y exportación están especificados; hay pruebas traversal/documentos desconocidos.
-7. Fixtures y pruebas son pendientes identificadas. Se separan pruebas con mock, integración real, QA Windows instalado y revisión manual cuando sea necesaria.
-8. Presupuestos NFR son propuestas hasta medirse; plan de versión/migración prueba snapshot previo, checksums, downgrade y esquema futuro.
+1. `ARCHITECTURE.md`, `DOMAIN.md` and `CONTRACTS.md` agree on canonical authority, limits, IDs, DTOs, errors, IPC version and transactions; ADR IDs match the reviewed architecture.
+2. Every REQ has a service owner, persistence/DTO, observable result, error and test; pending cross-references are labeled, never invented as closed contracts.
+3. Distinguish pilot 0.0.1 and v0.1.0 gates; agree labels for phases, unknowns, P1 decisions and invalidated progress.
+4. PRE/P1/P2 have exact required fields, versioned `PhaseDefinition`, a reproducible gate, history policy and domain revalidation; P2 allows justified absence of candidates without arbitrary minimums.
+5. Restore/switch and migrations specify WAL, files, manifest, locking, retention, failure/interruption and recovery. Archive/restore specifies dependencies. `TRASHED` is reserved and unexposed; no trash bin, merging or permanent deletion is enabled in v0.1.
+6. Reader/protocol/path boundaries, Tauri/CSP capabilities, sanitization, private logs and export are specified; tests cover traversal/unknown documents.
+7. Fixtures and tests are identified pending work. Distinguish mock tests, real integration, installed Windows QA and manual review where required.
+8. NFR budgets remain proposals until measured; version/migration planning tests prior snapshots, checksums, downgrade and future schemas.
 
-Si un punto sigue abierto, se registra en el documento dueño antes de implementar su comportamiento dependiente.
+Record any open point in its owning document before implementing dependent behavior.
 
-
-
-Precisión SPEC-003 / ADR-020: savePhaseAnswer en NOT_STARTED devuelve GateBlocked sin efectos ni receipt nuevo (replay durable primero). Editar una fase ya iniciada aunque no sea la activa conserva activePhaseCode y aplica CAS/invalidation; guardar nunca inicia ni acepta fases. Cubrir ambos escenarios y el stale no-op.
+SPEC-003 / ADR-020 clarification: savePhaseAnswer in NOT_STARTED returns GateBlocked without effects or a new receipt (durable replay first). Editing a started phase even when inactive preserves activePhaseCode and applies CAS/invalidation; saving never starts or accepts phases. Cover both scenarios and stale no-op.

@@ -84,7 +84,7 @@ pub fn evaluate_outputs(
         } else if !processed && output.required {
             issues.push(GateIssueDto {
                 requirement_key: output.key.clone(),
-                message: "Completa esta salida para continuar.".into(),
+                message: "Complete this output to continue.".into(),
                 status: if answer.resolution == AnswerResolution::PENDING {
                     GateIssueDtoStatus::Pending
                 } else {
@@ -125,7 +125,7 @@ fn answer_review_type_matches(answer: &NormalizedAnswer, paper_review_type: &str
 pub fn document_gate_issue(available: bool, active: bool) -> Option<GateIssueDto> {
     (!available || !active).then(|| GateIssueDto {
         requirement_key: "paperHasActiveDocument".into(),
-        message: "El PDF activo no está disponible.".into(),
+        message: "The active PDF is unavailable.".into(),
         status: GateIssueDtoStatus::Missing,
     })
 }
@@ -133,7 +133,7 @@ pub fn document_gate_issue(available: bool, active: bool) -> Option<GateIssueDto
 pub fn accepted_pre_issue(state: &str, snapshot_is_current: bool) -> Option<GateIssueDto> {
     (!snapshot_is_current).then(|| GateIssueDto {
         requirement_key: "accepted_PRE".into(),
-        message: "La aceptación de PRE falta o ya no coincide con las entradas actuales.".into(),
+        message: "PRE acceptance is missing or no longer matches the current inputs.".into(),
         status: if state == "COMPLETED" {
             GateIssueDtoStatus::Invalid
         } else {

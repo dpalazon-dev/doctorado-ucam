@@ -113,7 +113,7 @@ async fn fts5_available_in_bundled_sqlite() {
     let root = LibraryRoot::at(d.path().join("library"));
     let actor = DbActor::start(root.clone()).unwrap();
     let id = actor.info().library_id.clone();
-    actor.submit(|c|{c.execute_batch("CREATE VIRTUAL TABLE temp.probe USING fts5(text, tokenize='unicode61 remove_diacritics 2');INSERT INTO probe VALUES('investigación');")?;assert_eq!(c.query_row("SELECT count(*) FROM probe WHERE probe MATCH 'investigacion'",[],|r|r.get::<_,i64>(0))?,1);assert_eq!(c.query_row("PRAGMA quick_check",[],|r|r.get::<_,String>(0))?,"ok");assert!(!c.prepare("PRAGMA foreign_key_check")?.exists([])?);Ok(())}).await.unwrap();
+    actor.submit(|c|{c.execute_batch("CREATE VIRTUAL TABLE temp.probe USING fts5(text, tokenize='unicode61 remove_diacritics 2');INSERT INTO probe VALUES('résumé');")?;assert_eq!(c.query_row("SELECT count(*) FROM probe WHERE probe MATCH 'resume'",[],|r|r.get::<_,i64>(0))?,1);assert_eq!(c.query_row("PRAGMA quick_check",[],|r|r.get::<_,String>(0))?,"ok");assert!(!c.prepare("PRAGMA foreign_key_check")?.exists([])?);Ok(())}).await.unwrap();
     actor.shutdown(std::time::Duration::from_secs(5)).unwrap();
     let reopened = DbActor::start(root).unwrap();
     assert_eq!(id, reopened.info().library_id);
@@ -338,8 +338,8 @@ fn startup_diagnostics_are_classified_and_safe() {
     use research_workbench_core::transport::error::AppError;
     let busy = diagnostic_message(&AppError::new(ErrorCode::Busy));
     let storage = diagnostic_message(&AppError::new(ErrorCode::StorageUnavailable));
-    assert!(busy.1.to_lowercase().contains("otra instancia"));
-    assert!(storage.1.contains("almacenamiento"));
+    assert!(busy.1.to_lowercase().contains("another instance"));
+    assert!(storage.1.contains("library storage"));
     assert_ne!(busy, storage);
     assert!(!busy.1.contains('\\'));
     assert!(!storage.1.contains("C:"));

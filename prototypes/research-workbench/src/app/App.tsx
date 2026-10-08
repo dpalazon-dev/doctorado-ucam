@@ -44,7 +44,7 @@ export function App() {
     } catch {
       if (request !== statusRequest.current) return;
       setStatusError(
-        "No se pudo comprobar el estado de recuperación de la biblioteca.",
+        "Could not check the library recovery status.",
       );
     }
   }, []);
@@ -65,7 +65,7 @@ export function App() {
             ? app.error.message
             : !lib.ok
               ? lib.error.message
-              : "No se pudo abrir la biblioteca.",
+              : "Could not open the library.",
         );
       void refreshLibraryStatus();
     }
@@ -89,15 +89,15 @@ export function App() {
   }
   const activeView =
     view.kind === "PaperWorkspace"
-      ? "Lector"
+      ? "Reader"
       : view.kind === "Library"
-        ? "Biblioteca"
+        ? "Library"
         : view.kind === "Settings"
-          ? "Configuración"
-          : "Inicio";
+          ? "Settings"
+          : "Home";
   return (
     <div className="app-shell">
-      <aside aria-label="Navegación">
+      <aside aria-label="Navigation">
         <div className="brand">
           Research
           <br />
@@ -109,47 +109,46 @@ export function App() {
             aria-current={view.kind === "Home" ? "page" : undefined}
             onClick={() => setView({ kind: "Home" })}
           >
-            Inicio
+            Home
           </button>
           <button
             type="button"
             aria-current={view.kind === "Library" ? "page" : undefined}
             onClick={() => setView({ kind: "Library" })}
           >
-            Biblioteca
+            Library
           </button>
           <button
             type="button"
             disabled
-            aria-label="Conocimiento, próximamente"
+            aria-label="Knowledge, coming soon"
           >
-            Conocimiento · próximo
+            Knowledge · coming soon
           </button>
           <button
             type="button"
             aria-current={view.kind === "Settings" ? "page" : undefined}
             onClick={showSettings}
           >
-            Configuración
+            Settings
           </button>
         </nav>
-        <small>Local · sin conexión</small>
+        <small>Local · offline</small>
       </aside>
       <main>
         <header>
-          <span>Tu espacio de investigación</span>
-          <span>{info ? "v" + info.appVersion : "Iniciando…"}</span>
+          <span>Your research workspace</span>
+          <span>{info ? "v" + info.appVersion : "Starting…"}</span>
         </header>
         {libraryStatus?.recoveryRequired && (
           <section className="recovery-notice" role="alert">
-            <h2>La biblioteca necesita recuperación</h2>
+            <h2>The library needs recovery</h2>
             <p>
-              Hay una operación de importación pendiente o que requiere
-              atención. Algunas acciones pueden estar bloqueadas hasta
-              resolverla.
+              An import operation is pending or needs attention. Some actions
+              may be blocked until it is resolved.
             </p>
             <button type="button" onClick={() => void refreshLibraryStatus()}>
-              Comprobar estado de recuperación
+              Check recovery status
             </button>
           </section>
         )}
@@ -157,19 +156,19 @@ export function App() {
           <section className="recovery-notice" role="alert">
             <p>{statusError}</p>
             <button type="button" onClick={() => void refreshLibraryStatus()}>
-              Comprobar de nuevo
+              Check again
             </button>
           </section>
         )}
         {error ? (
           <section role="alert">
-            <h1>No se pudo abrir la biblioteca</h1>
+            <h1>Could not open the library</h1>
             <p>{error}</p>
-            <p>Vuelve a abrir la aplicación para reintentar.</p>
+            <p>Reopen the app to try again.</p>
           </section>
         ) : !info || !library ? (
           <section role="status">
-            <h1>Preparando tu biblioteca…</h1>
+            <h1>Preparing your library…</h1>
           </section>
         ) : view.kind === "Library" ? (
           <LibraryPage
@@ -188,7 +187,7 @@ export function App() {
             />
           ) : (
             <section role="status">
-              <p>Preparando el lector…</p>
+              <p>Preparing the reader…</p>
             </section>
           )
         ) : view.kind === "Home" ? (
@@ -203,32 +202,32 @@ export function App() {
             <p className="eyebrow">{activeView}</p>
             <h1>
               {info.state === "readOnlyDiagnostic"
-                ? "Biblioteca en modo diagnóstico"
-                : "Configuración"}
+                ? "Library in diagnostic mode"
+                : "Settings"}
             </h1>
             <article className="card">
               <h2>{library.displayName}</h2>
               <dl>
-                <dt>Ubicación</dt>
+                <dt>Location</dt>
                 <dd>{library.rootLabel}</dd>
-                <dt>Identidad</dt>
+                <dt>Identity</dt>
                 <dd>{library.libraryId}</dd>
-                <dt>Esquema</dt>
+                <dt>Schema</dt>
                 <dd>{library.schemaVersion}</dd>
-                <dt>Estado</dt>
+                <dt>Status</dt>
                 <dd>
                   {statusError
-                    ? "No verificado"
+                    ? "Unverified"
                     : libraryStatus?.recoveryRequired
-                      ? "Recuperación necesaria"
+                      ? "Recovery required"
                       : libraryStatus?.writable
-                        ? "Disponible"
+                        ? "Available"
                         : library.writable
-                          ? "Estado de recuperación desconocido"
-                          : "Solo diagnóstico"}
+                          ? "Recovery status unknown"
+                          : "Diagnostic only"}
                 </dd>
-                <dt>Operaciones</dt>
-                <dd>{libraryStatus?.activeOperations ?? "No disponible"}</dd>
+                <dt>Operations</dt>
+                <dd>{libraryStatus?.activeOperations ?? "Unavailable"}</dd>
               </dl>
               {statusError && <p role="alert">{statusError}</p>}
             </article>
@@ -242,15 +241,15 @@ export function App() {
         }}
       >
         <DialogContent>
-          <DialogTitle>Esta es tu biblioteca local</DialogTitle>
+          <DialogTitle>This is your local library</DialogTitle>
           <DialogDescription>
-            Research Workbench guardará una copia administrada de los PDFs que
-            importes. Podrás mover el archivo original sin perder la copia. Los
-            datos viven separados de la aplicación.
+            Research Workbench will keep a managed copy of every PDF you
+            import. You can move the original file without losing the copy. Your
+            data is stored separately from the app.
           </DialogDescription>
           <p>{library?.rootLabel}</p>
           <button className="primary" onClick={() => setConfirmed(true)}>
-            Entendido
+            Got it
           </button>
         </DialogContent>
       </Dialog>

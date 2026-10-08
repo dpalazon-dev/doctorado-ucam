@@ -1,145 +1,145 @@
-# Espacio de trabajo y grafo de investigación
+# Workspace and Research Graph
 
-Fecha: 7 de octubre de 2026. Estado: diseño de ampliación solicitado por el usuario. No acredita implementación. Complementa el diseño de tutorial y configuración científica. Ambos deben trasladarse conjuntamente a los contratos antes de activar T05.
+Date: October 7, 2026. Status: extension design requested by the user. This document does not establish implementation. It complements the tutorial and scientific-configuration design. Both designs should be transferred to the contracts together before T05 is activated.
 
-## Objetivo
+## Objective
 
-Dar a Research Workbench una interfaz de escritorio inspirada en Obsidian y permitir explorar conexiones reales mediante un grafo global y un grafo centrado en un paper. El usuario puede registrar conexiones entre papers con significado tipado o como enlaces simples. Desde el grafo puede abrir un paper, consultar una conexión y continuar explorando.
+Give Research Workbench an Obsidian-inspired desktop interface and make it possible to explore real connections through a global graph and a paper-centered graph. Users can record connections between papers with a typed meaning or as simple links. From the graph, they can open a paper, inspect a connection, and continue exploring.
 
-La petición también fija el estilo editorial. Toda prosa mantenida y todo texto propio de la interfaz deben evitar la raya larga y el punto y coma. Se conservan los caracteres necesarios en sintaxis de código, URLs, datos del usuario, citas literales y archivos históricos. La aplicación nunca reescribe notas o citas del investigador para imponer este estilo.
+The request also sets the editorial style. All maintained prose and all original interface text should avoid the em dash and semicolon. Keep those characters where required in code syntax, URLs, user data, verbatim quotations, and historical files. The application never rewrites researchers' notes or quotations to impose this style.
 
-## Decisiones visuales
+## Visual decisions
 
-Se adopta un escritorio oscuro y compacto con tema claro seleccionable. La inspiración es la organización espacial y la calma visual de Obsidian. No se copian su marca, iconos propios ni código.
+Use a dark, compact workspace with a selectable light theme. Obsidian's spatial organization and visual calm are the inspiration. Do not copy its brand, custom icons, or code.
 
-| Elemento | Comportamiento previsto |
+| Element | Intended behavior |
 |---|---|
-| Barra estrecha de herramientas | Biblioteca, grafo global, búsqueda, tutorial y configuración, con nombre accesible y ayuda visible |
-| Panel izquierdo | Navegación y lista de papers, plegable y redimensionable |
-| Zona central | Pestañas de trabajo para biblioteca, paper y grafo. Abrir un nodo reutiliza la pestaña del mismo paper |
-| Paper | Secciones Lectura, Procesamiento, Conocimiento y Grafo local |
-| Panel derecho | Propiedades y conexiones de la selección, plegable. El tutorial usa este espacio sin tapar los campos |
-| Barra inferior | Biblioteca activa, estado de guardado y estado de recuperación cuando corresponda |
+| Narrow tool rail | Library, global graph, search, tutorial, and settings, with accessible names and visible help |
+| Left panel | Navigation and paper list, collapsible and resizable |
+| Central area | Work tabs for the library, a paper, and the graph. Opening a node reuses that paper's tab |
+| Paper | Reading, Processing, Knowledge, and Local Graph sections |
+| Right panel | Properties and connections for the selection, collapsible. The tutorial uses this space without covering fields |
+| Bottom bar | Active library, saved state, and recovery state where applicable |
 
-La interfaz sustituye las tarjetas de gran tamaño y el fondo verdoso actuales por superficies planas, separadores sutiles y jerarquía tipográfica. Se conserva el PDF con su presentación original, sin invertir sus colores por cambiar de tema.
+Replace the current oversized cards and green background with flat surfaces, subtle dividers, and typographic hierarchy. Preserve the PDF's original presentation. Do not invert its colors by changing its subject.
 
-Paleta inicial oscura: fondo `#17171b`, panel `#202025`, superficie activa `#292930`, borde `#383840`, texto principal `#eeeef2`, secundario `#b4b4c0` y acento `#b39aff`. Paleta clara: fondo `#faf9fc`, panel `#f0eef5`, texto `#24222b`, secundario `#5e586c` y acento `#6844ad`. Son valores iniciales sujetos a medición de contraste, no un resultado de accesibilidad ya validado.
+Initial dark palette: background `#17171b`, panel `#202025`, active surface `#292930`, edge `#383840`, primary text `#eeeef2`, secondary text `#b4b4c0`, and accent `#b39aff`. Light palette: background `#faf9fc`, panel `#f0eef5`, text `#24222b`, secondary text `#5e586c`, and accent `#6844ad`. These are initial values subject to contrast measurement, not a validated accessibility result.
 
-Usar Segoe UI, texto base de 14 px y títulos discretos. Botones compactos con áreas de interacción suficientes, foco visible, atajos descubribles y paneles que se repliegan antes de recortar el contenido. A 200 % de zoom se conserva acceso a todas las acciones. El tema, la disposición y el movimiento reducido son preferencias de presentación. No modifican datos científicos.
+Use Segoe UI, 14 px base text, and restrained headings. Buttons should be compact while retaining adequate hit areas. Provide visible focus, non-disruptive shortcuts, and panels that collapse before content is clipped. All actions must remain available at 200% zoom. Theme, layout, and reduced motion are presentation preferences. They do not modify scientific data.
 
-El tutorial permanece accesible desde un botón identificado como Tutorial en todos los espacios. La navegación por pestañas conserva los borradores de la sesión y el estado del lector. Cerrar una pestaña con cambios pendientes permite guardar, descartar explícitamente o cancelar. Volver al grafo restaura centro, filtros y selección mientras la biblioteca siga activa.
+Keep a button labeled Tutorial accessible in every workspace. Tab navigation retains session drafts and the reader's position. Closing a tab with pending changes offers Save, explicitly Discard, or Cancel. Returning to the graph restores its center, filters, and selection while the library remains active.
 
-## Qué representan las conexiones
+## What connections represent
 
-Se mantienen tres categorías con leyenda explícita.
+Maintain three categories with an explicit legend.
 
-1. **Enlace entre papers**. Registro explícito realizado por el investigador. Puede ser simple o tener una definición semántica versionada.
-2. **Relación entre elementos de conocimiento**. La Relation existente conecta KnowledgeItems según la ontología. Sigue conservando sus extremos, contexto y procedencia.
-3. **Asociación derivada**. Por ejemplo, dos papers comparten un Concept UUID. Es una consulta explicable sobre enlaces existentes. No se guarda como una afirmación nueva ni se etiqueta como cita.
+1. **Link between papers.** An explicit record created by the researcher. It may be simple or have a versioned semantic definition.
+2. **Relationship between knowledge elements.** The existing Relation connects KnowledgeItems according to the ontology. It continues to preserve its endpoints, context, and provenance.
+3. **Derived association.** For example, two papers share a Concept UUID. This is an explainable view of existing links. It is not stored as a new assertion and is not labeled as a citation.
 
-La vista Papers muestra conexiones explícitas por defecto. Una capa opcional permite ver asociaciones por conceptos compartidos. La vista Conocimiento muestra items, conceptos y relaciones tipadas. Esta separación evita que toda coincidencia produzca una maraña de enlaces o parezca una conclusión científica.
+By default, the Papers view shows explicit connections. An optional layer shows associations based on shared concepts. The Knowledge view shows items, concepts, and typed relationships. This separation prevents every coincidence from creating a tangle of links or appearing to be a scientific conclusion.
 
-Una conexión simple significa únicamente «he relacionado estos papers». No implica citación, apoyo, contradicción, causalidad o equivalencia. Un paper no se convierte en KnowledgeItem y un Reference no sustituye la identidad del paper.
+A simple link means only that I have associated these papers. It does not imply citation, support, contradiction, causation, or equivalence. A paper does not become a KnowledgeItem, and a Reference does not replace the paper's identity.
 
-## PaperLink como agregado separado
+## PaperLink as a separate addition
 
-Se propone `PaperLink` con UUID, `sourcePaperId`, `targetPaperId`, `typeRef` opcional, contexto, justificación, origen declarado, lifecycle, revision y timestamps. Los extremos son FKs a Paper de la misma biblioteca. Se conservan los patrones existentes de receipt, auditoría y CAS dentro de una transacción del actor DB.
+Propose `PaperLink` with a UUID, `sourcePaperId`, `targetPaperId`, optional `typeRef`, context, justification, declared origin, lifecycle, revision, and timestamps. The endpoints are foreign keys to Papers in the same library. Retain the existing receipt, audit, and CAS patterns within a DB-actor transaction.
 
-- Sin `typeRef`, el enlace es simétrico. El backend normaliza el par de UUID. No se inventa un tipo científico por defecto.
-- Con `typeRef`, se resuelve la definición exacta por namespace, code y version. La definición admite extremos Paper y declara dirección o simetría. No se reutiliza una matriz de KnowledgeItem como si admitiera Papers.
-- Las definiciones se amplían con un ámbito cerrado `paper_link` o `knowledge_relation`. Ese ámbito forma parte del contenido inmutable. Los catálogos personales pueden incluir ambos ámbitos, pero cada familia pertenece a uno solo.
-- No hay autoenlaces, extremos inexistentes ni conexiones entre bibliotecas. Crear o modificar exige ambos papers activos. Archivar un enlace sigue permitido aunque un extremo esté archivado. Restaurarlo exige ambos extremos activos.
-- Archivar un paper conserva sus enlaces. Se ocultan por defecto cuando algún extremo está archivado. El filtro de archivados permite consultarlos con su estado visible. Restaurar el paper vuelve a mostrar los enlaces que seguían activos, sin restaurar los archivados explícitamente.
-- Unicidad activa por extremos normalizados cuando corresponda, tipo exacto o ausencia de tipo y contexto normalizado. Contextos diferentes y tipos diferentes permiten conexiones paralelas. Una colisión en create, update o restore produce Conflict atómico.
-- El contexto usa la normalización ya fijada para relaciones. La definición del algoritmo exacto debe quedar en el contrato compartido antes del código. Se conserva el texto original presentado al investigador.
-- Cambiar tipo o dirección es una edición explícita con revision. Publicar otra versión de una definición no cambia enlaces anteriores. Un enlace tipado que pierde su definición provoca un error de integridad, nunca pasa silenciosamente a simple.
-- El contexto y la justificación describen el juicio del investigador. La procedencia opcional reutiliza localizadores existentes mediante una asociación propia. Una cita literal conserva fuente y localizador. Ausencia de localizador se presenta como pendiente, sin impedir un enlace personal simple.
-- PaperLink no satisface automáticamente un gate P2 que requiere Relation entre KnowledgeItems. Tampoco modifica la confianza de los papers o items conectados.
+- Without `typeRef`, the link is symmetric. The backend normalizes the UUID pair. No scientific type is invented by default.
+- With `typeRef`, resolve the exact definition by namespace, code, and version. The definition permits Paper endpoints and declares direction or symmetry. Do not reuse a KnowledgeItem matrix as though it permitted Papers.
+- Extend definitions with a closed scope, `paper_link` or `knowledge_relation`. Scope is part of immutable content. Personal catalogs may include both scopes, but each definition family belongs to only one.
+- No self-links, missing endpoints, or links between libraries. Creating or modifying a link requires both papers to be active. Archiving a link remains allowed even if an endpoint is archived. Restoring it requires both endpoints to be active.
+- Archiving a paper retains its links. Hide them by default when either endpoint is archived. The archived-items filter allows users to inspect them with their visible state. Restoring the paper shows links that were still active, without restoring links that were explicitly archived.
+- Enforce active uniqueness, where applicable, over normalized endpoints, the exact type or absence of a type, and normalized context. Different contexts and different types allow parallel links. A collision during create, update, or restore produces an atomic Conflict.
+- Context uses the normalization already defined for relationships. The exact algorithm must be specified in the shared contract before implementation. Retain the original text shown to the researcher.
+- Changing type or direction is an explicit revision. Publishing another version of a definition does not change existing links. If a typed link loses its definition, report an integrity error. Never silently convert it to a simple link.
+- Context and justification describe the researcher's judgment. Optional provenance reuses existing locators through its own association. A literal quotation retains its source and locator. A missing locator is shown as pending, without preventing a simple personal link.
+- PaperLink does not automatically satisfy a P2 gate that requires a Relation between KnowledgeItems. It also does not change the confidence of connected papers or items.
 
-El catálogo inicial de conexiones entre papers puede incluir `cites`, `extends` y `compares_with`, cada una con definición, dirección, ejemplos y límites revisados. Los nombres no bastan para afirmar que esas conexiones existen. No se inferirán desde el PDF ni desde títulos parecidos.
+The initial catalog of paper connections may include `cites`, `extends`, and `compares_with`, each with a definition, direction, examples, and reviewed limits. Names alone do not establish that these connections exist. Do not infer them from PDFs or similar titles.
 
-Para `cites`, el significado es «el investigador registra que el paper origen cita al destino». Es una declaración humana, no una comprobación automática. Sin localizador, formulario, inspector y lista muestran «Citación registrada. Procedencia pendiente». Con localizador muestran «Citación registrada. Fuente localizable» y permiten abrirla. Ninguno de estos estados se etiqueta como cita verificada. Si se necesitara una certificación bibliográfica, requeriría otro contrato de validación humana. La existencia de una cita tampoco valida el contenido citado. Esta distinción debe trasladarse a CONTRACTS y SPECS antes de habilitar el catálogo.
+For `cites`, the meaning is “the researcher records that the source paper cites the destination.” This is a human assertion, not an automatic check. Without a locator, the form, inspector, and list show “Citation recorded. Provenance pending.” With a locator, they show “Citation recorded. Source is locatable” and allow the user to open it. Neither state is labeled as a verified quotation. Bibliographic certification, if required, would need a separate human-validation contract. The existence of a citation also does not validate the cited content. Transfer this distinction to CONTRACTS and SPECS before enabling the catalog.
 
-## Grafo global y local
+## Global and local graph
 
-El grafo global se abre desde la navegación principal. Muestra los papers del alcance seleccionado, sus enlaces y, si se activa, las asociaciones derivadas. El grafo local centra el paper abierto y muestra sus vecinos a profundidad 1 por defecto, con profundidad seleccionable de 1 a 3. El recorrido incluye enlaces entrantes y salientes y conserva las flechas de dirección.
+Open the global graph from the main navigation. It shows papers in the selected scope, their links, and, if enabled, derived associations. The local graph centers on the open paper and shows its neighbors at depth 1 by default, with selectable depth from 1 to 3. Traversal includes incoming and outgoing links and preserves direction arrows.
 
-Pulsar un nodo lo selecciona y abre sus propiedades. Doble clic o la acción Abrir paper abre su espacio de trabajo. La acción Centrar aquí cambia el centro del grafo local. Esta separación permite explorar sin perder el grafo. Atrás recupera la selección y el centro anteriores.
+Clicking a node selects it and opens its properties. Double-clicking it or choosing Open Paper opens its workspace. The Center Here action changes the center of the local graph. This separation lets users explore without losing the graph. Back restores the previous selection and center.
 
-Pulsar una arista muestra significado, dirección, tipo y versión cuando existan, contexto, origen y procedencia disponible. Los enlaces simples se identifican como Sin tipo. Las asociaciones derivadas se representan con trazo distinto y enumeran los conceptos compartidos que las explican. No se ofrecen controles de edición sobre una arista derivada.
+Clicking an edge shows its meaning, direction, type and version when present, context, origin, and available provenance. Simple links are labeled No type. Derived associations use a different line style and list the shared concepts that explain them. Do not offer editing controls on a derived edge.
 
-Acciones: acercar, alejar, ajustar a vista, buscar un nodo visible, filtrar por título/dominio/tipo de relación, mostrar archivados, alternar aislados y elegir capas. La búsqueda del grafo filtra metadatos ya soportados. No introduce una segunda sintaxis FTS.
+Actions: zoom in, zoom out, fit to view, search visible nodes, filter by title/domain/relationship type, show archived items, toggle isolated nodes, and choose layers. Graph search filters metadata already supported by the product. Do not introduce a second FTS syntax.
 
-Crear relación desde un paper o nodo abre un formulario con selector de paper destino. El tipo es opcional y el formulario explica su significado antes de guardar. La conexión aparece solo después de confirmación del backend. Una edición en conflicto conserva el borrador y permite recargar el registro.
+Create Relationship from a paper or node opens a form with a destination-paper selector. Type is optional, and the form explains its meaning before saving. The connection appears only after backend confirmation. If an edit conflicts, retain the draft and allow the record to be reloaded.
 
-Los papers sin enlaces siguen siendo accesibles. El grafo local vacío muestra su nodo y «Este paper todavía no tiene conexiones», con acción Añadir conexión. Biblioteca vacía, consulta sin coincidencias, capacidad todavía no disponible y error de consulta tienen mensajes diferentes. Nunca se incluyen nodos de demostración en una biblioteca real.
+Papers without links remain accessible. An empty local graph shows its node and “This paper has no connections yet,” with an Add Connection action. An empty library, a query with no matches, unavailable capability, and query error have distinct messages. Never include demonstration nodes in a real library.
 
-La posición, tamaño del nodo y proximidad visual no representan calidad, verdad o relevancia científica. Tamaño uniforme por defecto. Las relaciones paralelas se agrupan visualmente con un contador y se pueden inspeccionar por separado.
+Node position, size, and visual proximity do not represent quality, truth, or scientific relevance. Use uniform size by default. Visually group parallel relationships with a count and allow them to be inspected separately.
 
-## Arquitectura y límites
+## Architecture and limits
 
-SQLite sigue siendo la única fuente canónica. No se incorpora un servidor, una base de datos de grafos ni un almacén duplicado en frontend. Graph es una proyección de lectura. PaperLinks tiene dominio, casos de uso, repositorio y comandos propios.
+SQLite remains the only canonical source. Do not add a server, graph database, or duplicate frontend store. Graph is a read projection. PaperLinks has its own domain, use cases, repository, and commands.
 
-Fronteras propuestas: `domain/paper_links`, `application/paper_links`, adaptador SQLite, comandos IPC cerrados de enlaces y consulta de grafo, DTOs Rust generados para TypeScript, `features/graph` para navegación/representación y `features/paper-links` para formularios. Los nombres ABI, permisos y tablas definitivos deben cerrarse en CONTRACTS y DATA antes de despachar código.
+Proposed boundaries: `domain/paper_links`, `application/paper_links`, a SQLite adapter, closed link IPC commands and graph query, Rust-generated DTOs for TypeScript, `features/graph` for navigation/representation, and `features/paper-links` for forms. Final ABI names, permissions, and tables must be closed in CONTRACTS and DATA before product work is dispatched.
 
-Una respuesta de grafo incluye identidades tipadas para evitar colisiones entre Paper y KnowledgeItem, extremos completos, tipo de arista, referencias a la definición exacta, indicador de asociación derivada y metadatos de recorte. Ninguna arista puede apuntar a un nodo ausente. La consulta se resuelve sobre una instantánea coherente de lectura.
+A graph response includes typed identities to avoid collisions between Paper and KnowledgeItem, complete endpoints, edge type, references to the exact definition, a derived-association indicator, and truncation metadata. No edge may point to a missing node. Resolve the query against a coherent read snapshot.
 
-Límites iniciales de producto: hasta 300 nodos y 1000 aristas por vista, profundidad máxima 3. Las consultas pasan por el actor DB existente. El backend limita la expansión durante el recorrido, no después de materializar toda la biblioteca. La elección es determinista, prioriza el nodo central y ordena los candidatos por UUID. La respuesta indica si el resultado está recortado y permite reducir filtros. Nunca se presenta el subconjunto como toda la biblioteca.
+Initial product limits: up to 300 nodes and 1000 edges per view, with a maximum depth of 3. Queries go through the existing DB actor. The backend limits expansion during traversal, not after materializing the entire library. Selection is deterministic, prioritizes the central node, and orders candidates by UUID. The response indicates whether it was truncated and lets users narrow filters. Never present a subset as the entire library.
 
-El layout se calcula fuera del hilo de interacción cuando sea costoso, se detiene al estabilizarse y puede pausarse. Cambiar de biblioteca cancela consultas y descarta respuestas antiguas. Las coordenadas son estado de presentación reconstruible. Un fallo del render ofrece la lista de conexiones con las mismas acciones.
+Calculate layout outside the interaction thread when expensive, stop when stabilized, and allow it to be paused. Changing libraries cancels queries and discards stale responses. Coordinates are reconstructible presentation state. A rendering failure offers the connection list with the same actions.
 
-Para la implementación se evaluará un componente de grafo mantenido que funcione offline y permita flechas, selección y límites de recursos. La dependencia, versión y licencia se verificarán en un spike acotado al despachar esa tarea. No se selecciona una librería por una maqueta ni se instala una ahora. La alternativa de desarrollar un motor propio añade complejidad innecesaria.
+For implementation, evaluate a maintained graph component that works offline and supports arrows, selection, and resource limits. Verify the dependency, version, and license in a bounded spike when that task is dispatched. Do not select or install a library based on a mockup. Building a custom engine would add unnecessary complexity.
 
-## Accesibilidad y rendimiento
+## Accessibility and performance
 
-Todas las acciones del grafo tienen equivalentes de teclado y una lista accesible de nodos y conexiones. Los nombres accesibles incluyen título y tipo. Dirección, selección y categorías no se comunican solo mediante color. Escape cierra el inspector emergente o cancela una interacción sin borrar datos.
+Every graph action has a keyboard equivalent and an accessible list of nodes and connections. Accessible names include title and type. Do not communicate direction, selection, or categories through color alone. Escape closes the popover inspector or cancels an interaction without deleting data.
 
-Movimiento reducido desactiva la animación continua. Paneles y menús respetan foco y orden de tabulación. Se medirá contraste AA en ambos temas y se verificará el recorrido a 200 % de zoom. La lectura PDF, PRE/P1 y sus borradores deben pasar regresión tras cambiar el shell.
+Reduced motion disables continuous animation. Panels and menus respect focus and tab order. Measure AA contrast in both themes and verify the workflow at 200% zoom. PDF reading, PRE/P1, and their drafts must pass regression after the shell changes.
 
-Presupuestos propuestos para medir en el equipo de referencia: consulta y primera vista utilizables en menos de 2 s para 300 nodos y 1000 aristas, feedback de selección en menos de 100 ms una vez estabilizado. Registrar hardware, datos y percentil 95 de 20 ejecuciones. Son criterios pendientes de prueba, no prestaciones demostradas.
+Proposed budgets to measure on the reference machine: query and first usable view in under 2 s for 300 nodes and 1000 edges, and selection feedback in under 100 ms once stabilized. Record hardware, data, and the 95th percentile across 20 runs. These are pending test criteria, not demonstrated performance.
 
-## Persistencia, exportación y migración
+## Persistence, export, and migration
 
-No editar migraciones publicadas 0001 o 0002. Antes de crear 0003 se coordina el esquema de configuración y conocimiento. PaperLinks puede usar una migración posterior independiente para evitar acoplar toda la captura al grafo.
+Do not edit published migrations 0001 or 0002. Coordinate the configuration and knowledge schema before creating 0003. PaperLinks may use a separate later migration to avoid coupling all capture workflows to the graph.
 
-Backup y restore incluyen enlaces, definiciones históricas y asociaciones de procedencia. Export añade records explícitos de PaperLink y sus definiciones en la misma revisión de formato 2.0 propuesta por configuración científica. Un export de paper incluye sus enlaces incidentes y los metadatos de sus extremos. No recorre transitivamente todos los enlaces de los papers agregados. Completa además los Documents, Papers y localizadores referenciados por la procedencia. No incluye todos los PDFs de los vecinos salvo que formen parte del cierre documental requerido y se hayan solicitado PDFs.
+Backup and restore include links, historical definitions, and provenance associations. Export adds explicit PaperLink records and their definitions in the same proposed 2.0 format review as scientific configuration. A paper export includes its incident links and endpoint metadata. Do not traverse all links transitively from added papers. Also include Documents, Papers, and locators referenced by provenance. Do not include every neighboring PDF unless it belongs to the required documentary closure and PDFs were requested.
 
-El cierre es finito por conjuntos de IDs visitados. Las definiciones exactas y ambos extremos siempre se exportan. La política de archivados del export debe quedar explícita en CONTRACTS antes de implementarlo. Restore preserva IDs y revisiones sin reinterpretar un tipo retirado. No se añade un importador genérico ni se afirman capacidades aún inexistentes.
+Closure is finite, based on sets of visited IDs. Always export exact definitions and both endpoints. Specify the export policy for archived records in CONTRACTS before implementation. Restore preserves IDs and revisions without reinterpreting a retired type. Do not add a generic importer or claim capabilities that do not exist.
 
-## ADR y entrega por fases
+## ADR and phased delivery
 
-ADR-025 propuesto: espacio de trabajo con paneles, PaperLink separado y grafo derivado. Se coordina con ADR-024 de tutorial/configuración. La petición humana modifica el alcance que excluía el grafo, pero este documento no sustituye por sí solo la ABI vigente.
+Proposed ADR-025: workspace with panels, separate PaperLink, and derived graph. Coordinate it with ADR-024 for tutorial/configuration. The human request changes the scope that excluded the graph, but this document alone does not replace the current ABI.
 
-1. Cerrar los ADRs y revisar DOMAIN, CONTRACTS, DATA, SPECS, QUALITY y briefs afectados. Retirar la exclusión del grafo acotado y mantener fuera inferencias automáticas, plugins ejecutables y edición genérica de ontología. No activar T05 con su catálogo fijo antiguo.
-2. Integrar T04c cuando complete su QA nativa pendiente. El candidato congelado no recibe cambios estéticos durante esa validación.
-3. UI-01 aplica el sistema visual y la política editorial a las pantallas reales de Biblioteca, Reader y PRE/P1. UI-02 incorpora paneles y navegación preservando borradores. Ningún botón activo simula capacidades futuras.
-4. PL-01 implementa PaperLink y su catálogo por ámbito, con pruebas de dominio/persistencia. PL-02 añade formularios, listado y navegación entre papers. Es utilizable sin motor de grafo.
-5. GR-01 implementa consultas global/local y una lista accesible. GR-02 añade render interactivo y filtros. La capa de conocimiento se incorpora cuando T05/T07 estén integradas.
-6. Extender el tutorial con creación de enlace, inspección de significado, navegación local/global y diferencia entre enlace y asociación derivada. Coordinar export/backup con T08 y validar el recorrido instalado en T09/T10.
+1. Close the ADRs and review affected DOMAIN, CONTRACTS, DATA, SPECS, QUALITY, and briefs. Remove the exclusion of the bounded graph while keeping automatic inferences, executable plugins, and generic ontology editing out of scope. Do not activate T05 with its old fixed catalog.
+2. Integrate T04c when its pending native QA is complete. Do not make aesthetic changes to the frozen candidate during this validation.
+3. UI-01 applies the visual system and editorial policy to the actual Library, Reader, and PRE/P1 screens. UI-02 adds panels and navigation while preserving drafts. No active button simulates future capabilities.
+4. PL-01 implements PaperLink and its scoped catalog, with domain/persistence tests. PL-02 adds forms, listing, and navigation between papers. It works without a graph engine.
+5. GR-01 implements global/local queries and an accessible list. GR-02 adds interactive rendering and filters. Add the knowledge layer when T05/T07 are integrated.
+6. Extend the tutorial with link creation, meaning inspection, local/global navigation, and the distinction between a link and a derived association. Coordinate export/backup with T08 and validate the installed workflow in T09/T10.
 
-Cada corte tiene un autor de producto nuevo, revisión independiente y merge verificado del orquestador. La planificación detallada debe fijar firmas y comandos sobre el código integrado antes de delegar. No hay autorización para que un worker invente contratos a partir de esta propuesta.
+Each cut has a new product author, independent review, and verified merge by the orchestrator. Detailed planning must set signatures and commands against integrated code before delegation. Workers are not authorized to invent contracts from this proposal.
 
-## Aceptación
+## Acceptance
 
-| ID | Resultado verificable |
+| ID | Verifiable result |
 |---|---|
-| ED-01 | Prosa mantenida y texto propio visible sin raya larga ni punto y coma. Código necesario, citas y datos del usuario conservados |
-| UI-01 | Tema oscuro/claro coherente, foco y contraste medidos, paneles utilizables a 200 % |
-| UI-02 | Navegar paper, grafo, paper conserva borradores y posición del lector |
-| PL-01 | Crear enlace simple A/B y consultar desde A o B devuelve el mismo registro |
-| PL-02 | Enlace dirigido conserva orientación y definición exacta después de reiniciar |
-| PL-03 | Self-link, extremo ausente y colisión fallan atómicamente. CAS y replay preservan integridad |
-| PL-04 | Archive/restore respeta extremos y lifecycle sin borrar conexiones |
-| GR-01 | Global y local muestran únicamente registros reales de la biblioteca activa |
-| GR-02 | Local respeta profundidad y límites. Toda arista tiene ambos extremos y recorte visible |
-| GR-03 | Seleccionar, abrir, centrar y volver funcionan con ratón y teclado |
-| GR-04 | Arista derivada explica su origen y nunca se edita como afirmación |
-| GR-05 | Cambio de biblioteca descarta resultados antiguos. Error de render conserva lista accesible |
-| PT-01 | Export/restore preserva enlaces, extremos, definiciones y procedencia sin cierre transitivo ilimitado |
-| TU-09 | Tutorial enseña grafo y significado de las conexiones con datos de práctica aislados |
+| ED-01 | Maintained prose and original visible text contain no em dash or semicolon. Necessary code, citations, and user data are preserved |
+| UI-01 | Coherent dark/light themes, measured focus and contrast, panels usable at 200% |
+| UI-02 | Navigating between paper and graph preserves drafts and reader position |
+| PL-01 | Creating a simple A/B link and querying it from A or B returns the same record |
+| PL-02 | A directed link retains its exact direction and definition after restart |
+| PL-03 | Self-link, missing endpoint, and collision fail atomically. CAS and replay preserve integrity |
+| PL-04 | Archive/restore respects endpoints and lifecycle without deleting links |
+| GR-01 | Global and local views show only real records from the active library |
+| GR-02 | Local view respects depth and limits. Every edge has both endpoints and truncation is visible |
+| GR-03 | Select, open, focus, and return work with mouse and keyboard |
+| GR-04 | A derived edge explains its origin and is never edited as an assertion |
+| GR-05 | Changing libraries discards stale results. Rendering errors preserve the accessible list |
+| PT-01 | Export/restore preserves links, endpoints, definitions, and provenance without unbounded transitive closure |
+| TU-09 | Tutorial teaches the graph and meaning of connections using isolated practice data |
 
-## Referencia y artefactos
+## References and artifacts
 
-La [documentación oficial del grafo de Obsidian](https://help.obsidian.md/plugins/graph), consultada el 7 de octubre de 2026, describe vistas global y local, profundidad local, filtros y navegación entre notas. Se toma como referencia de interacción. La semántica científica y los enlaces entre papers de este documento son decisiones propias de Research Workbench.
+The [official Obsidian graph documentation](https://help.obsidian.md/plugins/graph), consulted on October 7, 2026, describes global and local views, local depth, filters, and navigation between notes. It is used as an interaction reference. The scientific semantics and links between papers in this document are Research Workbench design decisions.
 
-La maqueta `OBSIDIAN_WORKSPACE_MOCKUP.svg` muestra la dirección visual con títulos sintéticos. Es una imagen estática de diseño, no una pantalla de producto ni una prueba de funcionamiento.
+The [OBSIDIAN_WORKSPACE_MOCKUP.svg](./OBSIDIAN_WORKSPACE_MOCKUP.svg) mockup shows the visual direction using synthetic titles. It is a static design image, not a product screen or an operational test.

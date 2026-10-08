@@ -32,7 +32,7 @@ const fail: IpcResult<never> = {
   ok: false,
   error: {
     code: "StorageUnavailable",
-    message: "No se pudo confirmar.",
+    message: "Could not confirm.",
     retryable: true,
   },
 };
@@ -42,7 +42,7 @@ const conflict: IpcResult<never> = {
   ok: false,
   error: {
     code: "Conflict",
-    message: "La posición cambió en otra operación.",
+    message: "The position changed in another operation.",
     retryable: false,
   },
 };
@@ -106,7 +106,7 @@ it("retries_uncertain_save_with_same_receipt_and_requires_explicit_local_resolut
   );
   await act(async () => {
     await expect(first.result.current.save(2, 1)).rejects.toThrow(
-      "No se pudo confirmar.",
+      "Could not confirm.",
     );
   });
   await act(async () => {
@@ -332,7 +332,7 @@ it("late_uncertain_result_from_unmounted_view_reaches_reopened_same_document_hoo
   await waitFor(() => expect(reopened.result.current.recovery).toBeNull());
   await act(async () => {
     finishSave(fail);
-    await expect(pending).rejects.toThrow("No se pudo confirmar.");
+    await expect(pending).rejects.toThrow("Could not confirm.");
   });
   expect(reopened.result.current.recovery).toMatchObject({
     kind: "uncertain",
@@ -395,8 +395,8 @@ it("late_save_error_for_previous_document_does_not_leak_into_reopened_view", asy
   hook.rerender({ initial: position(documentB, 0) });
   await waitFor(() => expect(hook.result.current.status).toBe("idle"));
   await act(async () => {
-    reject(new Error("error de A"));
-    await expect(pending).rejects.toThrow("error de A");
+    reject(new Error("error for A"));
+    await expect(pending).rejects.toThrow("error for A");
   });
   expect(hook.result.current.status).toBe("idle");
   expect(hook.result.current.error).toBeNull();

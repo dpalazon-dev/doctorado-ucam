@@ -3,14 +3,14 @@ use crate::transport::error::{AppError, ErrorCode};
 pub fn diagnostic_message(error: &AppError) -> (&'static str, &'static str) {
     match error.code {
         ErrorCode::Busy => (
-            "Biblioteca en uso",
-            "Otra instancia de Research Workbench ya utiliza esta biblioteca. Cierra la otra instancia y vuelve a intentarlo.",
+            "Library in use",
+            "Another instance of Research Workbench is already using this library. Close the other instance and try again.",
         ),
         ErrorCode::StorageUnavailable => (
-            "No se pudo abrir la biblioteca",
-            "No se pudo acceder al almacenamiento de la biblioteca. Comprueba el espacio y los permisos y vuelve a intentarlo.",
+            "Could not open the library",
+            "Could not access the library storage. Check available space and permissions, then try again.",
         ),
-        _ => ("No se pudo iniciar Research Workbench", error.message()),
+        _ => ("Could not start Research Workbench", error.message()),
     }
 }
 #[cfg(windows)]
@@ -48,8 +48,8 @@ fn show_message(_title: &str, message: &str) {
 pub fn show_shutdown_waiting(error: AppError) {
     if error.code == crate::transport::error::ErrorCode::Busy {
         show_message(
-            "Cierre pendiente",
-            "Hay operaciones pendientes. La aplicación conservará la biblioteca abierta hasta que terminen. No se ha completado el cierre.",
+            "Shutdown pending",
+            "Operations are still pending. The app will keep the library open until they finish. Shutdown has not completed.",
         );
     } else {
         show_error(&error);

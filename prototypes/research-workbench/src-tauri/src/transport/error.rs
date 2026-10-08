@@ -22,21 +22,19 @@ impl AppError {
     }
     pub fn message(&self) -> &'static str {
         match self.code {
-            ErrorCode::InvalidInput => "La solicitud contiene datos no válidos.",
-            ErrorCode::NotFound => "No se encontró el registro solicitado.",
-            ErrorCode::Conflict => "El registro o la solicitud ha cambiado. Revisa los datos.",
-            ErrorCode::Busy => "La biblioteca está ocupada. Inténtalo de nuevo.",
-            ErrorCode::SchemaTooNew => {
-                "La biblioteca requiere una versión más reciente de la aplicación."
-            }
-            ErrorCode::UnsupportedCapability => "Esta función todavía no está disponible.",
-            ErrorCode::PathNotAllowed => "La operación no está permitida.",
+            ErrorCode::InvalidInput => "The request contains invalid data.",
+            ErrorCode::NotFound => "The requested record was not found.",
+            ErrorCode::Conflict => "The record or request has changed. Check the details.",
+            ErrorCode::Busy => "The library is busy. Try again.",
+            ErrorCode::SchemaTooNew => "The library requires a newer version of the app.",
+            ErrorCode::UnsupportedCapability => "This feature is not available yet.",
+            ErrorCode::PathNotAllowed => "This operation is not allowed.",
             ErrorCode::MigrationFailed => {
-                "No se pudo actualizar la biblioteca. Se conserva la copia de seguridad."
+                "Could not update the library. The backup has been preserved."
             }
-            ErrorCode::BackupFailed => "No se pudo verificar la copia de seguridad.",
-            ErrorCode::IntegrityFailure => "La biblioteca necesita una revisión de integridad.",
-            _ => "No se pudo completar la operación. Revisa el estado de la biblioteca.",
+            ErrorCode::BackupFailed => "Could not verify the backup.",
+            ErrorCode::IntegrityFailure => "The library needs an integrity check.",
+            _ => "Could not complete the operation. Check the library status.",
         }
     }
     pub fn retryable(&self) -> bool {

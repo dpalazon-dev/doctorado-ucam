@@ -1,18 +1,18 @@
-# Contratos IPC de Research Workbench
+# Research Workbench IPC contracts
 
-**Estado: baseline de ejecución v0.2, adoptada el 1 de octubre de 2026.** Este documento define el contrato interno Tauri IPC para `CONTRACTS.md` del proyecto. No es una API HTTP ni pública. DTOs neutrales, serialización JSON `camelCase`, SQLite fuente canónica. Debe mantenerse consistente con `DOMAIN.md`, `DATA.md` y los SPECs.
+**Status: execution baseline v0.2, adopted on 1 October 2026.** This document defines the project's internal Tauri IPC contract. It is neither an HTTP nor a public API. Neutral DTOs, JSON `camelCase` serialization, SQLite canonical authority. It must remain consistent with `DOMAIN.md`, `DATA.md` and the SPECs.
 
-## Versión, compatibilidad y disponibilidad
+## Version, compatibility and availability
 
-- `contractVersion = 1` es la versión del sobre IPC, independiente de `schemaVersion`, `ontologyVersion` y versión de app.
-- UUID se transmite como string canónico; timestamps como UTC RFC3339; enums usan exactamente las claves de `DOMAIN.md` (mayúsculas donde se especifica). Conforme ADR-019, escritores de fechas canónicos con milisegundos y sufijo `Z`; lectores admiten también `+00:00` con validación completa y preservan el string original. Se rechazan fechas locales, otros offsets y `-00:00`; no se reescriben receipts previos.
-- **Piloto 0.0.1** implementa Library, Reader y Desktop lifecycle. **v0.1** añade Workflow, Knowledge, Concepts, Relations, Provenance, Search, Export, Backup y Settings. Esto no rebautiza el piloto como v0.1.
-- DTOs de módulos futuros pueden definirse aquí desde ahora, pero comandos no implementados no se simulan como éxito; capability registry los marca `available: false` hasta la versión que los implemente.
-- Cambios incompatibles de JSON requieren incrementar `contractVersion`; cambios aditivos tolerables conservan versión y no reutilizan un campo con semántica distinta.
+- `contractVersion = 1` is the IPC envelope version, independent of `schemaVersion`, `ontologyVersion` and the app version.
+- UUIDs are transmitted as canonical strings; timestamps as UTC RFC3339; enums use exactly the keys in `DOMAIN.md` (uppercase where specified). Under ADR-019, canonical date writers use milliseconds and the `Z` suffix; readers also accept `+00:00` with full validation and preserve the original string. Reject local dates, other offsets and `-00:00`; do not rewrite earlier receipts.
+- **Pilot 0.0.1** implements Library, Reader and Desktop lifecycle. **v0.1** adds Workflow, Knowledge, Concepts, Relations, Provenance, Search, Export, Backup and Settings. This does not relabel the pilot as v0.1.
+- DTOs for future modules may be defined here, but unimplemented commands must not simulate success; the capability registry marks them `available: false` until an implementing version.
+- Incompatible JSON changes require incrementing `contractVersion`; tolerable additive changes retain the version and never reuse a field with different semantics.
 
-## Sobre y error
+## Envelope and error
 
-Todo comando devuelve este envelope exitoso. Error Tauri también debe usar el envelope, no texto serializado ambiguo; el adaptador TypeScript normaliza errores de invoke a esta misma forma.
+Every command returns this success envelope. Tauri errors must also use the envelope, not ambiguous serialized text; the TypeScript adapter normalizes invoke errors into this same form.
 
 ```ts
 type IpcSuccess<T> = {
@@ -27,9 +27,9 @@ type IpcFailure = {
   ok: false;
   error: {
     code: IpcErrorCode;
-    message: string;          // seguro para UI, español
+    message: string;          // safe for the UI, English
     retryable: boolean;
-    details?: JsonObject;     // estructura limitada, sin rutas/contenido sensible
+    details?: JsonObject;     // bounded structure, no paths/sensitive content
   };
 };
 type IpcResult<T> = IpcSuccess<T> | IpcFailure;
@@ -41,9 +41,9 @@ type IpcErrorCode =
   | 'SchemaTooNew' | 'MigrationFailed' | 'BackupFailed' | 'ExportFailed';
 ```
 
-Cada llamada lleva `requestId` UUID generado por cliente. `confirmImport`, cancelación y todas las mutaciones persistentes reciben receipt durable; para los comandos idempotentes/destructivos se persiste `requestId` + hash de payload y resultado en una tabla descrita en DATA.md. Reintento con mismo requestId/payload devuelve resultado previo; payload distinto da `Conflict`. Lecturas no guardan receipt. Actualizaciones requieren `expectedRevision`; conflicto incluye `currentRevision`, nunca sobreescribe. En listas la paginación es cursor opaco, límite propuesto 100 (máximo 500).
+Every call carries a client-generated UUID `requestId`. `confirmImport`, cancellation and all persistent mutations receive a durable receipt; idempotent/destructive commands persist `requestId`, payload hash and result in the table described in DATA.md. Retrying the same requestId/payload returns the prior result; a different payload returns `Conflict`. Reads store no receipt. Updates require `expectedRevision`; conflicts include `currentRevision` and never overwrite. List pagination uses an opaque cursor, with a proposed limit of 100 (maximum 500).
 
-## DTOs compartidos
+## Shared DTOs
 
 ```ts
 type UUID = string;
@@ -61,10 +61,10 @@ type ReadingDecision = 'continue'|'light_read'|'archive';
 type RelevanceDecisionValue = { relevance: RelevanceRating; readingDecision: ReadingDecision };
 
 type PaperMetadataInput = {
-  title: string;                       // trim; 1..1000 caracteres (límite propuesto)
-  authors: string[];                   // orden bibliográfico; cada nombre trim/no vacío
-  year: number | null;                 // null o año de cuatro cifras
-  doi: string | null;                  // normalizado antes de unicidad
+  title: string;                       // trim; 1..1000 characters (proposed limit)
+  authors: string[];                   // bibliographic order; each name trimmed/non-empty
+  year: number | null;                 // null or a four-digit year
+  doi: string | null;                  // normalized before uniqueness checking
   venue: string | null;
   reviewType: ReviewType;
   domain: string | null;
@@ -91,11 +91,11 @@ type DuplicateCandidateDto = {
 type ImportPreviewDto = {
   importToken: UUID; originalFilename: string; sizeBytes: number;
   sha256: string; candidates: DuplicateCandidateDto[];
-  expiresAt: string;                  // token válido 24 h; recovery puede renovar
+  expiresAt: string;                  // token valid for 24 h; recovery may renew it
 };
 type DuplicateResolution = { action: 'reuseExisting'; paperId: UUID };
 type PaperFilterDto = {
-  lifecycle: 'ACTIVE'|'ARCHIVED'|'ALL'; // ACTIVE incluye NEW/ACTIVE/COMPLETED
+  lifecycle: 'ACTIVE'|'ARCHIVED'|'ALL'; // ACTIVE includes NEW/ACTIVE/COMPLETED
   query: string; yearFrom: number|null; yearTo: number|null;
   reviewTypes: ReviewType[]; domain: string|null; phase: PhaseCode|null;
   cursor: string|null; limit: number;
@@ -104,11 +104,11 @@ type PageDto<T> = { items: T[]; nextCursor: string|null; total?: number };
 type RevisionDto = { revision: number; updatedAt: string };
 ```
 
-Límites v1: title 1000 chars; answer/body 20,000; snippet/quote 10,000; relación/contexto 5,000; authors máximo 100 por paper; PDF máximo 500 MiB. Search query 1000 chars, excerpt 500 chars, 100 resultados por página por defecto, 500 máximo. Backend valida todos. Rechazar `NaN`, infinitos, paths no seleccionados y JSON desconocido/sobre límite; nunca truncar. La fixture del piloto debe incluir Unicode, nombres largos y archivos próximos al límite para comprobar manejo sin alterar estos máximos.
+v1 limits: title 1000 chars; answer/body 20,000; snippet/quote 10,000; relation/context 5,000; maximum 100 authors per paper; PDF maximum 500 MiB. Search query 1000 chars, excerpt 500 chars, default 100 results per page, maximum 500. The backend validates all limits. Reject `NaN`, infinities, unselected paths and unknown/oversized JSON; never truncate. Pilot fixtures must include Unicode, long names and files near the limit to check handling without changing these maxima.
 
-## Módulo Library
+## Library module
 
-Mantiene `LibraryApi` resumido del plan, con correcciones explícitas para duplicados y apertura/reanudación. La UI solo solicita selección de archivo vía picker nativo; no obtiene permiso de lectura arbitraria de rutas.
+Retains the plan's summarized `LibraryApi`, with explicit corrections for duplicates and opening/resuming. The UI requests file selection only through the native picker; it receives no arbitrary path-read permission.
 
 ```ts
 interface LibraryApi {
@@ -127,14 +127,14 @@ interface LibraryApi {
 }
 ```
 
-`selectPdf` devuelve `null` si el diálogo se cancela. DOI se normaliza: trim, quitar prefijo `doi:` o host `https://doi.org/`/`http://doi.org/`, lowercase y validar `10.<registrante>/<sufijo>`; no se resuelve en red. Si hay candidatos por DOI/hash, `confirmImport` exige decisión `reuseExisting` o se cancela con `cancelImport`; crear otro Paper con mismo DOI o SHA-256 no se admite en v0.1. Reutilizar devuelve Paper existente y no altera metadatos ni documento. El mismo importToken confirmado con mismo payload devuelve PaperDto previo; payload incompatible da Conflict. Token válido 24 h; recovery puede renovar token de la intención. Un DOI normalizado nunca crea Paper duplicado. La coincidencia no fusiona semánticamente conceptos.
-Cuando confirmImport devuelve DuplicateDecisionRequired, error.details.candidates contiene una lista no vacía de DuplicateCandidateDto desde la transacción que detecta el duplicado, también en la comprobación final tras promoción. IDs únicos, orden por paperId; reasons sin repeticiones en orden doi, sha256; sin rutas ni contenido PDF. El error no confirma la importación ni permite cambiar el payload de una intención ya ligada. No hay nuevo IPC/DTO ni cambio de contractVersion. La interfaz ofrece abrir el candidato mediante cancelImport confirmado y después Reader.openPaper; no modifica silenciosamente duplicateResolution ni busca candidatos recorriendo listPapers. Fallo de cancelación conserva el diálogo/borrador sin abrir; fallo de apertura posterior permite reintentar solo Reader. reuseExisting conserva su semántica backend para peticiones compatibles. Interacción exacta en TASK03_BOUNDARIES.
+`selectPdf` returns `null` when the dialog is cancelled. Normalize DOI: trim, remove `doi:` or the `https://doi.org/`/`http://doi.org/` host, lowercase and validate `10.<registrant>/<suffix>`; do not resolve it over the network. When DOI/hash candidates exist, `confirmImport` requires `reuseExisting`, or cancellation through `cancelImport`; creating another Paper with the same DOI or SHA-256 is disallowed in v0.1. Reuse returns the existing Paper without altering metadata or document. Confirming the same importToken with the same payload returns the prior PaperDto; an incompatible payload returns Conflict. Tokens are valid for 24 h; recovery may renew an intent's token. A normalized DOI never creates a duplicate Paper. Matching does not semantically merge concepts.
+When confirmImport returns DuplicateDecisionRequired, error.details.candidates contains a non-empty list of DuplicateCandidateDto from the transaction detecting the duplicate, including the final post-promotion check. IDs are unique and sorted by paperId; reasons are unique in doi, sha256 order; no paths or PDF content. The error neither confirms import nor allows changing an already bound intent's payload. No new IPC/DTO or contractVersion change. The UI offers opening the candidate through confirmed cancelImport followed by Reader.openPaper; it does not silently change duplicateResolution or search for candidates by scanning listPapers. Cancellation failure retains the dialog/draft without opening; subsequent opening failure permits retrying Reader only. reuseExisting retains backend semantics for compatible requests. Exact interaction is in TASK03_BOUNDARIES.
 
-Precondiciones/postcondiciones: token existe, no expirado y pertenece a proceso/biblioteca; source ya copiado a staging. En éxito, Paper+authors+Document y estado de import se confirman consistentemente. En error recuperable, staging queda ligado a intención; no se comunica éxito. Cancelar solo afecta el token indicado. Archive/restore conserva UUID, documento y relaciones y exige expectedRevision.
+Preconditions/postconditions: the token exists, has not expired and belongs to the process/library; the source is already copied into staging. On success, Paper+authors+Document and import state commit consistently. On recoverable error, staging remains bound to the intent; report no success. Cancellation affects only the specified token. Archive/restore preserves UUID, document and relations and requires expectedRevision.
 
-## Módulo Reader
+## Reader module
 
-Abrir el Paper actualiza en una transacción el último abierto, actividad y fase contextual; cubre la ausencia de setter de last-opened del resumen anterior.
+Opening a Paper updates the last-opened paper, activity and contextual phase in one transaction; this fills the missing last-opened setter in the earlier summary.
 
 ```ts
 type ReadingPositionDto = { documentId: UUID; pageIndex: number; zoom: number;
@@ -150,13 +150,13 @@ interface ReaderApi {
 }
 ```
 
-Si no existe fila, `getReadingPosition` devuelve valor por defecto determinista `pageIndex=1, zoom=1.0, revision=0, updatedAt=document.importedAt` sin crearla. Page index es entero desde uno; zoom finito y rango propuesto 0.25–5.0. El backend no conoce conteo PDF; frontend limita página, y backend valida rango estructural. Cada documento conserva posición separada. Guardados serializados por documento y optimistic revision; el cliente no interpreta respuesta antigua como estado actual. `documentUrl` solo lo emite el servicio tras verificar Document registrado, UUID, path canónico dentro de raíz; el protocolo rechaza traversal y archivos no registrados. El protocolo sirve solo el PDF de ese Document, no ruta arbitraria. Cancelación de render no cancela una persistencia ya confirmada.
+If no row exists, `getReadingPosition` returns deterministic defaults `pageIndex=1, zoom=1.0, revision=0, updatedAt=document.importedAt` without creating a row. Page index is an integer numbered from one; zoom is finite with proposed range 0.25–5.0. The backend does not know PDF page count; the frontend bounds the page and the backend validates structural range. Every document retains a separate position. Saves are serialized per document with optimistic revision; the client does not treat an old response as current state. Only the service emits `documentUrl`, after verifying a registered Document, UUID and canonical path inside the root; the protocol rejects traversal and unregistered files. It serves only that Document's PDF, never an arbitrary path. Render cancellation does not cancel already committed persistence.
 
-openPaper registra lastOpenedAt, contexto de sesión, auditoría y receipt en una transacción; conserva Paper.revision y Paper.updatedAt bibliográficos y no cambia metadatos/fase. El replay no vuelve a registrar actividad. Antes de emitir documentUrl se verifica el acceso actual, también en replay: el receipt previo no garantiza que el archivo siga disponible. Perfil de lectura y recursos locales: ADR-015 y docs/plans/TASK03_BOUNDARIES.md.
+openPaper records lastOpenedAt, session context, audit and receipt in one transaction; it preserves bibliographic Paper.revision and Paper.updatedAt and changes neither metadata nor phase. Replay does not record activity again. Before emitting documentUrl, check current access, including during replay: a prior receipt does not guarantee file availability. Reading profile and local resources: ADR-015 and docs/plans/TASK03_BOUNDARIES.md.
 
-## Módulo Workflow
+## Workflow module
 
-`PhaseDefinitionDto` es snapshot declarativo e inmutable: `code`, `version`, `name`, `objective`, `keyQuestions`, `doItems`, `dontItems`, `considerations`, `requiredOutputs`, `completionRules`, `definitionHash`. Cada salida es `{key,label,prompt,required,allowedResolutions,ruleKey}`; no contiene scripts, expresiones evaluables ni código. `ruleKey` pertenece al enum cerrado `answerProcessed | paperHasActiveDocument | p1DecisionProcessed | p2ArtifactPresent | p2NoCandidatesJustified`. La decisión P1 procesada satisface completitud de P1 en sus tres valores; la rama `continue`/`light_read`/`archive` se aplica en `advancePhase`, no es un requisito de gate que excluya dos opciones. La definición fijada al crear processing no cambia si se instala una versión nueva; el snapshot previo se preserva en DB y export. `PhaseAnswerDto`: La resolución canónica es [WORKFLOW_GATES.md](WORKFLOW_GATES.md); los JSON [PRE/P1/P2 v1](phase-definitions/) fijan payloads inmutables embebibles al compilar. completionRules enumera handlers por salida con alternativa cerrada candidatos/ausencia, no una conjunción global.
+`PhaseDefinitionDto` is a declarative immutable snapshot: `code`, `version`, `name`, `objective`, `keyQuestions`, `doItems`, `dontItems`, `considerations`, `requiredOutputs`, `completionRules`, `definitionHash`. Each output is `{key,label,prompt,required,allowedResolutions,ruleKey}`; it contains no scripts, evaluable expressions or code. `ruleKey` belongs to the closed enum `answerProcessed | paperHasActiveDocument | p1DecisionProcessed | p2ArtifactPresent | p2NoCandidatesJustified`. A processed P1 decision satisfies P1 completion for all three values; `continue`/`light_read`/`archive` branching occurs in `advancePhase`, not as a gate requirement excluding two options. The definition pinned when processing is created does not change when a new version is installed; preserve the prior snapshot in DB and export. `PhaseAnswerDto`: canonical resolution is in [WORKFLOW_GATES.md](WORKFLOW_GATES.md); [PRE/P1/P2 v1 JSON](phase-definitions/) fixes immutable payloads embeddable at compilation. completionRules lists handlers per output with a closed candidates/absence alternative, not a global conjunction.
 
 ```ts
 type PhaseRuleKey = 'answerProcessed' | 'paperHasActiveDocument' | 'p1DecisionProcessed'
@@ -206,23 +206,23 @@ interface WorkflowApi {
 }
 ```
 
-**Edición de fases (ADR-020):** para una petición nueva, savePhaseAnswer sobre NOT_STARTED devuelve GateBlocked sin respuesta, cambio de clock/contexto, auditoría de éxito ni receipt nuevo. Guardar no inicia una fase. Una fase ya iniciada puede editarse aunque no sea la activa, sin aceptar previamente de nuevo su cadena ni cambiar activePhaseCode: CAS de respuesta, no-op e invalidación conservan sus reglas. El replay durable se resuelve antes de esta guarda; siguen vigentes restricciones de lifecycle y capacidades (P2 no habilitada en T04).
+**Phase editing (ADR-020):** for a new request, savePhaseAnswer on NOT_STARTED returns GateBlocked without an answer, clock/context change, success audit or new receipt. Saving does not start a phase. An already started phase may be edited while inactive without reaccepting its prerequisite chain or changing activePhaseCode: answer CAS, no-op and invalidation retain their rules. Resolve durable replay before this guard; lifecycle and capability restrictions remain applicable (P2 is not enabled in T04).
 
-`relevance_decision` ANSWERED exige `structuredValue: RelevanceDecisionValue` completo por enums; PENDING/null guarda borrador sin decidir rama, UNKNOWN/NA no admitidos. Nunca interpretar answerText. PRE.review_type confirma Paper.reviewType con estructura y resolución según [WORKFLOW_GATES.md](WORKFLOW_GATES.md); P1.review_type caracteriza textualmente la fuente. UNKNOWN/NA textual explicado no exige repetir explicación como answerText. savePhaseAnswer.expectedRevision protege la respuesta: primera escritura expected=0/revision=1; replay previo CAS, no-op posterior CAS conserva revisions/snapshots. save nunca archiva.
+ANSWERED `relevance_decision` requires complete enum-defined `structuredValue: RelevanceDecisionValue`; PENDING/null saves a draft without branch selection, and UNKNOWN/NA are disallowed. Never interpret answerText. PRE.review_type confirms Paper.reviewType using the structure and resolution in [WORKFLOW_GATES.md](WORKFLOW_GATES.md); P1.review_type characterizes the source textually. Explained textual UNKNOWN/NA does not require repeating the explanation as answerText. savePhaseAnswer.expectedRevision protects the answer: first write expected=0/revision=1; replay before CAS, no-op after CAS preserves revisions/snapshots. Saving never archives.
 
-evaluateGate es lectura con snapshot/hash canónico. advance compara expectedPhaseRevision de fromPhase activa y reevalúa bajo IMMEDIATE; snapshot/fase/contexto/revisiones/lifecycle/audit/receipt se confirman juntos. P1 continue activa P2; light_read completa P1, Paper ACTIVE, active P1, nextPhase=null; archive completa P1+Paper ARCHIVED+archivedFromLifecycle, active P1, nextPhase=null. P2 nunca iniciada queda NOT_STARTED en las ramas terminales; P2 anterior conserva datos/NEEDS_REVIEW. Cerrar P2 mantiene active P2 y Paper ACTIVE, nextPhase=null, sin P3. Inputs obsoletos o gate bloqueado producen Conflict/GateBlocked sin efectos.
+evaluateGate is a read with canonical snapshot/hash. advance compares expectedPhaseRevision of active fromPhase and reevaluates under IMMEDIATE; snapshot/phase/context/revisions/lifecycle/audit/receipt commit together. P1 continue activates P2; light_read completes P1 with Paper ACTIVE, active P1, nextPhase=null; archive completes P1+Paper ARCHIVED+archivedFromLifecycle with active P1, nextPhase=null. P2 never started remains NOT_STARTED on terminal branches; previous P2 retains data/NEEDS_REVIEW. Closing P2 retains active P2 and Paper ACTIVE, nextPhase=null, without P3. Stale inputs or a blocked gate produce Conflict/GateBlocked without effects.
 
-goBack/touch compara la fase actualmente activa, no destino. Navegar preserva respuestas/state/completedAt/snapshot; cambio real de contexto renueva revisión destino con clock fresco max(revision)+1 por Paper bajo UoW, sin tabla/wire nuevo. Habilitar fase hacia delante —inicializar o activar— y completar exige prerequisito COMPLETED, snapshot aceptado y gate vigente, más continue aceptado para P2. Touch no acepta prerequisitos; consulta/navegación de datos ya iniciados no autoriza avance. Definición/reglas/clock exactos en WORKFLOW_GATES.
+goBack/touch compares the currently active phase, not the destination. Navigation preserves answers/state/completedAt/snapshot; a real context change renews the destination revision with a fresh max(revision)+1 clock per Paper under the UoW, without a new table/wire. Forward enablement—initialization or activation—and completion require a COMPLETED prerequisite, accepted snapshot and current gate, plus accepted continue for P2. Touch does not accept prerequisites; reading/navigating already started data does not authorize advance. Exact definitions/rules/clocks are in WORKFLOW_GATES.
 
-PRE/P1/P2 incluye Document vigente vivo {id,status,sha256,available} en snapshot. Prueba de acceso/handle retenido antes TX; referencia DB revalidada dentro; ABI de documento se concreta tras T03, sin lectura/hash de PDF grande bajo DbActor. Archivo inaccesible bloquea sin mutar/receipt exitoso; desaparición externa no incrementa clock ficticio. Cambio DB Document invalida/renueva revisiones en su UoW.
+PRE/P1/P2 includes the current live Document {id,status,sha256,available} in the snapshot. Obtain access proof/retained handle before the transaction; revalidate the DB reference inside it. Finalize document ABI after T03, without large PDF reads/hashes under DbActor. An inaccessible file blocks without mutation/success receipt; external disappearance does not increment a fictitious clock. A DB Document change invalidates/renews revisions in its UoW.
 
-setP3Candidate.expectedWorkflowRevision es revision paper_phases(P2). Sólo Claims/Questions asociados; priority null o integer1..5, rationale 1..5000 al seleccionar. Asociaciones son autoridad de selección; única justificación de cero candidatos en PhaseAnswer estructurada existente, con candidatos debe ser null. Save de esa key permite ausencia sin item ficticio y nunca cambia selección. Resumen y gate usan mismos IDs/count/justificación. Cambio efectivo de proyección renueva respuesta y phase clock en misma UoW. Seis salidas P2 enlazan artefactos por key; alternativa p2ArtifactPresent OR p2NoCandidatesJustified sólo para candidatos, no AND global ni código declarativo. Capacidad requerida ausente devuelve UnsupportedCapability; aceptación P2 final espera T07.
+setP3Candidate.expectedWorkflowRevision is the paper_phases(P2) revision. Only associated Claims/Questions; priority is null or integer1..5, rationale is 1..5000 when selecting. Associations are selection authority; the sole zero-candidate justification lives in the existing structured PhaseAnswer and must be null when candidates exist. Saving that key permits absence without a fictitious item and never changes selection. Summary and gate use the same IDs/count/justification. An effective projection change renews the answer and phase clock in the same UoW. Six P2 outputs link artifacts per key; p2ArtifactPresent OR p2NoCandidatesJustified applies only to candidates, never a global AND or declarative code. Missing required capability returns UnsupportedCapability; final P2 acceptance waits for T07.
 
-Tras cambio efectivo, fase COMPLETED y posteriores ya iniciadas pasan NEEDS_REVIEW con datos/snapshot histórico preservados; NOT_STARTED sin iniciar. No-op canónico no invalida; advance requiere reconfirmación. Detalle cerrado de normalización, artifacts, ausencia y snapshots en WORKFLOW_GATES.
+After an effective change, a COMPLETED phase and already started later phases become NEEDS_REVIEW with data/historical snapshot preserved; NOT_STARTED remains unstarted. Canonical no-op does not invalidate; advance requires reconfirmation. Normalization, artifacts, absence and snapshot details are closed in WORKFLOW_GATES.
 
-En piloto 0.0.1 processingInitialized=false. Workflow v0.1 importa/inicializa PRE IN_PROGRESS, P1/P2 NOT_STARTED, active PRE y fija las tres definiciones v1 en el mismo commit. Upgrade preserva UUID/metadatos/documento/lifecycle/archivedFrom/revisiones bibliográficas; no genera confirmación PRE.review_type ni restaura. Sólo primer advance PRE exitoso cambia NEW→ACTIVE. Las condiciones de habilitación aceptada/vigente de WORKFLOW_GATES gobiernan P1/P2. P2 completada sigue Paper ACTIVE, no asigna COMPLETED global. COMPLETED reservado se conserva en lectura/upgrade/Library archive/restore; transiciones Workflow incompatibles UnsupportedCapability sin efectos. T04 puede leer/pinar/activar P2 por continue aceptado, pero sus saves/gates/advance/candidatos quedan capability-gated hasta resolutores reales T06/T07.
+In pilot 0.0.1, processingInitialized=false. Workflow v0.1 imports/initializes PRE IN_PROGRESS, P1/P2 NOT_STARTED, active PRE and pins all three v1 definitions in the same commit. Upgrade preserves UUID/metadata/document/lifecycle/archivedFrom/bibliographic revisions; it creates no PRE.review_type confirmation and does not restore. Only the first successful PRE advance changes NEW→ACTIVE. Accepted/current enablement conditions in WORKFLOW_GATES govern P1/P2. Completed P2 retains Paper ACTIVE, not global COMPLETED. Reserved COMPLETED survives read/upgrade/Library archive/restore; incompatible Workflow transitions return UnsupportedCapability without effects. T04 may read/pin/activate P2 through accepted continue, but saves/gates/advance/candidates remain capability-gated until real T06/T07 resolvers.
 
-## Módulos Knowledge, Concepts y Relations
+## Knowledge, Concepts and Relations modules
 
 ```ts
 type KnowledgeType = 'concept'|'claim'|'evidence'|'question'|'gap'|'assumption'|'condition'
@@ -327,27 +327,27 @@ interface RelationApi {
 }
 ```
 
-En v1 `bodyFormat='plain_text'` y `bodyJson=null`; no TipTap ni formato enriquecido. Los atributos son los unions discriminados `KnowledgeAttributes`/`KnowledgeAttributesPatch`; no esquemas JSON libres. `JsonValue` es dato finito sin código, paths, prototypes ni contenido ejecutable. `createItem` con detalle, paper/concept links, provenance y audit es todo o nada en un UnitOfWork/SQLite commit. Captura `literature` puede guardarse como borrador pendiente, pero el DTO siempre incluye `provenance` y `provenanceStatus`. Update no altera origin ni typeCode; el typeCode del atributo de patch debe coincidir con el persistido. Todos los list/get permiten estado archivado según `includeArchived`/lifecycle; las referencias desde objetos activos a conceptos archivados siguen resolviendo y etiquetan el lifecycle.
+In v1, `bodyFormat='plain_text'` and `bodyJson=null`; no TipTap or rich format. Attributes are discriminated unions `KnowledgeAttributes`/`KnowledgeAttributesPatch`, not free JSON schemas. `JsonValue` is finite data without code, paths, prototypes or executable content. `createItem` with detail, paper/concept links, provenance and audit is all-or-nothing in one UnitOfWork/SQLite commit. `literature` capture may be saved as a pending draft, but the DTO always includes `provenance` and `provenanceStatus`. Update changes neither origin nor typeCode; patch attribute typeCode must match the persisted value. All list/get operations allow archived state according to `includeArchived`/lifecycle; active-object references to archived concepts still resolve and label lifecycle.
 
-Concept matching es sugerencia léxica, nunca fusión. `createConcept` exige `origin`, `confidence` y provenance como parámetros explícitos; si la UI preselecciona `researcher_interpretation`/`requires_validation`, debe mostrarlos como valores editables y enviarlos expresamente, nunca atribuirlos silenciosamente. Alias normalizado único dentro del concepto; nombres parecidos pueden pertenecer a conceptos distintos. Merge y hard delete no están en el contrato implementable de piloto 0.0.1 ni v0.1; requieren ADR posterior y ampliación versionada. Archive/restore reversible sí está en v0.1. Archive conserva entidades relacionadas, mantiene sus referencias navegables y las excluye de listas activas por defecto; filtros `includeArchived` permiten consultar explícitamente.
+Concept matching is a lexical suggestion, never merging. `createConcept` requires explicit `origin`, `confidence` and provenance parameters; if the UI preselects `researcher_interpretation`/`requires_validation`, show editable values and send them explicitly, never silently attribute them. Normalized aliases are unique within a concept; similar names may identify different concepts. Merge and hard delete are outside the pilot 0.0.1/v0.1 implementable contract and require a later ADR and versioned extension. Reversible archive/restore is in v0.1. Archive retains related entities, keeps references navigable and excludes them from active lists by default; `includeArchived` filters permit explicit queries.
 
-Relaciones validan allowlist + endpoint matrix de DOMAIN.md tanto en create como al leer/importar; no basta validación UI. En v0.1 extremos y typeCode son inmutables; corregirlos exige archivar y crear una nueva Relation para preservar historia. Update cambia únicamente contexto, justificación, origin y confidence con expectedRevision. Archive/restore no propaga a extremos ni provenance. Supports/contradicts deben tener origen/contexto y provenance pertinente para presentarse como literales; propuestas del investigador requieren origin explícito.
+Relations validate the DOMAIN.md allowlist + endpoint matrix during creation and read/import; UI validation is insufficient. In v0.1 endpoints and typeCode are immutable; correcting them requires archiving and creating a new Relation to preserve history. Update changes only context, justification, origin and confidence with expectedRevision. Archive/restore propagates neither to endpoints nor provenance. Supports/contradicts require relevant origin/context and provenance to be presented as literal source statements; researcher proposals require explicit origin.
 
-### Precisiones de captura y conceptos (ADR-022)
+### Capture and concept clarifications (ADR-022)
 
-Las firmas wire anteriores se conservan. Texto canónico: CRLF/CR→LF y trim exterior, contenido interior intacto; validar máximos existentes antes de aceptar normalización, sin truncar. normalizedName/alias/domain colapsa whitespace Unicode y aplica Unicode lowercase, conserva tildes/puntuación, sin NFKC. paperIds/conceptIds/affectedConceptIds son sets de UUID válidos ordenados/deduplicados exactos; alias normalizados duplicados intraconcepto se rechazan. La canonicalización de contenido no cambia el hash de payload ni la identidad de receipts.
+Keep the wire signatures above. Canonical text: CRLF/CR→LF and outer trim, interior content unchanged; validate existing maxima before accepting normalization, without truncation. normalizedName/alias/domain collapses Unicode whitespace and applies Unicode lowercase, preserving diacritics/punctuation without NFKC. paperIds/conceptIds/affectedConceptIds are sorted, exactly deduplicated sets of valid UUIDs; reject duplicate normalized aliases within a concept. Content canonicalization changes neither payload hash nor receipt identity.
 
-Captura sin provenance produce NONE real, sin Document/fila ficticia; literatura NONE se muestra pendiente de atribuir. Document explícito sin anclaje produce PENDING. Padre y cada Provenance inicial revision0; no expectedParentRevision en creación. paper_items nuevos usan P2 con selección=false y prioridad/motivo null; no inician ni activan fase.
+Capture without provenance produces genuine NONE without a fictitious Document/row; literature NONE is shown as awaiting attribution. An explicit Document without an anchor produces PENDING. Parent and every initial Provenance have revision0; creation has no expectedParentRevision. New paper_items use P2 with selection=false and null priority/rationale; they neither start nor activate a phase.
 
-Concept preferredName/title es un canon con mirror atómico, definition/bodyText una sola fuente. ConceptApi controla nombre/definición/aliases/domain; Knowledge.updateItem sobre Concept sólo admite confidence. Cualquier title/bodyText/attributes presente rechaza todo el patch aunque sea igual. Insight.affectedConceptIds debe ser subset de conceptIds en create y de vínculos existentes en update; quitar un afectado no desvincula, linkConcept no lo marca afectado.
+Concept preferredName/title is one canonical value with an atomic mirror, and definition/bodyText has one authority. ConceptApi controls name/definition/aliases/domain; Knowledge.updateItem on Concept allows only confidence. Any supplied title/bodyText/attributes rejects the whole patch even if unchanged. Insight.affectedConceptIds must be a subset of conceptIds on create and existing links on update; removing an affected concept does not unlink it, and linkConcept does not mark it affected.
 
-UpdateItem/updateConcept/linkConcept nuevos requieren padre ACTIVE; ARCHIVED devuelve InvalidInput y requiere restore, incluso no-op. Nuevo enlace/captura hacia Concept archivado se rechaza. Con padre ACTIVE, enlace ya existente es no-op aunque destino ahora esté ARCHIVED: no crea asociación ni altera la histórica. Replay durable precede todas estas guardas. Un link efectivo incrementa sólo item.revision, nunca Concept destino; wire no añade expectedRevision, se lee revisión dentro de IMMEDIATE. No-op conserva clocks/revisiones/tiempos y no evento efectivo.
+New updateItem/updateConcept/linkConcept requests require an ACTIVE parent; ARCHIVED returns InvalidInput and requires restore, including no-op. Reject new links/capture to archived Concepts. With an ACTIVE parent, an existing link is a no-op even if its destination is now ARCHIVED: create no association and alter no historical association. Durable replay precedes all these guards. An effective link increments only item.revision, never the destination Concept; wire adds no expectedRevision, and revision is read inside IMMEDIATE. No-op preserves clocks/revisions/times and creates no effective event.
 
-listConceptItems acepta filter.conceptId null o igual al argumento conceptId; distinto InvalidInput. domain compara igualdad normalizada en Concept propio o cualquier Concept vinculado (OR existencial sin filas duplicadas); no hereda domain de Paper. Referencias archivadas siguen legibles/exportables. Alias/preferredName iguales entre Concepts no fusionan sentidos.
+listConceptItems accepts filter.conceptId null or equal to its conceptId argument; a different value returns InvalidInput. domain matches normalized equality on the Concept itself or any linked Concept (existential OR without duplicate rows); it does not inherit Paper.domain. Archived references remain readable/exportable. Equal aliases/preferredName across Concepts do not merge senses.
 
-Relación activa única por source/target normalizados según simetría, typeCode y contextText canónico. Create, update de contexto y restore que colisionan devuelven Conflict atómico: no reemplazar/fusionar ni dejar cambios de contenido, revisions, clocks, audit o receipt de éxito. Sólo la constraint conocida se traduce a Conflict; no ocultar otros errores SQL.
+An active relation is unique by source/target normalized for symmetry, typeCode and canonical contextText. Colliding create, context update and restore return atomic Conflict: never replace/merge or leave content, revision, clock, audit or success-receipt changes. Translate only the known constraint into Conflict; do not hide other SQL errors.
 
-## Módulo Provenance
+## Provenance module
 
 ```ts
 type ProvenanceInput = { documentId: UUID; pageIndex: number|null; pageLabel: string|null;
@@ -362,15 +362,15 @@ interface ProvenanceApi {
 }
 ```
 
-Exactamente uno de `itemId`/`relationId` requerido. `attachLocator` incrementa revision del padre en la misma transacción que crea Provenance y asociación. `updateLocator` revisa revision de Provenance, incrementa solo ella y conserva el hash capturado; cambiar localizador no valida automáticamente la cita. `checkDocumentHash` es mutación idempotente y usa `requestId` receipt; al detectar hash actual distinto cambia estados LOCATED→STALE e incrementa revision/updatedAt de cada Provenance afectado, sin alterar contenido/anclaje. `ProvenanceDto` expone revision y updatedAt; `KnowledgeItemDto.provenance[]` y status agregada reflejan PENDING/LOCATED/STALE/MIXED para que UI no oculte pendientes. `pageIndex` null o entero >=1. Al crear captura `capturedDocumentHash` desde Document registrado, no UI. Locator cambia a LOCATED solo si coordenadas/localizador validan y hash coincide; sin anclaje explícito: PENDING. Ruta original no sale por IPC ni export compartible.
+Require exactly one of `itemId`/`relationId`. `attachLocator` increments the parent revision in the same transaction that creates Provenance and the association. `updateLocator` checks Provenance revision, increments only that revision and preserves the captured hash; a locator change does not automatically validate a quotation. `checkDocumentHash` is an idempotent mutation with a `requestId` receipt; detecting a different current hash changes LOCATED→STALE and increments revision/updatedAt of each affected Provenance without altering content/anchor. `ProvenanceDto` exposes revision and updatedAt; `KnowledgeItemDto.provenance[]` and aggregate status reflect PENDING/LOCATED/STALE/MIXED so the UI cannot hide pending work. `pageIndex` is null or integer >=1. Creation captures `capturedDocumentHash` from the registered Document, not the UI. Locator becomes LOCATED only when coordinates/locator validate and hashes match; no explicit anchor means PENDING. Original paths leave neither IPC nor shareable export.
 
-### Anclaje registrado y conservación de fuente (ADR-022)
+### Registered anchoring and source preservation (ADR-022)
 
-locator es null o el objeto cerrado `{kind:'page_region',x,y,width,height}` con números finitos: x/y>=0, width/height>0, cada valor<=1, x+width<=1, y+height<=1; región exige pageIndex entero>=1. Sin keys extra, coerción ni clamping. Página sola es anclaje registrado LOCATED con hash registrado igual al capturado; pageLabel/section/quote solos son PENDING. LOCATED describe registro de ubicación: T05 no comprueba page count, PDF físico ni verdad de cita. T07 usa Reader para validar/navegar la página real y presenta errores sin inventar navegación.
+locator is null or the closed object `{kind:'page_region',x,y,width,height}` with finite numbers: x/y>=0, width/height>0, each value<=1, x+width<=1, y+height<=1; a region requires integer pageIndex>=1. No extra keys, coercion or clamping. A page alone is a registered LOCATED anchor with registered hash equal to captured hash; pageLabel/section/quote alone are PENDING. LOCATED describes a registered location: T05 checks neither page count, physical PDF nor quotation truth. T07 uses Reader to validate/navigate the real page and presents errors without inventing navigation.
 
-updateLocator conserva documentId y capturedDocumentHash; documentId distinto devuelve InvalidInput. STALE permanece STALE al editar. Si capturedHash discrepa del registrado, actualización válida deja STALE conservando ambos. Fuera de STALE, añadir/quitar página válida permite LOCATED/PENDING conforme regla, sin verificar cita. Fuente distinta requiere attach explícito nuevo y conservación de historia; no rebind/revalidate implícito en v0.1. checkDocumentHash nunca modifica Document.sha256 ni capturedHash, ni revive estados PENDING/STALE automáticamente.
+updateLocator preserves documentId and capturedDocumentHash; a different documentId returns InvalidInput. STALE remains STALE after editing. If capturedHash differs from the registered hash, a valid update retains STALE and both hashes. Outside STALE, adding/removing a valid page permits LOCATED/PENDING under the rule, without verifying the quotation. A different source requires a new explicit attach and retained history; no implicit rebind/revalidate in v0.1. checkDocumentHash never modifies Document.sha256 or capturedHash and never automatically revives PENDING/STALE.
 
-## Módulo Search
+## Search module
 
 ```ts
 type SearchRequestDto = { query: string; scopes: Array<'papers'|'knowledge'|'concepts'>;
@@ -387,9 +387,9 @@ interface SearchApi {
 }
 ```
 
-Search usa FTS5 con tokenizer `unicode61 remove_diacritics 2`; consulta trata input como términos literales unidos por AND, sin exponer sintaxis avanzada FTS. Proyección FTS interna sin IDs/rowid como contrato público, mantenida en la misma transacción que los registros canónicos. Filtros parametrizados; excerpt límite 500 chars y neutralización de HTML. No busca texto integral del PDF/OCR en v0.1. Excluir archivados por defecto; no aplicar rank como puntuación científica. Índice reconstruible desde registros canónicos.
+Search uses FTS5 tokenizer `unicode61 remove_diacritics 2`; treat input as literal terms joined by AND, without exposing advanced FTS syntax. The internal FTS projection exposes no IDs/rowid as a public contract and is maintained in the same transaction as canonical records. Parameterized filters; excerpt maximum 500 chars with HTML neutralization. No full PDF/OCR text search in v0.1. Exclude archived records by default; never use rank as a scientific score. The index is rebuildable from canonical records.
 
-## Módulos Export y Backup
+## Export and Backup modules
 
 ```ts
 type ExportRequestDto = { destinationToken: UUID; includePdfs: boolean;
@@ -425,7 +425,7 @@ interface PortabilityApi {
 }
 ```
 
-Tokens de destino/backup proceden de diálogo nativo; no aceptar paths libres. Tokens expiran en 24 h y quedan ligados a operación/biblioteca. Export JSONL/Markdown usa snapshot consistente, omite rutas privadas e incluye PDF solo por opción. Layout exacto:
+Destination/backup tokens come from native dialogs; accept no free paths. Tokens expire in 24 h and are bound to the operation/library. JSONL/Markdown export uses a consistent snapshot, omits private paths and includes PDFs only by explicit option. Exact layout:
 
 ```text
 research-export/
@@ -446,18 +446,18 @@ research-export/
   ontology/
   markdown/papers/<paperId>.md
   markdown/concepts/<conceptId>.md
-  files/<documentId>/source.pdf       # solo con includePdfs
+  files/<documentId>/source.pdf       # only with includePdfs
 ```
 
-Cada JSONL línea es `{recordType: RecordType, recordVersion: 1, data: object}`; `RecordType` es el enum cerrado `paper | author | venue | document | phaseDefinition | paperPhase | phaseAnswer | knowledgeItem | concept | relation | provenance | validation | paperAuthor | paperItem | itemConcept | itemProvenance | relationProvenance | conceptAlias`. Manifest cerrado: `{exportVersion:'1.0',schemaVersion:number,ontologyVersions:Record<string,string>,createdAt:string,entityCounts:Record<string,number>,files:Array<{path:string,sizeBytes:number,sha256:string}>,includedPdfs:boolean}`. No exportar `app_session`, `app_settings`, receipts, locks, backups, logs o rutas originales. Los `data` preservan UUID y FKs como IDs; cada tipo usa whitelist cerrada basada en columnas canónicas: Paper (`id,title,doi,year,reviewType,domain,url,venueId,lifecycle,createdAt,updatedAt`); Author (`id,displayName,orcid`); Venue (`id,name,kind,identifier`); Document (`id,paperId,originalFilename,sha256,mediaType,sizeBytes,importedAt,status`); PhaseDefinition (code/version/definitionHash/definition JSON declarativo); PaperPhase (paperId/phaseCode/definitionVersion/state/revision/acceptedGateSnapshotHash/completedAt); PhaseAnswer (paperId/phaseCode/questionKey/answerText/structuredValue/resolution/explanation/revision/updatedAt); KnowledgeItem (id/typeCode/title/bodyText/bodyFormat/bodyJson/origin/lifecycle/confidence/attributes/revision/timestamps); Concept (itemId/preferredName/normalizedName/domain/mergedIntoId); Relation (id/sourceItemId/targetItemId/typeCode/contextText/justificationText/origin/confidence/lifecycle/revision/timestamps); Provenance (id,documentId,pageIndex,pageLabel,section,quoteText,locator,capturedDocumentHash,locatorState,revision,timestamps). Association records son `paperAuthor(paperId,authorId,position)`, `paperItem(paperId,itemId,phaseCode,selectedForP3,priority,rationale)`, `itemConcept(itemId,conceptId)`, `itemProvenance(itemId,provenanceId)`, `relationProvenance(relationId,provenanceId)`, `conceptAlias(conceptId,alias,normalizedAlias)`. Estos registros preservan los edges semánticos completos; una asociación se emite únicamente cuando todos sus extremos están incluidos. Validation rows se incluyen cuando existan. `phase_definitions.jsonl` preserva la definición inmutable necesaria para interpretar históricamente cada `definitionVersion`.
+Each JSONL line is `{recordType: RecordType, recordVersion: 1, data: object}`; `RecordType` is the closed enum `paper | author | venue | document | phaseDefinition | paperPhase | phaseAnswer | knowledgeItem | concept | relation | provenance | validation | paperAuthor | paperItem | itemConcept | itemProvenance | relationProvenance | conceptAlias`. Closed manifest: `{exportVersion:'1.0',schemaVersion:number,ontologyVersions:Record<string,string>,createdAt:string,entityCounts:Record<string,number>,files:Array<{path:string,sizeBytes:number,sha256:string}>,includedPdfs:boolean}`. Do not export `app_session`, `app_settings`, receipts, locks, backups, logs or original paths. `data` preserves UUIDs and FKs as IDs; each type uses a closed allowlist based on canonical columns: Paper (`id,title,doi,year,reviewType,domain,url,venueId,lifecycle,createdAt,updatedAt`); Author (`id,displayName,orcid`); Venue (`id,name,kind,identifier`); Document (`id,paperId,originalFilename,sha256,mediaType,sizeBytes,importedAt,status`); PhaseDefinition (code/version/definitionHash/declarative definition JSON); PaperPhase (paperId/phaseCode/definitionVersion/state/revision/acceptedGateSnapshotHash/completedAt); PhaseAnswer (paperId/phaseCode/questionKey/answerText/structuredValue/resolution/explanation/revision/updatedAt); KnowledgeItem (id/typeCode/title/bodyText/bodyFormat/bodyJson/origin/lifecycle/confidence/attributes/revision/timestamps); Concept (itemId/preferredName/normalizedName/domain/mergedIntoId); Relation (id/sourceItemId/targetItemId/typeCode/contextText/justificationText/origin/confidence/lifecycle/revision/timestamps); Provenance (id,documentId,pageIndex,pageLabel,section,quoteText,locator,capturedDocumentHash,locatorState,revision,timestamps). Association records are `paperAuthor(paperId,authorId,position)`, `paperItem(paperId,itemId,phaseCode,selectedForP3,priority,rationale)`, `itemConcept(itemId,conceptId)`, `itemProvenance(itemId,provenanceId)`, `relationProvenance(relationId,provenanceId)`, `conceptAlias(conceptId,alias,normalizedAlias)`. These records retain complete semantic edges; emit an association only when all endpoints are included. Include Validation rows when present. `phase_definitions.jsonl` preserves the immutable definition required to interpret each historical `definitionVersion`.
 
-Para `exportPaper`, closure inicia en Paper y agrega autores/venue/documents, fases/respuestas y KnowledgeItems asociados; Concepts usados y Relations solo si ambos extremos entran en el closure. Después agrega provenance de cada item/relation incluido y cualquier Document referenciado por esas provenance, incluyendo siempre el Paper padre de cada Document, aunque no sea el Paper inicial. Así no se emite relación con extremo ausente ni se omite procedencia de un objeto incluido. Asociaciones se exportan solo si sus extremos están incluidos. Si no se incluyen PDFs, se conserva Document metadata/hash y se omiten binario y ruta.
+For `exportPaper`, closure starts at Paper and adds authors/venue/documents, phases/answers and associated KnowledgeItems; include used Concepts and Relations only if both endpoints enter the closure. Then add provenance for every included item/relation and any Document referenced by that provenance, always including each Document's parent Paper even if it is not the initial Paper. Thus no relation lacks an endpoint and no included object's provenance is omitted. Export associations only when all endpoints are included. Without PDFs, retain Document metadata/hash and omit binary and path.
 
-Backup incluye snapshot SQLite + PDFs referenciados + ontología/manifest, verificado por hashes e `integrity_check`. `selectBackup` selecciona un backup directory creado por esta aplicación. Restore escribe a raíz nueva, valida contenido y devuelve `PreparedLibraryDto`; nunca activa automáticamente. Usuario revisa destino y activa mediante `switchLibrary`. Si se pierde conexión/proceso, `getOperationStatus` devuelve result/error terminal completo; job y receipt sobreviven restart. Backup v0.1 manual y pre-migration; conservar todas las copias verificadas; ninguna purga automática.
+Backup includes SQLite snapshot + referenced PDFs + ontology/manifest, verified with hashes and `integrity_check`. `selectBackup` selects a backup directory created by this app. Restore writes into a new root, validates content and returns `PreparedLibraryDto`; never activate automatically. The user reviews the destination and activates through `switchLibrary`. If connection/process is lost, `getOperationStatus` returns a complete terminal result/error; job and receipt survive restart. v0.1 backups are manual and pre-migration; retain every verified copy, with no automatic purge.
 
-Cancelación de export/backup/restore solo marca cancelación y limpia staging cuyo operationId/intención coincide; tras publicar export/backup o preparar restore, devuelve el resultado terminal. Restore cancelado deja la biblioteca activa intacta. Mutaciones SQL cortas no se interrumpen a mitad; cancelar después del commit recupera el receipt y resultado.
+Export/backup/restore cancellation only marks cancellation and cleans staging whose operationId/intent matches; after publishing export/backup or preparing restore, return the terminal result. Cancelled restore leaves the active library intact. Do not interrupt short SQL mutations halfway; cancellation after commit retrieves the receipt and result.
 
-## Módulo Settings y Desktop lifecycle
+## Settings module and Desktop lifecycle
 
 ```ts
 type AppInfoDto = { appVersion: string; contractVersion: 1; schemaVersion: number|null;
@@ -473,46 +473,46 @@ interface SettingsApi {
 }
 ```
 
-`LibraryInfoDto = { libraryId: UUID; displayName: string; rootLabel: string; schemaVersion: number; writable: boolean }`. `switchLibrary` pertenece a v0.1, no al piloto 0.0.1. Añadir `selectLibrary` para que un diálogo nativo emita `targetToken` y `switchLibrary` valide la biblioteca antes de activar: cerrar/flush/soltar lock de la anterior, validar y migrar destino con backup y adquirir su lock de forma ordenada. En piloto ambos devuelven `UnsupportedCapability`; no aceptar path libre. Si seleccionar/cambiar falla, la biblioteca activa anterior sigue abierta o recuperable y el usuario ve cuál continúa activa.
+`LibraryInfoDto = { libraryId: UUID; displayName: string; rootLabel: string; schemaVersion: number; writable: boolean }`. `switchLibrary` belongs to v0.1, not pilot 0.0.1. Add `selectLibrary` so a native dialog emits `targetToken` and `switchLibrary` validates before activation: close/flush/release the previous lock, validate and migrate the destination with backup and acquire its lock in order. In the pilot both return `UnsupportedCapability`; accept no free path. Selection/switch failure leaves the previous library open or recoverable, and the user sees which library remains active.
 
-Root de biblioteca se determina en backend; solo se expone etiqueta amigable, no path absoluto, salvo pantalla local diagnóstica explícita. Configuración no acepta arbitrary filesystem path. La elección/cambio de biblioteca se incorpora en v0.1 mediante tokens de picker y validación de destino.
+The backend determines library root; expose only a friendly label, not an absolute path, except on an explicit local diagnostic screen. Settings accept no arbitrary filesystem path. v0.1 incorporates library selection/switching through picker tokens and destination validation.
 
-Arranque toma single-instance/library lock antes de recuperar operaciones o escribir, verifica schema compatibility, migra solo tras backup y reconcilia staging. Cierre bloquea nuevas mutaciones, resuelve persistencias pendientes con timeout finito, cierra DB y suelta lock; no reporta Saved previo al commit. Segunda instancia enfoca primera o informa Busy. WebView2/instalador no son IPC de dominio. `getLastOpenedPaper` es lectura; `openPaper` de Reader es el único setter y debe persistir last-open en commit. El backend serializa operaciones con actor dedicado y una conexión SQLite; cualquier `UnitOfWork` cruzado conserva transacción en esa misma conexión.
+Startup acquires the single-instance/library lock before recovery or writing, verifies schema compatibility, migrates only after backup and reconciles staging. Closure blocks new mutations, resolves pending persistence with a finite timeout, closes DB and releases the lock; never report Saved before commit. A second instance focuses the first or reports Busy. WebView2/installer are not domain IPC. `getLastOpenedPaper` is a read; Reader `openPaper` is the sole setter and must persist last-open in the commit. The backend serializes operations through a dedicated actor and one SQLite connection; any cross-module `UnitOfWork` retains its transaction on that same connection.
 
-## Atomicidad, cancelación y postcondiciones
+## Atomicity, cancellation and postconditions
 
-| Operación | Atomicidad y postcondición |
+| Operation | Atomicity and postcondition |
 |---|---|
-| Import | Saga filesystem/SQLite con `import_operations`; resultado solo tras commit; reconciliación reiniciable por token. No borrar destino/archivo de propietario ambiguo. |
-| Metadata/archive/restore | Una transacción DB incrementa revision y auditoría. Stale revision no cambia nada. |
-| Save answer | Respuesta+revision+historial en transacción. |
-| Advance phase | Releer todas las respuestas/salidas/gates bajo write transaction; falla sin efectos o completa la fase e inicializa la siguiente cuando esa rama la habilita, en un único commit; light_read/archive en P1 y cierre P2 devuelven nextPhase=null. |
-| Create item/relation/provenance | Objeto, asociaciones, extensiones y audit event en una transacción; sin entidad huérfana por fallo parcial. |
-| Save reading position | Last-write por revision bajo transacción; los clientes serializan; stale revision da Conflict y cliente vuelve a leer/mezcla con usuario. |
-| Export/backup | Snapshot consistente coordinado con imports/DB; solo publicar carpeta final tras verificar; temporal cancelable antes del rename final. |
-| Restore | Nunca muta biblioteca activa durante validación; activa solo tras éxito y elección explícita fuera del contrato de restore. |
+| Import | Filesystem/SQLite saga with `import_operations`; result only after commit; restartable reconciliation by token. Never delete a destination/file with ambiguous ownership. |
+| Metadata/archive/restore | One DB transaction increments revision and audit. Stale revision changes nothing. |
+| Save answer | Answer+revision+history in one transaction. |
+| Advance phase | Reread all answers/outputs/gates under a write transaction; fail without effects or complete the phase and initialize the next when that branch enables it, in one commit; P1 light_read/archive and closing P2 return nextPhase=null. |
+| Create item/relation/provenance | Object, associations, extensions and audit event in one transaction; no orphan entity from partial failure. |
+| Save reading position | Last-write by revision under a transaction; clients serialize; stale revision returns Conflict and the client rereads/merges with the user. |
+| Export/backup | Consistent snapshot coordinated with imports/DB; publish the final folder only after verification; temporary work is cancellable before final rename. |
+| Restore | Never mutate the active library during validation; activate only after success and explicit selection outside the restore contract. |
 
-`requestId` persistido hace retry seguro de las mutaciones designadas. `operationId` identifica trabajo largo de export/backup y permite consultar/cancelar progreso; no es clave idempotente. Cancelación no significa rollback de un commit ya confirmado. Si proceso cae, el siguiente arranque reanuda o deja issue recuperable según estado durable. Mensajes no incluyen texto científico, rutas privadas, stack trace ni bytes de PDF.
+Persisted `requestId` makes designated mutation retries safe. `operationId` identifies long export/backup jobs and permits querying/cancelling progress; it is not an idempotency key. Cancellation does not roll back an already confirmed commit. After a crash, the next startup resumes or leaves a recoverable issue according to durable state. Messages include no scientific text, private paths, stack trace or PDF bytes.
 
-## Seguridad y recursos
+## Security and resources
 
-- Solo comandos explícitos; React no puede ejecutar SQL, leer archivos arbitrarios o invocar shell.
-- Picker nativo produce token; token de import expira y se vincula a sesión/biblioteca. PDF protocol recibe Document UUID, resuelve path desde SQLite y verifica canonicalización/raíz.
-- Consultas SQL parametrizadas; `limit` acotado; validar UUID, enums, resolución de IDs y tamaño antes de escribir.
-- PDFs, JSON de ontología, body y quote son datos no confiables; no ejecutar contenido ni convertir a HTML sin sanitizar. CSP restringida a recursos empaquetados y protocolo de documentos.
-- No telemetría ni red en núcleo local. Logs rotados de error/códigos/UUID técnicos; no body, quotes, PDF, paths originales o metadatos completos.
-- SQLite single writer por biblioteca; foreign keys on en cada conexión. Operaciones destructivas no disponibles en piloto/v0.1.
+- Explicit commands only; React cannot run SQL, read arbitrary files or invoke a shell.
+- Native picker emits a token; import tokens expire and are bound to session/library. PDF protocol receives Document UUID, resolves its path from SQLite and verifies canonicalization/root.
+- Parameterized SQL queries; bounded `limit`; validate UUIDs, enums, resolved IDs and size before writing.
+- PDFs, ontology JSON, body and quote are untrusted data; neither execute content nor convert it to HTML without sanitization. Restrict CSP to packaged resources and the document protocol.
+- No telemetry or network in the local core. Rotated technical error/code/UUID logs; no body, quotations, PDF, original paths or complete metadata.
+- One SQLite writer per library; foreign keys enabled on every connection. Destructive operations are unavailable in the pilot/v0.1.
 
-## Registro de comandos Tauri
+## Tauri command registry
 
-Las funciones internas se registran con prefijo de feature y este registry es cerrado en contractVersion 1: `library_select_pdf`, `library_confirm_import`, `library_cancel_import`, `library_list_papers`, `library_get_paper`, `library_update_metadata`, `library_archive_paper`, `library_restore_paper`; `reader_open_paper`, `reader_get_last_opened_paper`, `reader_get_reading_position`, `reader_save_reading_position`; `workflow_get_phase`, `workflow_get_phase_answers`, `workflow_get_phase_definition`, `workflow_save_phase_answer`, `workflow_evaluate_gate`, `workflow_advance_phase`, `workflow_go_back_to_phase`, `workflow_touch_phase`, `workflow_set_p3_candidate`, `workflow_get_p3_candidate_summary`; `knowledge_create_item`, `knowledge_update_item`, `knowledge_archive_item`, `knowledge_restore_item`, `knowledge_get_item`, `knowledge_list_items`; `concept_suggest`, `concept_get`, `concept_list_items`, `concept_create`, `concept_update`, `concept_link`, `concept_archive`, `concept_restore`; `relation_create`, `relation_update`, `relation_list`, `relation_archive`, `relation_restore`; `provenance_attach_locator`, `provenance_update_locator`, `provenance_get`, `provenance_check_document_hash`; `search_library`, `search_knowledge`; `export_choose_destination`, `export_library`, `export_paper`, `backup_choose_destination`, `backup_create`, `backup_select`, `backup_choose_restore_target`, `backup_verify`, `backup_restore`, `operation_get_status`, `operation_cancel`; `settings_get_app_info`, `settings_get_library_info`, `settings_select_library`, `settings_switch_library`, `settings_get_library_status`. Los comandos no implementados permanecen capability-gated; no se aceptan aliases libres. No se registra una API genérica de filesystem, SQL o ejecución.
+Internal functions register with a feature prefix; the registry is closed in contractVersion 1: `library_select_pdf`, `library_confirm_import`, `library_cancel_import`, `library_list_papers`, `library_get_paper`, `library_update_metadata`, `library_archive_paper`, `library_restore_paper`, `reader_open_paper`, `reader_get_last_opened_paper`, `reader_get_reading_position`, `reader_save_reading_position`, `workflow_get_phase`, `workflow_get_phase_answers`, `workflow_get_phase_definition`, `workflow_save_phase_answer`, `workflow_evaluate_gate`, `workflow_advance_phase`, `workflow_go_back_to_phase`, `workflow_touch_phase`, `workflow_set_p3_candidate`, `workflow_get_p3_candidate_summary`, `knowledge_create_item`, `knowledge_update_item`, `knowledge_archive_item`, `knowledge_restore_item`, `knowledge_get_item`, `knowledge_list_items`, `concept_suggest`, `concept_get`, `concept_list_items`, `concept_create`, `concept_update`, `concept_link`, `concept_archive`, `concept_restore`, `relation_create`, `relation_update`, `relation_list`, `relation_archive`, `relation_restore`, `provenance_attach_locator`, `provenance_update_locator`, `provenance_get`, `provenance_check_document_hash`, `search_library`, `search_knowledge`, `export_choose_destination`, `export_library`, `export_paper`, `backup_choose_destination`, `backup_create`, `backup_select`, `backup_choose_restore_target`, `backup_verify`, `backup_restore`, `operation_get_status`, `operation_cancel`, `settings_get_app_info`, `settings_get_library_info`, `settings_select_library`, `settings_switch_library`, `settings_get_library_status`. Unimplemented commands remain capability-gated; free aliases are not accepted. Register no generic filesystem, SQL or execution API.
 
-## Decisiones propuestas fijadas y validación antes de aceptación
+## Fixed proposed decisions and validation before acceptance
 
-Las decisiones de esta sección están cerradas como propuesta coherente para revisión; no equivalen a aprobación. La aceptación debe comprobarlas contra la implementación planeada y pruebas de frontera: límites declarados (title 1000, answer/body 20.000, snippet/quote 10.000, contexto/relación 5.000, 100 autores, PDF 500 MiB); DOI normalizado sin resolución en red y sin duplicar DOI/hash; allowlist completa de 13 relaciones con matriz de extremos de DOMAIN; `plain_text` con `bodyJson=null`; protocolo de documento por UUID con capability local restringida; conflictos por revision optimista, no-op canónico sin invalidación y cambio real invalidando snapshots dependientes según DOMAIN. Hard delete y merge quedan fuera de v0.1 y requieren ADR posterior. La aceptación requiere pruebas de límites/Unicode, round-trip Rust↔TypeScript de DTO/envelope, rechazo de payload/enum desconocido, reintento idempotente, conflicto de revision, reconciliación import filesystem/SQLite, reconstrucción export/backup con asociaciones y definiciones de fase, y compatibilidad de migraciones. El protocolo y las capabilities concretas se fijan en el documento de arquitectura para la versión elegida; no amplían el conjunto de comandos de este contrato.
+This section's decisions are closed as a coherent proposal for review, not equivalent to approval. Acceptance must check them against planned implementation and boundary tests: declared limits (title 1000, answer/body 20,000, snippet/quote 10,000, context/relation 5,000, 100 authors, PDF 500 MiB); normalized DOI without network resolution or duplicate DOI/hash; complete 13-relation allowlist with DOMAIN endpoint matrix; `plain_text` with `bodyJson=null`; UUID document protocol with restricted local capability; optimistic revision conflicts, canonical no-op without invalidation and real changes invalidating dependent snapshots under DOMAIN. Hard delete and merge remain outside v0.1 and require a later ADR. Acceptance requires boundary/Unicode tests, Rust↔TypeScript DTO/envelope round-trip, unknown payload/enum rejection, idempotent retry, revision conflict, filesystem/SQLite import reconciliation, export/backup reconstruction with associations and phase definitions, and migration compatibility. Concrete protocol/capabilities are fixed in the architecture document for the selected version; they do not expand this contract's command set.
 
-Los filtros con lifecycle e includeArchived tienen una única interpretación: lifecycle=ACTIVE exige includeArchived=false; lifecycle=ARCHIVED o ALL exige includeArchived=true. Combinaciones incoherentes devuelven InvalidInput. El estado de lifecycle gobierna el filtrado y el booleano expresa la elección explícita de consultar archivados.
+lifecycle and includeArchived filters have one interpretation: lifecycle=ACTIVE requires includeArchived=false; lifecycle=ARCHIVED or ALL requires includeArchived=true. Inconsistent combinations return InvalidInput. Lifecycle controls filtering and the boolean expresses an explicit choice to query archived records.
 
-## Precisión de candidatos y entrega P2 (ADR-023)
+## Candidate and P2 delivery clarification (ADR-023)
 
-Rigen las siete decisiones de [TASK06_DECISIONS](../plans/TASK06_DECISIONS.md). setP3Candidate exige P2 iniciada sin activarla; selected=false exige priority/rationale=null y permite deseleccionar item archivado. Summary conserva seleccionados archivados; el gate exige artefactos activos. Cero candidatos tras set exige justificación1..5000 recibidos y canónica no vacía, con candidatos null. Save candidata permite PENDING/null, nunca cambia selección; objeto presente completo y coincidente con DB. Ese save, al igual que todo save/evaluate/advance P2, se habilita en producción sólo tras T07. T06 entrega captura/candidatos reales; no existe guardado de justificación cero sin items hasta habilitar save. La ABI interna se fijará tras verificar T05; wire existente intacto.
+The seven decisions in [TASK06_DECISIONS](https://github.com/dpalazon-dev/doctorado-ucam/blob/c985b079d39ee5915c017c38c1f50b7a94526843/prototypes/research-workbench/docs/plans/TASK06_DECISIONS.md) apply. setP3Candidate requires started P2 without activating it; selected=false requires priority/rationale=null and permits deselecting an archived item. Summary retains selected archived items; the gate requires active artifacts. Zero candidates after set requires a received justification of 1..5000 characters that is canonically non-empty, with candidates null. Candidate save permits PENDING/null and never changes selection; a present object must be complete and match DB. That save, like every P2 save/evaluate/advance, becomes available in production only after T07. T06 delivers real capture/candidates; no zero-item justification save exists until save is enabled. Finalize the internal ABI after verifying T05; existing wire remains unchanged.

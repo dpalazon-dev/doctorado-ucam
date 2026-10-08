@@ -27,8 +27,8 @@ use std::{
 
 fn metadata(doi: Option<&str>) -> PaperMetadataInput {
     PaperMetadataInput {
-        title: "  Título de prueba  ".into(),
-        authors: vec![" Autora Uno ".into()],
+        title: "  Test title  ".into(),
+        authors: vec![" Test Author One ".into()],
         year: Some(2024),
         doi: doi.map(str::to_owned),
         venue: Some(" Revista ".into()),
@@ -388,8 +388,8 @@ fn duplicate_doi_normalized() {
 #[test]
 fn metadata_is_trimmed_and_invalid_doi_rejected() {
     let normalized = normalize_metadata(metadata(None)).unwrap();
-    assert_eq!(normalized.title, "Título de prueba");
-    assert_eq!(normalized.authors, ["Autora Uno"]);
+    assert_eq!(normalized.title, "Test title");
+    assert_eq!(normalized.authors, ["Test Author One"]);
     assert!(normalize_doi("doi not real".into()).is_err());
 }
 
@@ -420,7 +420,7 @@ fn import_survives_original_move() {
     let initialized=tauri::async_runtime::block_on(fixture.actor.submit({let id=paper.id.0.clone();move|connection|Ok(connection.query_row("SELECT p.processing_initialized,p.current_phase,(SELECT count(*) FROM paper_phases WHERE paper_id=p.id),(SELECT count(*) FROM phase_answers WHERE paper_id=p.id) FROM papers p WHERE p.id=?1",[id],|r|Ok((r.get::<_,i64>(0)?,r.get::<_,String>(1)?,r.get::<_,i64>(2)?,r.get::<_,i64>(3)?)))?)})).unwrap();
     assert_eq!(initialized, (1, "PRE".into(), 3, 0));
     let mut changed_metadata = metadata(None);
-    changed_metadata.title = "Título efectivo actualizado".into();
+    changed_metadata.title = "Updated effective title".into();
     tauri::async_runtime::block_on(fixture.service.update_metadata(
         UUID::new(),
         paper.id.clone(),
@@ -467,7 +467,7 @@ fn import_survives_original_move() {
         }
     }))
     .unwrap();
-    assert_eq!(saved, "Título efectivo actualizado");
+    assert_eq!(saved, "Updated effective title");
     reopened
         .shutdown(std::time::Duration::from_secs(2))
         .unwrap();
@@ -743,7 +743,7 @@ fn duplicate_doi_normalized_prevents_second_paper() {
     fs::write(&second, other).unwrap();
     let preview = fixture.select(second);
     let mut duplicate = metadata(Some("https://doi.org/10.1234/same"));
-    duplicate.title = "No debe reemplazar".into();
+    duplicate.title = "Must not replace".into();
     let error = tauri::async_runtime::block_on(fixture.service.confirm_import(
         UUID::new(),
         preview.import_token,
@@ -779,7 +779,7 @@ fn duplicate_hash_requires_decision() {
     assert_eq!(preview.candidates.len(), 1);
     assert_eq!(preview.candidates[0].paper_id.0, existing.id.0);
     let mut incoming = metadata(None);
-    incoming.title = "Título que no debe fusionarse".into();
+    incoming.title = "Title that must not be merged".into();
     let error = tauri::async_runtime::block_on(fixture.service.confirm_import(
         UUID::new(),
         preview.import_token.clone(),
@@ -1600,7 +1600,7 @@ fn import_token_retry_payload_conflict() {
     .unwrap();
     assert_eq!(first.id, replay.id);
     let mut conflict = metadata(None);
-    conflict.title = "Otro payload".into();
+    conflict.title = "Other payload".into();
     let error = tauri::async_runtime::block_on(fixture.service.confirm_import(
         request,
         preview.import_token,
@@ -2992,7 +2992,7 @@ fn same_request_metadata_archive_restore_cannot_race_cancel_cleanup() {
     assert!(errors.iter().all(|error| {
         error.code == research_workbench_core::transport::error::ErrorCode::Conflict
     }));
-    assert_eq!(title, "Título de prueba");
+    assert_eq!(title, "Test title");
     assert_eq!(lifecycle, "NEW");
     assert_eq!(receipt_count, 0);
     assert_eq!(maintenance.active_operations(), 0);
@@ -3327,7 +3327,7 @@ fn application_library_helper_uses_callers_transaction() {
     let unchanged =
         tauri::async_runtime::block_on(fixture.service.get_paper(UUID::new(), paper.id.clone()))
             .unwrap();
-    assert_eq!(unchanged.title, "Título de prueba");
+    assert_eq!(unchanged.title, "Test title");
     assert_eq!(unchanged.revision, paper.revision);
     assert_eq!(
         tauri::async_runtime::block_on(fixture.actor.submit({

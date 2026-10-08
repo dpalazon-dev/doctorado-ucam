@@ -1,31 +1,31 @@
-# Desarrollo con agentes
+# Development with agents
 
-## Lectura y control
-`AGENTS.md` es la entrada automática para Codex. `INTENT.md` es un documento del proyecto: se lee por la instrucción explícita de AGENTS, no por una capacidad automática supuesta. El contenido normativo reside en `docs/architecture/`; `docs/session/` es archivo inmutable y no se usa como fuente de instrucciones.
+## Reading and authority
+`AGENTS.md` is the automatic entry point for Codex. `INTENT.md` is a project document: agents read it because AGENTS explicitly instructs them to, not through an assumed automatic capability. Normative content lives in `docs/architecture/`; the original `docs/session/` archive is historical evidence and never operational instructions. That local session archive is excluded from this public snapshot.
 
-El usuario autoriza la ejecución local completa y los merges comprobados. Este chat mantiene el objetivo, asigna tareas, revisa resultados y decide integración. Abrir una nueva sesión desde el repositorio cargará su configuración local; esta conversación usa las herramientas ya disponibles y modelos seleccionados explícitamente en cada delegación.
+The historical development agreement authorized complete local execution and verified local merges. The coordinating chat maintained the objective, assigned tasks, reviewed results and decided integration. A new session uses the configuration actually available to it; this conversation used the loaded tools and models explicitly selected for each delegation. The original local configuration is not distributed with this prototype.
 
-## Skills instaladas
+## Installed skills
 - Karpathy: `C:/Users/david/.codex/plugins/cache/karpathy-skills/andrej-karpathy-skills/1.0.0/skills/karpathy-guidelines/SKILL.md`.
-- Superpowers: `C:/Users/david/.codex/plugins/cache/superpowers-marketplace/superpowers/6.4.2/skills/` con `using-git-worktrees`, `writing-plans`, `subagent-driven-development`, `test-driven-development`, `requesting-code-review`, `verification-before-completion` y `finishing-a-development-branch`.
+- Superpowers: `C:/Users/david/.codex/plugins/cache/superpowers-marketplace/superpowers/6.4.2/skills/` with `using-git-worktrees`, `writing-plans`, `subagent-driven-development`, `test-driven-development`, `requesting-code-review`, `verification-before-completion` and `finishing-a-development-branch`.
 
-Son referencias de esta instalación, no dependencias del software distribuido. Si cambia la instalación, resuelve las rutas desde el catálogo real; no descargues instrucciones sustitutas silenciosamente.
+These are references to the original workstation installation, not distributed software dependencies. If the installation changes, resolve paths from the actual catalog; do not silently download substitute instructions.
 
-## Ciclo por tarea
-1. Registrar BASE y leer el brief con contratos, archivos y pruebas. El ledger pertenece al plan en `.superpowers/sdd/` y su primera línea identifica el plan.
-2. Crear rama `agent/<tarea>` desde el último commit integrado en un worktree `.worktrees/<tarea>`. Un único implementador de producto activo, agentes nuevos por tarea; investigadores independientes pueden trabajar en paralelo.
-3. Implementador escribe pruebas pertinentes, demuestra fallos antes de cambios cuando aplica, implementa, valida, autorrevisa y confirma commits. No altera otros módulos ni el contrato sin coordinación.
-4. Orquestador entrega brief, informe y diff BASE..HEAD a revisión independiente. Comprueba conformidad y calidad; revisión especializada Rust/TypeScript donde corresponde.
-5. Hallazgos importantes vuelven al autor y se revisa el diff de corrección. Cinco rondas como máximo según Superpowers; ninguna decisión o aplazamiento se descarta en silencio.
-6. En worktree de integración, árbol limpio, merge preparado sin commit, comprobaciones pertinentes, commit de merge si pasan. Si fallan, conserva evidencia y corrige antes de integrar. Al cerrar una fase, valida el conjunto y promociona a main.
-7. Guardar commits y evidencia en el ledger y un resumen vigente en `docs/STATUS.md`. Versionar informes finales en `docs/reviews/` para que sobrevivan a la limpieza de scratch.
+## Task cycle
+1. Record BASE and read the brief covering contracts, files and tests. The ledger belongs to the plan under `.superpowers/sdd/`; its first line identifies that plan.
+2. Create an `agent/<task>` branch from the latest integrated commit in a `.worktrees/<task>` checkout. Use one active product implementer and new agents for each task; independent researchers may work in parallel.
+3. The implementer writes relevant tests, demonstrates failure before a change where appropriate, implements, validates, performs self-review and commits. Changes to other modules or contracts require coordination.
+4. The orchestrator provides the brief, report and BASE..HEAD diff for independent review. Check specification conformity and quality; require Rust/TypeScript specialist review where applicable.
+5. Important findings return to the author, and reviewers examine the correction diff. Apply the installed Superpowers limit of five rounds; never silently discard or defer a finding.
+6. In a clean integration worktree, prepare the merge without committing, run relevant checks, then commit only if they pass. On failure, preserve evidence and correct the problem before integration. When a phase closes, validate the whole milestone and promote main.
+7. Record commits and evidence in the ledger and maintain a current summary in `docs/STATUS.md`. Preserve final reports in a durable review archive so scratch cleanup does not lose evidence. The original [execution plans](../plans/README.md) and [reviews](../reviews/README.md) are retained through pinned historical links.
 
-No se publican ramas ni se modifica infraestructura externa. No se requieren confirmaciones entre tareas ya autorizadas. Los tests y el build son comprobaciones convencionales, no conclusiones de otro modelo.
+The local development agreement did not authorize publishing branches or changing external infrastructure by default. Routine confirmations were unnecessary for already authorized tasks. Tests and builds provide conventional evidence, not conclusions inferred from another model.
 
-## Worktrees en esta conversación
-Durante la preparación, la herramienta nativa de la app estaba ligada al directorio original de este chat, sin repositorio: la llamada inicial falló con `Not a git repository` y no admitía indicar la ruta del repositorio nuevo. El chat ya trabaja desde Research-Workbench. Se conservan los worktrees creados con Git y la ubicación `.worktrees/` indicada en AGENTS; el orquestador sigue en este chat. La herramienta nativa no ofrece un parámetro para fijar esa ubicación. Estos worktrees se gestionan mediante Git y no se presentan como adjuntos registrados por la app.
+## Worktrees in the original conversation
+During preparation, the app's native tool was attached to the original chat directory before a repository existed: its first call failed with `Not a git repository` and could not accept the new repository path. The chat subsequently worked from Research-Workbench. Git-created worktrees under `.worktrees/` were retained, with the chat as orchestrator. The native tool had no parameter for that location. These checkouts were managed by Git, not presented as registered app attachments.
 
-La carpeta `.worktrees/` está ignorada antes de crear los worktrees. Los binarios, bibliotecas de pruebas y backups quedan en rutas ignoradas y aisladas. Antes de retirar un worktree se verifica que sus commits están integrados y no contiene trabajo pendiente; se conserva evidencia útil. Nunca se usa limpieza global para ahorrar espacio.
+Ignore `.worktrees/` before creating checkouts. Keep binaries, synthetic test libraries and backups in ignored, isolated paths. Before removing a worktree, verify that its commits are integrated and it contains no pending work; preserve useful evidence. Never use global cleanup merely to save space.
 
-## Evidencia
-Un test backend acredita una regla de dominio/persistencia; un test frontend acredita comportamiento de UI; una prueba de IPC acredita el contrato real; un instalador generado acredita empaquetado. Inicio, upgrade, desinstalación y recuperación en una máquina limpia se registran por separado. No se extrapola una categoría a otra.
+## Evidence
+A backend test establishes a domain/persistence rule; a frontend test establishes UI behavior; an IPC test establishes the actual contract; a generated installer establishes packaging. Launch, upgrade, uninstall and recovery on a clean machine require separate records. Do not extrapolate from one evidence category to another.

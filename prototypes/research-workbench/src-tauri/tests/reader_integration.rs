@@ -256,12 +256,12 @@ fn fixture() -> (
     fs::write(&path, bytes).unwrap();
     let paper = paper_id.0.clone();
     let doc = document_id.0.clone();
-    let name = "síntesis.pdf".to_owned();
+    let name = "synthesis.pdf".to_owned();
     let hash = format!("{:x}", Sha256::digest(bytes));
     let rel = relative.clone();
     tauri::async_runtime::block_on(actor.submit(move |connection| {
         let tx=connection.transaction()?;
-        tx.execute("INSERT INTO papers(id,title,doi,year,review_type,domain,venue_id,lifecycle,revision,current_phase,processing_initialized,active_document_id,created_at,updated_at,last_opened_at) VALUES(?1,'Prueba de lectura',NULL,2024,'unknown',NULL,NULL,'NEW',0,NULL,0,?2,'2026-10-02T00:00:00Z','2026-10-02T00:00:00Z',NULL)",rusqlite::params![paper,doc])?;
+        tx.execute("INSERT INTO papers(id,title,doi,year,review_type,domain,venue_id,lifecycle,revision,current_phase,processing_initialized,active_document_id,created_at,updated_at,last_opened_at) VALUES(?1,'Reading test',NULL,2024,'unknown',NULL,NULL,'NEW',0,NULL,0,?2,'2026-10-02T00:00:00Z','2026-10-02T00:00:00Z',NULL)",rusqlite::params![paper,doc])?;
         tx.execute("INSERT INTO documents(id,paper_id,original_filename,relative_path,sha256,media_type,size_bytes,imported_at,status) VALUES(?1,?2,?3,?4,?5,'application/pdf',?6,'2026-10-02T00:00:00Z','ACTIVE')",rusqlite::params![doc,paper,name,rel,hash,bytes.len() as i64])?;
         tx.commit()?;Ok(())
     })).unwrap();
@@ -1289,8 +1289,8 @@ fn library_import_move_reader_save_reopen_child_archive_restore_preserves_docume
         UUID(uuid::Uuid::new_v4().to_string()),
         preview.import_token,
         PaperMetadataInput {
-            title: "Dos páginas sintéticas".into(),
-            authors: vec!["Investigadora de prueba".into()],
+            title: "Two synthetic pages".into(),
+            authors: vec!["Test researcher".into()],
             year: Some(2026),
             doi: None,
             venue: None,

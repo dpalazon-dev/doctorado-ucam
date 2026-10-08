@@ -154,7 +154,7 @@ fn prepare(mut root: LibraryRoot) -> Result<PreparedActor, AppError> {
     migrations::verify_integrity(&c)?;
     let info = LibraryInfoDto {
         library_id: crate::transport::dto::UUID(id),
-        display_name: "Biblioteca local".into(),
+        display_name: "Local library".into(),
         root_label: root.display_label().into(),
         schema_version: migrations::schema_version(&c)?,
         writable,

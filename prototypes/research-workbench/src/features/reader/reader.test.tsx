@@ -31,7 +31,7 @@ const opened: OpenPaperDto = {
   paper: {
     id: "00000000-0000-4000-8000-000000000001",
     documentId: docId,
-    title: "Paper sintético",
+    title: "Synthetic paper",
     authors: [],
     year: null,
     doi: null,
@@ -102,7 +102,7 @@ it("reader_saved_page_restored", async () => {
 it("reader_fractional_page_input_is_ignored", async () => {
   load.mockResolvedValue(pdf);
   render(<PaperReader opened={opened} api={api} onClose={vi.fn()} />);
-  const input = await screen.findByLabelText("Ir a página");
+  const input = await screen.findByLabelText("Go to page");
   fireEvent.change(input, { target: { value: "2.5" } });
   expect(input).toHaveProperty("value", "2");
   expect(api.saveReadingPosition).not.toHaveBeenCalled();
@@ -111,7 +111,7 @@ it("scanned_pdf_renders", async () => {
   load.mockResolvedValue(pdf);
   render(<PaperReader opened={opened} api={api} onClose={vi.fn()} />);
   expect(
-    await screen.findByRole("img", { name: "Página 2 del documento" }),
+    await screen.findByRole("img", { name: "Page 2 of the document" }),
   ).toBeTruthy();
   await waitFor(() => expect(pdf.renderPage).toHaveBeenCalled());
 });
@@ -119,7 +119,7 @@ it("corrupt_protected_pdf_recoverable", async () => {
   load.mockRejectedValue(new Error("encrypted"));
   render(<PaperReader opened={opened} api={api} onClose={vi.fn()} />);
   expect(await screen.findByRole("alert")).toBeTruthy();
-  expect(screen.getByRole("button", { name: "Cerrar lector" })).toBeTruthy();
+  expect(screen.getByRole("button", { name: "Close reader" })).toBeTruthy();
 });
 it("render_old_result_discarded", async () => {
   let rejectOld!: (reason: unknown) => void;
@@ -135,11 +135,11 @@ it("render_old_result_discarded", async () => {
   load.mockResolvedValue(pdf);
   render(<PaperReader opened={opened} api={api} onClose={vi.fn()} />);
   await waitFor(() => expect(pdf.renderPage).toHaveBeenCalled());
-  fireEvent.click(screen.getByRole("button", { name: "Página siguiente" }));
+  fireEvent.click(screen.getByRole("button", { name: "Next page" }));
   expect(firstSignal?.aborted).toBe(true);
   rejectOld(new Error("late render failure"));
   await waitFor(() =>
-    expect(screen.getByLabelText("Ir a página")).toHaveProperty("value", "3"),
+    expect(screen.getByLabelText("Go to page")).toHaveProperty("value", "3"),
   );
   expect(screen.queryByRole("alert")).toBeNull();
 });
@@ -147,7 +147,7 @@ it("close_cancels_render", async () => {
   load.mockResolvedValue(pdf);
   const onClose = vi.fn();
   render(<PaperReader opened={opened} api={api} onClose={onClose} />);
-  fireEvent.click(await screen.findByRole("button", { name: "Cerrar lector" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Close reader" }));
   expect(onClose).toHaveBeenCalled();
   await waitFor(() => expect(pdf.destroy).toHaveBeenCalled());
 });
@@ -161,17 +161,17 @@ it("save_error_never_shows_saved", async () => {
       ok: false,
       error: {
         code: "StorageUnavailable",
-        message: "No se pudo guardar.",
+        message: "Could not save.",
         retryable: true,
       },
     }),
   } as unknown as ReaderApi;
   render(<PaperReader opened={opened} api={failingApi} onClose={vi.fn()} />);
   fireEvent.click(
-    await screen.findByRole("button", { name: "Página siguiente" }),
+    await screen.findByRole("button", { name: "Next page" }),
   );
   expect(await screen.findByRole("alert")).toBeTruthy();
-  expect(screen.queryByText("Guardado")).toBeNull();
+  expect(screen.queryByText("Saved")).toBeNull();
 });
 
 it("reader_conflict_offers_explicit_saved_or_local_position_resolution", async () => {
@@ -191,7 +191,7 @@ it("reader_conflict_offers_explicit_saved_or_local_position_resolution", async (
       ok: false,
       error: {
         code: "Conflict",
-        message: "La posición cambió en otra operación.",
+        message: "The position changed in another operation.",
         retryable: false,
       },
     })
@@ -206,10 +206,10 @@ it("reader_conflict_offers_explicit_saved_or_local_position_resolution", async (
   load.mockResolvedValue(pdf);
   render(<PaperReader opened={current} api={conflictApi} onClose={vi.fn()} />);
   fireEvent.click(
-    await screen.findByRole("button", { name: "Página siguiente" }),
+    await screen.findByRole("button", { name: "Next page" }),
   );
   fireEvent.click(
-    await screen.findByRole("button", { name: "Guardar mi posición" }),
+    await screen.findByRole("button", { name: "Save my position" }),
   );
   await waitFor(() => expect(save).toHaveBeenCalledTimes(2));
   expect(save.mock.calls[1][0]).toMatchObject({
@@ -243,7 +243,7 @@ it("reader_keep_saved_applies_durable_page_and_zoom_to_the_canvas", async () => 
       ok: false,
       error: {
         code: "Conflict",
-        message: "La posición cambió en otra operación.",
+        message: "The position changed in another operation.",
         retryable: false,
       },
     }),
@@ -251,10 +251,10 @@ it("reader_keep_saved_applies_durable_page_and_zoom_to_the_canvas", async () => 
   load.mockResolvedValue(pdf);
   render(<PaperReader opened={current} api={conflictApi} onClose={vi.fn()} />);
   fireEvent.click(
-    await screen.findByRole("button", { name: "Página siguiente" }),
+    await screen.findByRole("button", { name: "Next page" }),
   );
   fireEvent.click(
-    await screen.findByRole("button", { name: "Conservar posición guardada" }),
+    await screen.findByRole("button", { name: "Keep saved position" }),
   );
   await waitFor(() =>
     expect(pdf.renderPage).toHaveBeenLastCalledWith(
@@ -264,7 +264,7 @@ it("reader_keep_saved_applies_durable_page_and_zoom_to_the_canvas", async () => 
       expect.any(AbortSignal),
     ),
   );
-  expect(screen.getByLabelText("Ir a página")).toHaveProperty("value", "5");
+  expect(screen.getByLabelText("Go to page")).toHaveProperty("value", "5");
   expect(screen.getByText("175%")).toBeTruthy();
 });
 
@@ -283,7 +283,7 @@ it("reader_shows_pending_position_when_replay_confirms_an_older_page", async () 
     ok: false,
     error: {
       code: "StorageUnavailable",
-      message: "No se pudo confirmar.",
+      message: "Could not confirm.",
       retryable: true,
     },
   };
@@ -302,27 +302,27 @@ it("reader_shows_pending_position_when_replay_confirms_an_older_page", async () 
     <PaperReader opened={current} api={readerApi} onClose={vi.fn()} />,
   );
   fireEvent.click(
-    await screen.findByRole("button", { name: "Página siguiente" }),
+    await screen.findByRole("button", { name: "Next page" }),
   );
-  await screen.findByRole("button", { name: "Reintentar guardado de posición" });
-  fireEvent.click(screen.getByRole("button", { name: "Página siguiente" }));
+  await screen.findByRole("button", { name: "Retry saving position" });
+  fireEvent.click(screen.getByRole("button", { name: "Next page" }));
   const retry = screen.getByRole("button", {
-    name: "Reintentar guardado de posición",
+    name: "Retry saving position",
   });
   await waitFor(() => expect(retry).toHaveProperty("disabled", false));
   fireEvent.click(retry);
   await waitFor(() => expect(save).toHaveBeenCalledTimes(2));
-  expect(screen.getByLabelText("Ir a página")).toHaveProperty("value", "4");
-  expect(await screen.findByText("Cambios pendientes")).toBeTruthy();
+  expect(screen.getByLabelText("Go to page")).toHaveProperty("value", "4");
+  expect(await screen.findByText("Changes pending")).toBeTruthy();
   expect(
-    screen.getByRole("button", { name: "Guardar mi posición" }),
+    screen.getByRole("button", { name: "Save my position" }),
   ).toBeTruthy();
-  expect(screen.queryByText("Guardado")).toBeNull();
+  expect(screen.queryByText("Saved")).toBeNull();
 });
 
 it.each([
-  ["conflict", "Conservar posición guardada"],
-  ["uncertain result", "Reintentar guardado de posición"],
+  ["conflict", "Keep saved position"],
+  ["uncertain result", "Retry saving position"],
 ])(
   "reader_reopened_same_document_receives_late_%s_controls",
   async (label, recoveryAction) => {
@@ -355,7 +355,7 @@ it.each([
       <PaperReader opened={current} api={readerApi} onClose={vi.fn()} />,
     );
     fireEvent.click(
-      await screen.findByRole("button", { name: "Página siguiente" }),
+      await screen.findByRole("button", { name: "Next page" }),
     );
     await waitFor(() => expect(save).toHaveBeenCalledTimes(1));
     first.unmount();
@@ -369,7 +369,7 @@ it.each([
         onClose={vi.fn()}
       />,
     );
-    await screen.findByRole("img", { name: /Página/ });
+    await screen.findByRole("img", { name: /Page/ });
     await act(async () => {
       finishSave(
         label === "conflict"
@@ -379,7 +379,7 @@ it.each([
               ok: false,
               error: {
                 code: "Conflict",
-                message: "La posición cambió en otra operación.",
+                message: "The position changed in another operation.",
                 retryable: false,
               },
             }
@@ -389,7 +389,7 @@ it.each([
               ok: false,
               error: {
                 code: "StorageUnavailable",
-                message: "No se pudo confirmar.",
+                message: "Could not confirm.",
                 retryable: true,
               },
             },

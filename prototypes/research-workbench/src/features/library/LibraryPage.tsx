@@ -67,7 +67,7 @@ export function LibraryPage({
     } catch {
       if (mounted.current && intent === openIntent.current)
         setActionError(
-          "No se pudo abrir el documento. Puedes intentarlo de nuevo.",
+          "Could not open the document. You can try again.",
         );
     }
   }
@@ -97,31 +97,31 @@ export function LibraryPage({
   }
   return (
     <section className="library-page">
-      <p className="eyebrow">Biblioteca local</p>
+      <p className="eyebrow">Local library</p>
       <div className="library-heading">
         <div>
-          <h1>Tu biblioteca</h1>
+          <h1>Your library</h1>
           <p className="lead">
-            Tus papers y sus copias PDF, reunidos en este equipo.
+            Your papers and their PDF copies, together on this computer.
           </p>
         </div>
         <button type="button" className="primary" onClick={beginImport}>
-          Importar PDF
+          Import PDF
         </button>
       </div>
       <div className="library-filters">
         <label>
-          Buscar por título, autores, DOI o revista
+          Search by title, authors, DOI, or journal
           <input
-            aria-label="Buscar en la biblioteca"
+            aria-label="Search the library"
             value={filter.query}
             onChange={(e) => setFilter({ ...filter, query: e.target.value })}
           />
         </label>
         <label>
-          Estado
+          Status
           <select
-            aria-label="Estado"
+            aria-label="Status"
             value={filter.lifecycle}
             onChange={(e) =>
               setFilter({
@@ -130,9 +130,9 @@ export function LibraryPage({
               })
             }
           >
-            <option value="ACTIVE">Activos</option>
-            <option value="ARCHIVED">Archivados</option>
-            <option value="ALL">Todos</option>
+            <option value="ACTIVE">Active</option>
+            <option value="ARCHIVED">Archived</option>
+            <option value="ALL">All</option>
           </select>
         </label>
       </div>
@@ -141,25 +141,25 @@ export function LibraryPage({
         <div role="alert">
           <p>{error}</p>
           <button type="button" onClick={reload}>
-            Reintentar
+            Try again
           </button>
         </div>
       )}
       {loading ? (
-        <p role="status">Cargando documentos…</p>
+        <p role="status">Loading documents…</p>
       ) : !error && papers.length === 0 ? (
         <div className="empty-state">
           <h2>
-            {filter.query ? "No hay resultados" : "Aún no hay documentos"}
+            {filter.query ? "No results" : "No documents yet"}
           </h2>
           <p>
             {filter.query
-              ? "Prueba otra búsqueda o cambia el filtro."
-              : "Importa tu primer PDF para comenzar a leer y organizar tu investigación."}
+              ? "Try another search or change the filter."
+              : "Import your first PDF to start reading and organizing your research."}
           </p>
           {!filter.query && (
             <button type="button" className="primary" onClick={beginImport}>
-              Importar PDF
+              Import PDF
             </button>
           )}
         </div>
@@ -170,33 +170,33 @@ export function LibraryPage({
               <div>
                 <p className="paper-state">
                   {paper.lifecycle === "ARCHIVED"
-                    ? "Archivado"
+                    ? "Archived"
                     : paper.lifecycle === "COMPLETED"
-                      ? "Completado"
-                      : "Activo"}{" "}
-                  · {paper.year ?? "Año sin indicar"}
+                      ? "Completed"
+                      : "Active"}{" "}
+                  · {paper.year ?? "Year not specified"}
                 </p>
                 <h2>{paper.title}</h2>
                 <p>
-                  {paper.authors.join(", ") || "Autores sin indicar"}
+                  {paper.authors.join(", ") || "Authors not specified"}
                   {paper.venue ? ` · ${paper.venue}` : ""}
                 </p>
                 {paper.doi && <p className="muted">DOI: {paper.doi}</p>}
               </div>
               <div className="actions">
                 <button type="button" onClick={() => void open(paper.id)}>
-                  Leer
+                  Read
                 </button>
                 <button type="button" onClick={() => selectPaper(paper)}>
-                  Editar
+                  Edit
                 </button>
                 {paper.lifecycle === "ARCHIVED" ? (
                   <button type="button" onClick={() => void restore(paper)}>
-                    Restaurar
+                    Restore
                   </button>
                 ) : (
                   <button type="button" onClick={() => void archive(paper)}>
-                    Archivar
+                    Archive
                   </button>
                 )}
               </div>
@@ -207,21 +207,21 @@ export function LibraryPage({
       {(nextCursor || hasPreviousPage) && (
         <nav
           className="library-pagination"
-          aria-label="Páginas de la biblioteca"
+          aria-label="Library pages"
         >
           <button
             type="button"
             disabled={!hasPreviousPage || loading}
             onClick={previousPage}
           >
-            Página anterior
+            Previous page
           </button>
           <button
             type="button"
             disabled={!nextCursor || loading}
             onClick={nextPage}
           >
-            Siguiente página
+            Next page
           </button>
         </nav>
       )}

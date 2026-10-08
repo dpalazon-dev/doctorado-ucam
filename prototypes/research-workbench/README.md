@@ -1,14 +1,14 @@
 # Research Workbench
 
-> **Prototipo parcial pausado.** Este proyecto se publica como referencia reutilizable y base para forks; actualmente no tiene mantenimiento activo porque su autor no dispone de tiempo. La publicación no implica compromiso de soporte o respuesta a issues. Es un prototipo Windows 11 x64 independiente, no una implementación de las Specs ResearchOS. Véase la [procedencia y límites del snapshot](../../docs/publication/README.md).
+> **Partial, paused prototype.** This project is published as a reusable reference and starting point for forks. It has no active maintenance because the author currently has no time to continue it. It is an independent Windows 11 x64 prototype, not an implementation of the ResearchOS specifications. See [snapshot provenance and limitations](../../docs/publication/README.md).
 
-Aplicación de escritorio local para leer papers y convertirlos en conocimiento estructurado con procedencia. Windows 11 x64 · Tauri 2 · React/TypeScript · Rust · SQLite.
+A local desktop application for reading papers and turning them into structured knowledge with explicit provenance. Windows 11 x64 · Tauri 2 · React/TypeScript · Rust · SQLite.
 
-El estado de ejecución conserva la evidencia e historia de desarrollo local. Consulta [estado](docs/STATUS.md), [intención](INTENT.md), [arquitectura](docs/architecture/README.md) y [plan](docs/plans/IMPLEMENTATION.md); la pausa de mantenimiento se describe arriba.
+The execution status preserves evidence from local development. See [status](docs/STATUS.md), [intent](INTENT.md), [architecture](docs/architecture/README.md) and [implementation plan](https://github.com/dpalazon-dev/doctorado-ucam/blob/c985b079d39ee5915c017c38c1f50b7a94526843/prototypes/research-workbench/docs/plans/IMPLEMENTATION.md).
 
-## Desarrollo
+## Development
 
-El directorio contiene el proyecto completo del prototipo para inspección y forks. En Windows x64 se requieren Node.js/npm, Rust con target MSVC, Visual Studio C++ Build Tools y SDK de Windows, y WebView2 Runtime. Desde PowerShell abierto en este directorio:
+This directory contains the prototype project for inspection and forks. Development on Windows x64 requires Node.js/npm, Rust with the MSVC target, Visual Studio C++ Build Tools and the Windows SDK, and the WebView2 Runtime. From PowerShell in this directory:
 
 ```powershell
 npm.cmd ci
@@ -17,8 +17,12 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/check.ps1
 npm.cmd run tauri:dev
 ```
 
-Los checks y el modo debug deben usar datos sintéticos. La guía de [`docs/development/ENVIRONMENT.md`](docs/development/ENVIRONMENT.md) contiene detalles de toolchain y límites de validación.
+Use synthetic libraries for checks and debug development. [The environment guide](docs/development/ENVIRONMENT.md) records toolchain details and validation limits.
 
-## Fuentes de la instantánea
+## Snapshot sources
 
-La carpeta `docs/session/` y los materiales de trabajo auxiliares fueron excluidos de la publicación. Los originales permanecen únicamente en el repositorio fuente local; no forman parte de este snapshot. La especificación original editable está disponible en [`docs/PRODUCT.md`](docs/PRODUCT.md).
+The `docs/session/` directory and auxiliary working materials were excluded from publication. The originals remain in the local source repository; they are not included in this snapshot. The original editable product specification is available in [docs/PRODUCT.md](docs/PRODUCT.md).
+
+## Language
+
+Current documentation, source comments and interface copy use English. Immutable versioned definition snapshots and original source quotations retain their original data values so their hashes, saved answers and historical evidence remain valid. Presentation text is separate from those identities.

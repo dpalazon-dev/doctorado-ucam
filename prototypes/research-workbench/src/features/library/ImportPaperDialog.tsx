@@ -97,7 +97,7 @@ export function ImportPaperDialog({
       setPreview(result.data);
       setCandidates(result.data.candidates);
     } catch {
-      setError("No se pudo seleccionar el PDF.");
+      setError("Could not select the PDF.");
     } finally {
       setPending(false);
       onOperationFinished();
@@ -129,7 +129,7 @@ export function ImportPaperDialog({
       onClose();
     } catch {
       setError(
-        "No se pudo cancelar la importación. El borrador sigue disponible.",
+        "Could not cancel the import. The draft is still available.",
       );
     } finally {
       setPending(false);
@@ -150,13 +150,13 @@ export function ImportPaperDialog({
       } else {
         setOpenFailed(candidate);
         setError(
-          "La importación se canceló. No se pudo abrir el documento existente; puedes reintentarlo.",
+          "The import was cancelled. Could not open the existing document; you can try again.",
         );
       }
     } catch {
       setOpenFailed(candidate);
       setError(
-        "La importación se canceló. No se pudo abrir el documento existente; puedes reintentarlo.",
+        "The import was cancelled. Could not open the existing document; you can try again.",
       );
     } finally {
       setPending(false);
@@ -165,7 +165,7 @@ export function ImportPaperDialog({
   async function submit() {
     if (!preview) return;
     if (!metadata.title) {
-      setError("Escribe un título para identificar el documento.");
+      setError("Enter a title to identify the document.");
       return;
     }
     if (
@@ -174,7 +174,7 @@ export function ImportPaperDialog({
         metadata.year < 1000 ||
         metadata.year > 9999)
     ) {
-      setError("El año debe tener cuatro cifras.");
+      setError("Year must have four digits.");
       return;
     }
     setPending(true);
@@ -202,12 +202,12 @@ export function ImportPaperDialog({
         if (valid.length) setCandidates(valid);
         else
           setError(
-            "Se detectó un duplicado, pero no se pudo validar su ficha. Puedes cancelar la importación.",
+            "A duplicate was detected, but its record could not be validated. You can cancel the import.",
           );
       } else setError(result.error.message);
     } catch {
       setError(
-        "No se pudo guardar el PDF. Conservamos la importación para que puedas intentarlo de nuevo.",
+        "Could not save the PDF. The import has been kept so you can try again.",
       );
     } finally {
       setPending(false);
@@ -223,10 +223,10 @@ export function ImportPaperDialog({
       }}
     >
       <DialogContent showClose={!pending} aria-describedby="import-description">
-        <DialogTitle>Importar PDF</DialogTitle>
+        <DialogTitle>Import PDF</DialogTitle>
         <DialogDescription id="import-description">
-          Se guardará una copia local administrada. El archivo original podrá
-          moverse después.
+          A managed local copy will be saved. You can move the original file
+          later.
         </DialogDescription>
         {error && (
           <p id="import-error" role="alert">
@@ -240,7 +240,7 @@ export function ImportPaperDialog({
               disabled={pending}
               onClick={() => void openExisting(openFailed)}
             >
-              Reintentar abrir existente
+              Try opening the existing paper again
             </button>
           </div>
         ) : !preview ? (
@@ -251,27 +251,26 @@ export function ImportPaperDialog({
               disabled={pending}
               onClick={() => void select()}
             >
-              Seleccionar PDF
+              Select PDF
             </button>
           </div>
         ) : candidates.length > 0 ? (
           <div className="duplicate-choice">
-            <p>Este documento puede estar ya en tu biblioteca:</p>
+            <p>This document may already be in your library:</p>
             {candidates.map((candidate) => (
               <article key={candidate.paperId}>
                 <h3>{candidate.title}</h3>
                 <p>
-                  Coincidencia:{" "}
-                  {candidate.reasons
-                    .map((reason) => (reason === "doi" ? "DOI" : "archivo"))
-                    .join(" y ")}
+                  Match: {candidate.reasons
+                    .map((reason) => (reason === "doi" ? "DOI" : "file"))
+                    .join(" and ")}
                 </p>
                 <button
                   type="button"
                   disabled={pending}
                   onClick={() => void cancel(candidate)}
                 >
-                  Abrir existente
+                  Open existing
                 </button>
               </article>
             ))}
@@ -280,7 +279,7 @@ export function ImportPaperDialog({
               disabled={pending}
               onClick={() => void cancel()}
             >
-              Cancelar importación
+              Cancel import
             </button>
           </div>
         ) : (
@@ -296,7 +295,7 @@ export function ImportPaperDialog({
             </p>
             <div className="metadata-form">
               <label>
-                Título
+                Title
                 <input
                   autoFocus
                   value={title}
@@ -306,20 +305,20 @@ export function ImportPaperDialog({
                 />
               </label>
               <label>
-                Autores
+                Authors
                 <input
                   value={authors}
                   onChange={(event) => setAuthors(event.target.value)}
-                  placeholder="Opcional; separados por coma"
+                  placeholder="Optional; comma-separated"
                 />
               </label>
               <label>
-                Año
+                Year
                 <input
                   inputMode="numeric"
                   value={year}
                   onChange={(event) => setYear(event.target.value)}
-                  placeholder="Opcional"
+                  placeholder="Optional"
                 />
               </label>
               <label>
@@ -330,14 +329,14 @@ export function ImportPaperDialog({
                 />
               </label>
               <label>
-                Revista o editorial
+                Journal or publisher
                 <input
                   value={venue}
                   onChange={(event) => setVenue(event.target.value)}
                 />
               </label>
               <label>
-                Tipo de revisión
+                Review type
                 <select
                   value={reviewType}
                   onChange={(event) =>
@@ -358,13 +357,13 @@ export function ImportPaperDialog({
                     <option key={value} value={value}>
                       {
                         {
-                          unknown: "Desconocido",
-                          survey: "Encuesta",
-                          topical_review: "Revisión temática",
-                          slr: "Revisión sistemática",
-                          mapping_study: "Mapeo",
+                          unknown: "Unknown",
+                          survey: "Survey",
+                          topical_review: "Topical review",
+                          slr: "Systematic review",
+                          mapping_study: "Mapping study",
                           tutorial: "Tutorial",
-                          other: "Otro",
+                          other: "Other",
                         }[value]
                       }
                     </option>
@@ -372,7 +371,7 @@ export function ImportPaperDialog({
                 </select>
               </label>
               <label>
-                Dominio
+                Domain
                 <input
                   value={domain}
                   onChange={(event) => setDomain(event.target.value)}
@@ -381,14 +380,14 @@ export function ImportPaperDialog({
             </div>
             <div className="actions">
               <button type="submit" className="primary" disabled={pending}>
-                Guardar en biblioteca
+                Save to library
               </button>
               <button
                 type="button"
                 disabled={pending}
                 onClick={() => void cancel()}
               >
-                Cancelar
+                Cancel
               </button>
             </div>
           </form>

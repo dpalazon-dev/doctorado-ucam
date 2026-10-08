@@ -816,7 +816,7 @@ See [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md) for Derived Types and cross-ver
 
 **Intention.** Set up a university course (*asignatura*) as an organised initiative — objectives, teaching guide, session plan and assessment scheme — reusing existing knowledge rather than starting from a blank syllabus.
 
-**Context.** A course recurs each academic year and must align its learning outcomes with a calendar, an official teaching guide (*guía docente*) and an assessment scheme under the institution's rules. Much of its content already exists as the researcher's own knowledge, documents and prior editions; the work is to organise it into a teachable structure.
+**Context.** A course recurs each academic year and must align its learning outcomes with a calendar, an official teaching guide and an assessment scheme under the institution's rules. Much of its content already exists as the researcher's own knowledge, documents and prior editions; the work is to organise it into a teachable structure.
 
 **Operational Flow.**
 1. Acquire the course's framing: degree, credits, competencies, calendar and institutional rules. → *Acquire (Register)*
@@ -874,7 +874,7 @@ See [TEACHING_VERTICAL.md](TEACHING_VERTICAL.md) for Derived Types and cross-ver
 
 **Intention.** Create an assessment instrument — an exam or a continuous-evaluation assignment — with a rubric aligned to the course's learning outcomes.
 
-**Context.** Assessment must measure the declared learning outcomes fairly and defensibly, and under continuous evaluation (*evaluación continua*) it recurs several times per term. A rubric makes the resulting grades reproducible and justifiable to students and to the institution.
+**Context.** Assessment must measure the declared learning outcomes fairly and defensibly, and under continuous evaluation it recurs several times per term. A rubric makes the resulting grades reproducible and justifiable to students and to the institution.
 
 **Operational Flow.**
 1. Retrieve the course, its learning outcomes and the sessions the assessment must cover. → *Retrieve*

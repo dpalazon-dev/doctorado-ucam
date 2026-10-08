@@ -1,16 +1,16 @@
-# T02 — selección nativa de PDF: verificación técnica
+# T02 — native PDF selection: technical verification
 
-Verificado el 1 de octubre de 2026. Decisión adoptada por el coordinador para T02; aún no se ha añadido ni probado esta dependencia.
+Verified on 1 October 2026. Decision adopted by the coordinator for T02; this dependency has not yet been added or tested.
 
-La [guía oficial Dialog de Tauri](https://v2.tauri.app/plugin/dialog/) permite utilizar el selector desde Rust sin instalar el paquete JavaScript. La operación `pick_file` recibe un callback y evita la variante bloqueante. Las rutas seleccionadas quedan en backend; la interfaz del proyecto devolverá únicamente el token y metadatos del contrato. La guía también describe permisos genéricos del plugin, que no deben concederse al frontend de esta aplicación.
+The [official Tauri Dialog guide](https://v2.tauri.app/plugin/dialog/) allows using the picker from Rust without installing the JavaScript package. The `pick_file` operation receives a callback and avoids the blocking variant. Selected paths remain in the backend; the project interface will return only the token and contract metadata. The guide also describes generic plugin permissions, which must not be granted to this application's frontend.
 
-El [registro de la crate](https://crates.io/crates/tauri-plugin-dialog/2.8.1) y su API devolvieron:
+The [crate registry](https://crates.io/crates/tauri-plugin-dialog/2.8.1) and its API returned:
 - tauri-plugin-dialog 2.8.1; rust_version 1.90; Apache-2.0 OR MIT.
-- Dependencia tauri ^2.12, compatible por restricción de versión con tauri=2.12.1 del scaffold y Rust1.99.0. La compilación de T02 deberá demostrar compatibilidad real.
-- Dependencias relevantes: rfd ^0.16 y tauri-plugin-fs ^2.6.0; dependencia transitoria no implica permiso frontend.
-- Checksum crate: daf9a5c92e39bdd84f22f6be9230e39d0c4e140345f71ffe6058dca4f71127cf.
-- Metadatos fuente: https://crates.io/api/v1/crates/tauri-plugin-dialog y https://crates.io/api/v1/crates/tauri-plugin-dialog/2.8.1/dependencies.
+- Dependency tauri ^2.12, compatible by version constraint with scaffold tauri=2.12.1 and Rust1.99.0. The T02 build must demonstrate actual compatibility.
+- Relevant dependencies: rfd ^0.16 and tauri-plugin-fs ^2.6.0; a transitive dependency does not imply frontend permission.
+- Crate checksum: daf9a5c92e39bdd84f22f6be9230e39d0c4e140345f71ffe6058dca4f71127cf.
+- Source metadata: https://crates.io/api/v1/crates/tauri-plugin-dialog and https://crates.io/api/v1/crates/tauri-plugin-dialog/2.8.1/dependencies.
 
-La [referencia Rust](https://docs.rs/tauri-plugin-dialog/2.8.1/tauri_plugin_dialog/) confirma DialogExt y FileDialogBuilder. El enlace detallado a FileDialogBuilder no fue accesible mediante web en esta consulta; verificar firma exacta en fuente descargada al implementar, sin inventarla.
+The [Rust reference](https://docs.rs/tauri-plugin-dialog/2.8.1/tauri_plugin_dialog/) confirms DialogExt and FileDialogBuilder. The detailed FileDialogBuilder link was inaccessible through the web during this inquiry; verify the exact signature in downloaded source when implementing, without inventing it.
 
-Decisión de implementación: pin Cargo =2.8.1 y registro backend del plugin, sin paquete npm ni `dialog:default`/`dialog:allow-open`. Callback bridged a oneshot y puerto de selección, filtro PDF sin tratar extensión como validación del archivo. Mantener los63 comandos propios del contrato y probar que invocar directamente plugin:dialog|open desde main sigue denegado. Actualizar inventario de licencias/lockfile. No usar el instalador automático tauri add, que podría ampliar configuración sin revisar. Estos detalles son decisiones propias del proyecto; las fuentes anteriores sustentan disponibilidad/API, no acreditan que ya esté integrado.
+Implementation decision: pin Cargo =2.8.1 and register the plugin in the backend, without an npm package or `dialog:default`/`dialog:allow-open`. Bridge the callback to a oneshot and the selection port; use a PDF filter without treating the extension as file validation. Keep the contract's 63 custom commands and test that invoking plugin:dialog|open directly from main remains denied. Update the license inventory and lockfile. Do not use the automatic tauri add installer, which could expand configuration without review. These details are project decisions; the sources above establish availability/API, not evidence that integration has occurred.

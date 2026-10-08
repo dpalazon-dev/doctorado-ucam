@@ -54,7 +54,7 @@ export async function loadPdfFromTask(
     const pdf = await task.promise;
     if (signal.aborted) {
       await destroyTask().catch(() => undefined);
-      throw new DOMException("La lectura se canceló.", "AbortError");
+      throw new DOMException("Reading was cancelled.", "AbortError");
     }
     return createDocument(pdf, destroyTask, signal, () =>
       signal.removeEventListener("abort", onAbort),
@@ -78,11 +78,11 @@ function createDocument(
     numPages: pdf.numPages,
     async renderPage(pageIndex, zoom, canvas, signal) {
       if (destroyed || loadSignal.aborted || signal.aborted)
-        throw new DOMException("La lectura se canceló.", "AbortError");
+        throw new DOMException("Reading was cancelled.", "AbortError");
       const page = await pdf.getPage(pageIndex);
       if (destroyed || loadSignal.aborted || signal.aborted) {
         page.cleanup();
-        throw new DOMException("La lectura se canceló.", "AbortError");
+        throw new DOMException("Reading was cancelled.", "AbortError");
       }
       let render: RenderTask | undefined;
       let cancel: (() => void) | undefined;
@@ -92,7 +92,7 @@ function createDocument(
         canvas.height = Math.ceil(viewport.height);
         const context = canvas.getContext("2d");
         if (!context)
-          throw new Error("No se pudo preparar el lienzo de lectura.");
+          throw new Error("Could not prepare the reading canvas.");
         render = page.render({ canvas, canvasContext: context, viewport });
         active.add(render);
         cancel = () => render?.cancel();

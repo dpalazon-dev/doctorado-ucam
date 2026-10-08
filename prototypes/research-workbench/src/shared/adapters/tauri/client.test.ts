@@ -13,7 +13,7 @@ it('received invalid envelopes or payloads are integrity failures without retrie
 it('transport failure and structured failures retain their separate semantics',async()=>{
  const thrown=await createTauriApis(async()=>{throw new Error('private');}).settings.getAppInfo({requestId});
  expect(thrown.ok).toBe(false);if(!thrown.ok)expect(thrown.error.code).toBe('StorageUnavailable');
- const failure={contractVersion:1,requestId,ok:false,error:{code:'Busy',message:'Biblioteca ocupada.',retryable:true}};
+ const failure={contractVersion:1,requestId,ok:false,error:{code:'Busy',message:'Library is busy.',retryable:true}};
  for(const invoke of [async()=>failure,async()=>{throw failure;}]) expect(await createTauriApis(invoke).settings.getAppInfo({requestId})).toEqual(failure);
 });
 it('validates payload and envelope from simulated invoke',async()=>{const invoke=vi.fn(async()=>fixture);const api=createTauriApis(invoke);const result=await api.settings.getAppInfo({requestId});expect(result.ok).toBe(true);expect(invoke).toHaveBeenCalledWith('settings_get_app_info',{args:{requestId}});});
@@ -53,7 +53,7 @@ it('library and reader clients route every enabled command through the validated
 
 it('reader client accepts and preserves the previous confirmed UTC receipt and position timestamps',async()=>{
  const legacyTime='2026-10-03T14:36:22.575865800+00:00';
- const opened={paper:{title:'Paper sintético',authors:[],year:null,doi:null,venue:null,reviewType:'unknown',domain:null,id:requestId,documentId:requestId,lifecycle:'NEW',archivedFromLifecycle:null,activePhaseCode:null,processingInitialized:false,revision:0,createdAt:'2026-10-01T00:00:00Z',updatedAt:'2026-10-01T00:00:00Z',lastOpenedAt:legacyTime},document:{id:requestId,paperId:requestId,originalFilename:'synthetic.pdf',sha256:'a'.repeat(64),importedAt:'2026-10-01T00:00:00Z',status:'ACTIVE'},readingPosition:{documentId:requestId,pageIndex:1,zoom:1,revision:0,updatedAt:legacyTime},documentUrl:`http://research.localhost/${requestId}`};
+ const opened={paper:{title:'Synthetic paper',authors:[],year:null,doi:null,venue:null,reviewType:'unknown',domain:null,id:requestId,documentId:requestId,lifecycle:'NEW',archivedFromLifecycle:null,activePhaseCode:null,processingInitialized:false,revision:0,createdAt:'2026-10-01T00:00:00Z',updatedAt:'2026-10-01T00:00:00Z',lastOpenedAt:legacyTime},document:{id:requestId,paperId:requestId,originalFilename:'synthetic.pdf',sha256:'a'.repeat(64),importedAt:'2026-10-01T00:00:00Z',status:'ACTIVE'},readingPosition:{documentId:requestId,pageIndex:1,zoom:1,revision:0,updatedAt:legacyTime},documentUrl:`http://research.localhost/${requestId}`};
  const paper=opened.paper;
  const position={documentId:requestId,pageIndex:2,zoom:1.25,revision:1,updatedAt:legacyTime};
  const responses=[opened,paper,position,position].map(data=>({contractVersion:1,requestId,ok:true,data}));

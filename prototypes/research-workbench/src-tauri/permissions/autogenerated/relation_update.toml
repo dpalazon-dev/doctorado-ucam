@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-relation-update"
+description = "Enables the relation_update command without any pre-configured scope."
+commands.allow = ["relation_update"]
+
+[[permission]]
+identifier = "deny-relation-update"
+description = "Denies the relation_update command without any pre-configured scope."
+commands.deny = ["relation_update"]

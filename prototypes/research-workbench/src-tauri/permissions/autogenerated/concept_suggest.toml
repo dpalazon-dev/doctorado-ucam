@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-concept-suggest"
+description = "Enables the concept_suggest command without any pre-configured scope."
+commands.allow = ["concept_suggest"]
+
+[[permission]]
+identifier = "deny-concept-suggest"
+description = "Denies the concept_suggest command without any pre-configured scope."
+commands.deny = ["concept_suggest"]

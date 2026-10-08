@@ -1,0 +1,122 @@
+{
+  "code": "P2",
+  "version": 1,
+  "name": "P2 — Modelo conceptual",
+  "objective": "Procesar preguntas, síntesis, conceptos, relaciones y referencias, conservando trazabilidad y una decisión explícita sobre candidatos P3.",
+  "keyQuestions": [
+    "¿Cómo responde el paper a las preguntas de lectura?",
+    "¿Qué síntesis y conceptos pertinentes obtengo?",
+    "¿Qué relaciones o contradicciones encuentro?",
+    "¿Qué referencias clasifico y qué candidatos justifico para P3?"
+  ],
+  "doItems": [
+    "Conservar notas y enlaces consultables de lo que captures.",
+    "Distinguir fuente, interpretación e hipótesis.",
+    "Justificar la ausencia de contradicciones y de candidatos."
+  ],
+  "dontItems": [
+    "Inventar conceptos, relaciones o contradicciones para superar la comprobación.",
+    "Presentar P2 completada como validación de las afirmaciones o cierre de P3/P4."
+  ],
+  "considerations": [
+    "No se exige una cantidad mínima de conceptos, relaciones o contradicciones.",
+    "Los candidatos son afirmaciones o preguntas enlazadas al paper.",
+    "Cero candidatos requiere justificación; con candidatos no se requiere una justificación de ausencia."
+  ],
+  "requiredOutputs": [
+    {
+      "key": "main_questions_processed",
+      "label": "Preguntas principales procesadas",
+      "prompt": "Explica cómo has procesado las preguntas principales; justifica el desconocimiento o la no aplicabilidad.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "ruleKey": "p2ArtifactPresent"
+    },
+    {
+      "key": "field_synthesis",
+      "label": "Síntesis del campo",
+      "prompt": "Enlaza tus notas de síntesis y resúmela; si no puedes formularla o no hay material pertinente, explica la ausencia.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED",
+        "UNKNOWN"
+      ],
+      "ruleKey": "p2ArtifactPresent"
+    },
+    {
+      "key": "relevant_concepts_reviewed",
+      "label": "Conceptos pertinentes revisados",
+      "prompt": "Resume qué conceptos has revisado y conserva los capturados como notas consultables; justifica el desconocimiento o la no aplicabilidad.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "ruleKey": "p2ArtifactPresent"
+    },
+    {
+      "key": "meaningful_relations_reviewed",
+      "label": "Relaciones pertinentes revisadas",
+      "prompt": "Resume qué relaciones has revisado y conserva las capturadas como enlaces; justifica el desconocimiento o la no aplicabilidad.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "ruleKey": "p2ArtifactPresent"
+    },
+    {
+      "key": "contradictions_reviewed",
+      "label": "Contradicciones revisadas",
+      "prompt": "Describe las contradicciones revisadas o explica su ausencia; no inventes ninguna.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "ruleKey": "p2ArtifactPresent"
+    },
+    {
+      "key": "references_classified",
+      "label": "Referencias clasificadas",
+      "prompt": "Resume la clasificación de las referencias y conserva las capturadas; justifica el desconocimiento o la no aplicabilidad.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "ruleKey": "p2ArtifactPresent"
+    },
+    {
+      "key": "p3_candidates_or_justification",
+      "label": "Candidatos P3 o justificación de ausencia",
+      "prompt": "Selecciona candidatos pertinentes con motivo o explica por qué no has seleccionado ninguno.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED"
+      ],
+      "ruleKey": "p2ArtifactPresent"
+    }
+  ],
+  "completionRules": [
+    "answerProcessed",
+    "p2ArtifactPresent",
+    "p2NoCandidatesJustified"
+  ],
+  "definitionHash": "2c8059fce6d4beadf442ea9d9f5d063906b5e1542f6fe0972e1c6f85be509393"
+}

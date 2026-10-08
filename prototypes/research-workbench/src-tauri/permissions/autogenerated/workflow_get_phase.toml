@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-workflow-get-phase"
+description = "Enables the workflow_get_phase command without any pre-configured scope."
+commands.allow = ["workflow_get_phase"]
+
+[[permission]]
+identifier = "deny-workflow-get-phase"
+description = "Denies the workflow_get_phase command without any pre-configured scope."
+commands.deny = ["workflow_get_phase"]

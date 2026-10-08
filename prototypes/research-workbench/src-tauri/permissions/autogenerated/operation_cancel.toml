@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-operation-cancel"
+description = "Enables the operation_cancel command without any pre-configured scope."
+commands.allow = ["operation_cancel"]
+
+[[permission]]
+identifier = "deny-operation-cancel"
+description = "Denies the operation_cancel command without any pre-configured scope."
+commands.deny = ["operation_cancel"]

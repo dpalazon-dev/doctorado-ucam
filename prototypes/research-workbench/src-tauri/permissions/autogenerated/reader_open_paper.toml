@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-reader-open-paper"
+description = "Enables the reader_open_paper command without any pre-configured scope."
+commands.allow = ["reader_open_paper"]
+
+[[permission]]
+identifier = "deny-reader-open-paper"
+description = "Denies the reader_open_paper command without any pre-configured scope."
+commands.deny = ["reader_open_paper"]

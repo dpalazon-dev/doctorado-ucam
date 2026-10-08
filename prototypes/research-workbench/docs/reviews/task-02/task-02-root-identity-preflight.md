@@ -1,0 +1,29 @@
+# T02fix1 — preflight de identidad raíz y ownership
+
+**DONE — propuesta interna de ownership; no constituye revisión ni aprobación del fix.**
+
+Agente `/root/task02_root_identity_preflight`. Fuente de producto exclusiva: baseline `45c4c8c48269495b74241004f92f68acf4770708`, consultada con `git show`/`git grep`. Leídos AGENTS, INTENT, STATUS, brief T02/F10, MANAGED_FILES y preflight central. No se consultó WIP ni store, no hubo código, pruebas, instalaciones, subagentes ni mutaciones Git. Única escritura: este informe.
+
+## Evidencia y hueco concreto
+
+- `src-tauri/src/adapters/windows/paths.rs:4–13`: `LibraryRoot` retiene exclusivamente `PathBuf`; `at` no abre ni valida un objeto y `Clone` solo duplica la ruta. `database/backups/logs` derivan paths (`14–29`); `resolve_data_root` comprueba ruta absoluta y produce otra instancia (`35–52`). Ninguna identidad Windows ni guarda persiste.
+- `src-tauri/src/adapters/sqlite/actor.rs:48–68`: `prepare` comprueba existencia de SQLite, crea root para biblioteca nueva, luego hace probe; para esquema admitido adquiere lock y abre DB. El esquema futuro reutiliza la conexión de diagnóstico sin adquirir lock (`59–61`), aplica query_only (`77–79`) y no ejecuta las creaciones de documentos/manifiesto reservadas a writable (`132–150`).
+- `src-tauri/src/adapters/sqlite/actor.rs:163–198`: `start` mueve root al hilo, pero el handshake transmite solo `LibraryInfoDto` (`173`) y `Inner` no retiene ni expone root (`21–25`). El UUID de biblioteca es identidad lógica validada contra manifest/DB (`95–131`), no identidad del directorio Windows.
+- `src-tauri/src/desktop/lifecycle.rs:95–97`: Desktop resuelve root y lo entrega al actor. `src-tauri/src/lib.rs:24–28` vuelve a resolver root y construye `LocalDocumentStore` con esa instancia distinta. Canonicalizar aquí podría autorizar un directorio sustituido después del arranque del actor.
+
+## Propuesta mínima que transferir al autor
+
+1. **`adapters/windows/paths.rs`**: conservar `LibraryRoot::at(PathBuf) -> Self` y `resolve_data_root() -> Result<LibraryRoot, AppError>` como especificación de ubicación, sin I/O ni creación anticipada. Añadir estado privado de raíz abierta que retenga una guarda RAII compartida (`Arc`) del helper Windows autorizado. Fijarla una sola vez al abrir la biblioteca; los clones comparten exactamente esa guarda/identidad. El estado no ligado no puede autorizar DocumentStore. Una forma mínima de firmas internas es `bind_existing(&mut self) -> Result<(), AppError>` y un accessor fallible a la guarda; no deben permitir rebind ni convertir una canonicalización posterior en nueva autorización.
+2. **`adapters/sqlite/actor.rs`**: en `prepare`, ligar la raíz existente antes del primer probe/apertura de SQLite/manifiesto; para raíz nueva, crearla con padres protegidos y ligarla antes de esos accesos. La comprobación actual de existencia de DB debe quedar bajo la raíz ligada. Mantener la guarda durante preparación y vida del actor. El handshake de arranque entrega también el `LibraryRoot` ligado, y `Inner` lo conserva; firma adicional mínima: `pub(crate) fn library_root(&self) -> &LibraryRoot`. `DbActor::start(root: LibraryRoot) -> Result<Self, AppError>` puede conservarse. El helper no constituye un nuevo servicio ni cambia DTO/IPC.
+3. **`lib.rs`** (ya transferido): quitar la segunda resolución y pasar `desktop.actor.library_root().clone()` al Store. Su constructor valida que la raíz ya está ligada; si esa validación requiere error, ajustar internamente a `new(root: LibraryRoot) -> Result<Self, AppError>`. Nunca abrir/ligar una raíz todavía no ligada desde el constructor Store. **`desktop/lifecycle.rs`** ya está transferido; no necesita un segundo root público ni cambio de factory si el actor ofrece el accessor anterior.
+4. Transferir explícitamente al autor **paths.rs y actor.rs**, además de las pruebas sintéticas pertinentes de **`tests/db_actor.rs` y `tests/schema_diagnostic.rs`** si requiere editarlas. lib/lifecycle, helper/export Windows y library_integration ya pertenecen a T02. No hacen falta cambios en migración 0001, schema_probe, contratos, Settings ni configuración global para esta solución.
+
+## Condiciones y riesgos para implementación/revisión
+
+- La guarda debe probar identidad del objeto y retener root y padres necesarios antes de abrir/crear descendientes; conservar solo una identidad numérica, path canonical o handle al último archivo no basta. El detalle de flags/FFI corresponde al helper y su revisión F10, fuera de este preflight.
+- La adquisición para una raíz existente ha de ser sin mutación: no crear directorios, lockfile, staging ni manifest; conservar la rama future-schema query_only y su ausencia de lock/migración. Construir Store tampoco debe causar I/O de creación para un actor diagnóstico. No se convierte ese actor en writable porque tenga guarda.
+- Una sustitución después de ligar root debe impedirse o producir error seguro contra esa identidad, nunca rebind. El root transferido por el actor evita además divergencia por una segunda lectura de variables de entorno.
+- Mantener vida compartida de guardas hasta que actor y operaciones de filesystem terminen; especificar su liberación al cerrar para no romper reapertura ni limpieza de fixtures Windows. No inferir que library_id ni `LibraryLock` demuestran identidad del directorio.
+- Regresiones a encargar al autor: sustitución entre actor-ready y Store, Store rechazando root no ligado, clones conservando la misma raíz, y diagnóstico future-schema sin nuevos recursos ni escrituras. Este informe no ejecutó esas pruebas ni certifica comportamiento Windows.
+
+Autorrevisión: referencias verificadas en el commit fijado; propuesta limitada al hueco de autoridad de raíz y a ownership T01 necesario para corregirlo. La implementación concreta y los hallazgos F10/F11 siguen abiertos.

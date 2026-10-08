@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-workflow-set-p3-candidate"
+description = "Enables the workflow_set_p3_candidate command without any pre-configured scope."
+commands.allow = ["workflow_set_p3_candidate"]
+
+[[permission]]
+identifier = "deny-workflow-set-p3-candidate"
+description = "Denies the workflow_set_p3_candidate command without any pre-configured scope."
+commands.deny = ["workflow_set_p3_candidate"]

@@ -5,3 +5,7 @@
 # Python
 __pycache__/
 *.pyc
+
+# Local worktrees, reports, caches and test data
+/.worktrees/
+/work/

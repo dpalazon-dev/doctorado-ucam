@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-concept-update"
+description = "Enables the concept_update command without any pre-configured scope."
+commands.allow = ["concept_update"]
+
+[[permission]]
+identifier = "deny-concept-update"
+description = "Denies the concept_update command without any pre-configured scope."
+commands.deny = ["concept_update"]

@@ -1,0 +1,2970 @@
+diff --git a/docs/reports/task-04c-fix1-report.md b/docs/reports/task-04c-fix1-report.md
+new file mode 100644
+index 0000000..c296874
+--- /dev/null
++++ b/docs/reports/task-04c-fix1-report.md
+@@ -0,0 +1,45 @@
++# T04c fix1 — checkpoint de gate
++
++**Estado:** `DONE_WITH_CONCERNS` para revisión; no declarar integración funcional. La revisión estática encontró un caso S2/F1 pendiente, por lo que el build Tauri no se ejecutó sobre este corte.
++
++## Identidad
++
++- Rama: `agent/task-04c-workflow-ui`
++- Base fix1: `c14c97dd8cfa2209e5596ef5ef8c39540973ad99`
++- Producto congelado: `37169112abd10d7639265af589b76904e734b290` (`fix(workflow): reconcile confirmed actions across remounts`)
++- Gate documental: este informe solamente; HEAD de producto sigue siendo el SHA anterior.
++
++## Cambios y cierres de fix1
++
++El delta de producto aborda S1–S8, TS9/TS10 y R1: reconfirmación NEEDS_REVIEW PRE/P1; relectura/notificación entre vistas; bloqueo por intenciones locales globales; identidad monotónica y replay con argumentos congelados; distinción entre respuesta ausente y PENDING durable; lectura P2 sin mutación; conflicto con valores actuales y borrador local; reevaluación explícita de GateBlocked; fixture Reader tipado; y replay acotado de una operación ARCHIVED ya pendiente.
++
++También se cubre el caso de recibo histórico: el resultado confirma la operación original, no el lifecycle/contexto actual. La vista archivada no adopta lifecycle histórico; una relectura completa gobierna controles y contexto. `refreshRequired` impide transiciones con tokens viejos tras éxito confirmado y refresh fallido, y Retry Load vuelve a reconciliar sin reenviar la mutación.
++
++## Validación ejecutada
++
++Desde el worktree indicado, se dot-sourceó `scripts/development-env.ps1` y se ejecutó:
++
++```powershell
++powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/check.ps1
++```
++
++Resultado: exit code `0`. El gate completo registró **122 tests frontend en 11 archivos** y **181 entradas de pruebas Rust**, incluidas las suites/helper. Los logs preservados son:
++
++- `C:\Users\david\Projects\Research-Workbench\work\task-04c-fix1\check.stdout.log`
++- `C:\Users\david\Projects\Research-Workbench\work\task-04c-fix1\check.stderr.log`
++- `C:\Users\david\Projects\Research-Workbench\work\task-04c-fix1\check.exit-code.txt`
++
++El producto permanece sin cambios desde el SHA congelado; el commit documental de este informe queda en HEAD de la rama y el worktree queda limpio tras ese commit. No se ejecutó `npm run tauri:build -- --debug --no-bundle`: el orquestador difirió ese gate hasta resolver F1. Tampoco se hizo QA GUI/instalador.
++
++## Limitación abierta: S2/F1
++
++Si una mutación se confirma cuando Paper A está desmontado, no hay listener que solicite reconciliación. El callback local de refresh puede salir al encontrar la vista desmontada. Al volver a montar A, la hidratación inicial carga Paper y fase, pero no limpia su `refreshRequired`; los controles siguen bloqueados y no aparece una acción de recuperación. El mismo callejón sin salida se reproduce al desmontar/remontar tras un refresh fallido. La relectura al montar debe completar la reconciliación vigente y limpiar ese estado sin recrear ni reenviar la mutación confirmada.
++
++Este caso está abierto para corrección/revisión independiente. El corte no es candidato a integración hasta que el revisor confirme cierre de F1 y se ejecute el gate Tauri aplazado en el corte corregido.
++
++## Autorrevisión
++
++- **Cerrado por evidencia del corte:** gate `scripts/check.ps1` exit 0; árbol limpio; identidad de producto trazable.
++- **Abierto:** remount de Paper con `refreshRequired` (S2/F1), revisión independiente y Tauri debug no-bundle.
++- **Alcance no demostrado:** QA GUI nativa, instalador y máquina limpia.
++
+diff --git a/docs/reports/task-04c-fix2-report.md b/docs/reports/task-04c-fix2-report.md
+new file mode 100644
+index 0000000..c5f118f
+--- /dev/null
++++ b/docs/reports/task-04c-fix2-report.md
+@@ -0,0 +1,41 @@
++# T04c fix2 — informe de corrección
++
++**Estado:** `DONE_WITH_CONCERNS` para revisión independiente acotada. F1 y F2 están implementados y sus regresiones son verdes en UI simulada. No se declara integración: `scripts/check.ps1` y Tauri debug no-bundle quedan diferidos hasta que el orquestador apruebe el corte.
++
++## Identidad
++
++- Worktree: `.worktrees/task-04c-workflow-ui`
++- Rama: `agent/task-04c-workflow-ui`
++- BASE fix2: `1f0fbdf7d4a422bdf14b9aafdcd74dbffdcfe8db`
++- BASE producto fix1: `37169112abd10d7639265af589b76904e734b290`
++- Commit de producto: `5d35f03b13c4e85a0944296bac20e593cf494b5c` (`fix(workflow): reconcile refresh state after remount`)
++- Commit de este informe: documental y separado del producto.
++
++## Correcciones
++
++F1: el montaje ahora ejecuta la misma relectura completa usada para recuperar una operación confirmada. Lee Paper, la fase vigente y, si es distinta, la fase activa antes de limpiar `refreshRequired`. Cada confirmación incrementa `refreshVersion`; una lectura sólo puede limpiar la obligación que observó al comenzar, y una confirmación posterior la mantiene abierta. Si falla la relectura, la acción explícita «Reintentar carga» permanece visible aunque una consulta parcial de fase haya limpiado el error anterior. El retry vuelve a leer el estado canónico y no reenvía la mutación.
++
++F2: un `GateBlocked` confirmado elimina la preview completa previa. No crea `pendingAction` ni evalúa automáticamente; sólo una reevaluación explícita puede producir una nueva preview que habilite el avance. Se conserva el borrador y el contexto de fase.
++
++No se tocaron contratos, Rust, Reader, dependencias, configuración ni el fixture App opcional.
++
++## Regresiones y verificación
++
++Pruebas TDD focales en `src/features/workflow/workflow.test.tsx` cubren save y transición confirmados sin consumidor seguidos de remount; tokens actuales tras remount; refresh fallido seguido de remount; recuperación después de consultar otra fase; fallo al releer la fase activa y recuperación completa con lifecycle ARCHIVED; una hidratación que empezó antes de otra confirmación; y GateBlocked con invalidación de preview y reevaluación explícita.
++
++La ejecución RED antes de corregir F1/F2 registró **5 fallos esperados y 49 pruebas verdes**. Tras añadir los casos de fase activa e hidratación concurrente, el corte actual pasó la suite focal: **56/56**, exit `0`. `npm run typecheck` pasó (`tsc -b`), exit `0`. `git diff --check` pasó antes del commit de producto; el árbol quedó limpio tras los commits.
++
++Comandos ejecutados desde el worktree, con `. .\scripts\development-env.ps1` antes de cada comando:
++
++```powershell
++npm.cmd test -- --run --reporter=dot src/features/workflow/workflow.test.tsx
++npm.cmd run typecheck
++```
++
++Stdout, stderr y exit codes inmediatos conservados en `C:\Users\david\Projects\Research-Workbench\work\task-04c-fix2\` (`red.*`, `green.*`, `typecheck.*`). `red.*` conserva la reproducción previa al cambio; `green.*` y `typecheck.*` son del corte verde. No se ejecutó la suite completa ni Cargo ni Tauri, conforme al brief mientras espera la revisión acotada. No se hizo QA nativa, instalador o prueba de equipo limpio.
++
++## Autorrevisión y límites
++
++Los botones de mutación siguen bloqueados mientras `refreshRequired` esté pendiente; los formularios conservan borradores. El contador protege lecturas concurrentes de una confirmación posterior, y las guardas de generación ya existentes impiden que una lectura obsoleta pinte Paper/fase. `GateBlocked` sólo descarta la preview; la relectura del gate depende de la acción expresa del usuario.
++
++La evidencia demuestra los escenarios de comportamiento en React/Vitest y el typecheck del corte. Revisión independiente pendiente; después, el orquestador decidirá y ejecutará una sola vez el gate/build integrados. No se afirma funcionamiento nativo ni integración.
+diff --git a/docs/reports/task-04c-report.md b/docs/reports/task-04c-report.md
+new file mode 100644
+index 0000000..cfa8db3
+--- /dev/null
++++ b/docs/reports/task-04c-report.md
+@@ -0,0 +1,40 @@
++# T04c UI Workflow PRE/P1 — checkpoint de implementación
++
++**Estado:** CHECKPOINT. La implementación y los gates de código están en `198f27b281d97810d16fb2955b620af4f99b1490`, pero no se declara funcionalmente cerrada ni integrada. La revisión de Sol está en curso y ha identificado un fallo importante que requiere fix1 del mismo autor.
++
++## Corte y commits
++
++- BASE: `d4a0c77b691d58493f03f622340005de0e6193ed`.
++- Rama/worktree: `agent/task-04c-workflow-ui`, `C:/Users/david/Projects/Research-Workbench/.worktrees/task-04c-workflow-ui`.
++- Commits de implementación: `6e8ffcbc46e8fa324d6cb448828aca6a9f621d33` (`feat(workflow): add PRE and P1 workspace UI`) y `198f27b281d97810d16fb2955b620af4f99b1490` (`fix(workflow): reconcile retries and refreshed phase tokens`).
++- El segundo commit es el SHA congelado para revisión y gates. El worktree estaba limpio antes de ejecutar los gates.
++
++## Cambios incluidos
++
++La entrada Procesamiento de Biblioteca navega por `paperId`, invalida aperturas Reader tardías y no lee el PDF ni muta estado al montar. App conserva en memoria de sesión los drafts por paper/fase/pregunta al volver a Biblioteca o cambiar de paper. El workspace consulta PRE/P1/P2, pide la definición con la versión fijada por `PhaseDto` y diferencia fase consultada de activa. P3/P4, P2, `ARCHIVED` y `COMPLETED` son de solo lectura según la capacidad disponible.
++
++Los formularios usan las resoluciones permitidas por definición, texto sin HTML, confirmación explícita de `PRE.review_type`, UNKNOWN/NOT_APPLICABLE con explicación y la decisión estructurada de P1 sin inferir su rama del texto. Evaluar y avanzar son acciones separadas. Las tres ramas de P1 consumen el resultado del backend. Los guardados preservan ediciones posteriores, serializan mutaciones por paper, manejan conflictos de forma explícita y reintentan solicitudes no confirmadas con el mismo payload. Tras un guardado confirmado se rehidrata paper/fase; un refresco fallido no vuelve a enviar la mutación. Consultar una fase `NOT_STARTED` no permite guardarla, evaluarla ni iniciarla implícitamente.
++
++Archivos dentro del ownership del brief: `src/app/{App.tsx,App.test.tsx,ShellView.ts,tokens.css}`, `src/features/library/{LibraryPage.tsx,library.test.tsx}`, los cinco nuevos archivos de `src/features/workflow/` y este informe. No se cambiaron contratos, Rust, wire, Reader ni archivos fuera del ownership.
++
++## Evidencia TDD y validación ejecutada
++
++Los tests de comportamiento añadidos se probaron en RED antes del cambio correspondiente y en GREEN después. Entre los casos RED/GREEN observados están: entrada Library sin Reader/touch, fase `NOT_STARTED` solo consulta, error tardío de revisión de conflicto tras cambiar de fase, token de fase rehidratado tras save confirmado, retry de transición con el mismo comando y fallo de refresh tras mutación confirmada sin segundo envío. La suite también cubre resolución de conflicto, doble submit, edición mientras guarda, ramas P1, gate bloqueado, consulta P2/archivada, contaminación entre papers, preview tardía, PDF no disponible y atributos accesibles.
++
++Comandos y resultados reales:
++
++- `npm.cmd test -- src/features/workflow/workflow.test.tsx src/features/library/library.test.tsx src/app/App.test.tsx` — exit 0; 3 archivos, 59 tests aprobados.
++- `npm.cmd run typecheck` — exit 0.
++- `git diff --check` — exit 0.
++- `powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/check.ps1` — exit 0. Se dot-sourceó antes `scripts/development-env.ps1`. El gate ejecutó typecheck, Vitest completo (11 archivos/102 tests aprobados), build Vite, `cargo fmt --check`, Clippy con `-D warnings`, Cargo tests y comprobación de contratos generados.
++- `npm.cmd run tauri:build -- --debug --no-bundle` — exit 0. Se dot-sourceó `scripts/development-env.ps1`; produjo `C:/Users/david/Projects/Research-Workbench/work/cargo-target/debug/research-workbench.exe`.
++
++Los logs reales de stdout, stderr y exit code están en `C:/Users/david/Projects/Research-Workbench/work/task-04c/`: `check.stdout.log`, `check.stderr.log`, `check.exit.txt`, `tauri-debug-no-bundle.stdout.log`, `tauri-debug-no-bundle.stderr.log` y `tauri-debug-no-bundle.exit.txt`. Tauri/Vite informa un aviso de chunk JavaScript de 872.77 kB antes de gzip; la compilación terminó correctamente.
++
++## Revisión pendiente y limitaciones
++
++Sol ha confirmado que `canAdvance` exige `phase.state === "IN_PROGRESS"` y por ello no permite completar/reconfirmar una fase `NEEDS_REVIEW`; el brief espera que la reconfirmación explícita sea posible. También pidió verificar el remount de A con una operación admitida y sus drafts/error de paper. No se modificó código tras congelar `198f27b`; ambos puntos quedan para el fix1 solicitado por Sol y la revisión posterior.
++
++No se ejecutó QA manual de GUI con biblioteca sintética, escalas DPI, reinstalación ni entorno Windows limpio. El build debug no-bundle y los tests automatizados no demuestran esos escenarios. No se hizo merge, push, release ni modificación de ledger/STATUS.
++
++**Autorrevisión checkpoint:** diff y scope revisados frente al ownership; tests focales y gate completo pasan en el SHA indicado; árbol de este worktree limpio al cerrar gates. No declarar DONE hasta corregir/revisar los hallazgos anteriores y recibir validación final de Sol.
+diff --git a/src/app/App.test.tsx b/src/app/App.test.tsx
+index 2d6f971..e817af0 100644
+--- a/src/app/App.test.tsx
++++ b/src/app/App.test.tsx
+@@ -11,6 +11,8 @@ import type {
+   IpcResult,
+   LibraryInfoDto,
+   AppInfoDto,
++  PaperDto,
++  OpenPaperDto,
+ } from "../shared/contracts/generated/contracts";
+ 
+ const { api } = vi.hoisted(() => ({
+@@ -24,9 +26,21 @@ const { api } = vi.hoisted(() => ({
+       selectPdf: vi.fn(),
+       listPapers: vi.fn(),
+       cancelImport: vi.fn(),
++      getPaper: vi.fn(),
+     },
+     reader: {
+       getLastOpenedPaper: vi.fn(),
++      openPaper: vi.fn(),
++    },
++    workflow: {
++      getPhase: vi.fn(),
++      getPhaseAnswers: vi.fn(),
++      getPhaseDefinition: vi.fn(),
++      savePhaseAnswer: vi.fn(),
++      evaluateGate: vi.fn(),
++      advancePhase: vi.fn(),
++      goBackToPhase: vi.fn(),
++      touchPhase: vi.fn(),
+     },
+   },
+ }));
+@@ -92,8 +106,22 @@ beforeEach(() => {
+   api.library.selectPdf.mockResolvedValue(failure);
+   api.library.cancelImport.mockResolvedValue(success(null));
+   api.reader.getLastOpenedPaper.mockResolvedValue(success(null));
++  api.library.getPaper.mockResolvedValue(success(workflowPaper));
++  api.reader.openPaper.mockRejectedValue(new Error("No se pudo abrir el PDF."));
++  api.workflow.getPhase.mockResolvedValue(success({ paperId: id, code: "PRE", definitionVersion: 1, state: "IN_PROGRESS", revision: 1, completedAt: null }));
++  api.workflow.getPhaseAnswers.mockResolvedValue(success([]));
++  api.workflow.getPhaseDefinition.mockResolvedValue(success({ code: "PRE", version: 1, name: "PRE", objective: "Objetivo", keyQuestions: [], doItems: [], dontItems: [], considerations: [], requiredOutputs: [], completionRules: [], definitionHash: "hash" }));
+ });
+ 
++const workflowPaper: PaperDto = {
++  id,
++  documentId: "00000000-0000-4000-8000-000000000102",
++  title: "Paper de prueba",
++  authors: [], year: null, doi: null, venue: null, reviewType: "unknown", domain: null,
++  lifecycle: "NEW", archivedFromLifecycle: null, activePhaseCode: "PRE", processingInitialized: true,
++  revision: 1, createdAt: "2026-10-03T00:00:00Z", updatedAt: "2026-10-03T00:00:00Z", lastOpenedAt: null,
++};
++
+ async function enterLibrary() {
+   render(<App />);
+   fireEvent.click(await screen.findByRole("button", { name: "Entendido" }));
+@@ -103,6 +131,44 @@ async function enterLibrary() {
+   await screen.findByRole("heading", { name: "Tu biblioteca" });
+ }
+ 
++it.each(["resolve", "reject"] as const)("late_reader_open_cannot_replace_workflow_after_%s", async (outcome) => {
++  api.settings.getAppInfo.mockResolvedValue(success({
++    ...appInfo,
++    capabilities: { reader: true, workflow: true, knowledge: false },
++  }));
++  api.library.listPapers.mockResolvedValue(success({ items: [workflowPaper], nextCursor: null, total: 1 }));
++  const opened: OpenPaperDto = {
++    paper: workflowPaper,
++    document: { id: workflowPaper.documentId!, paperId: id, originalFilename: "paper.pdf", sha256: "a".repeat(64), importedAt: "2026-10-03T00:00:00Z", status: "ACTIVE" },
++    readingPosition: { documentId: workflowPaper.documentId!, pageIndex: 0, zoom: 1, revision: 1, updatedAt: "2026-10-03T00:00:00Z" },
++    documentUrl: "file:///synthetic.pdf",
++  };
++  let settle!: (value: IpcResult<OpenPaperDto>) => void;
++  api.reader.openPaper.mockImplementation(() => new Promise((resolve, reject) => {
++    settle = (value) => outcome === "resolve" ? resolve(value) : reject(new Error("Reader tardío"));
++  }));
++  render(<App />);
++  fireEvent.click(await screen.findByRole("button", { name: "Entendido" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Abrir biblioteca" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Leer" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Procesamiento" }));
++  await screen.findByRole("heading", { name: "Paper de prueba" });
++  await act(async () => settle(success(opened)));
++
++  expect(screen.getByRole("button", { name: "Volver a Biblioteca" })).toBeTruthy();
++  expect(screen.queryByText("Reader tardío")).toBeNull();
++  expect(screen.queryByText("No se pudo abrir el PDF.")).toBeNull();
++  expect(api.workflow.getPhase).toHaveBeenCalled();
++});
++
++it("workflow_is_unavailable_when_capability_is_false", async () => {
++  api.library.listPapers.mockResolvedValue(success({ items: [workflowPaper], nextCursor: null, total: 1 }));
++  await enterLibrary();
++  fireEvent.click(await screen.findByRole("button", { name: "Procesamiento" }));
++  expect(await screen.findByRole("heading", { name: "Procesamiento todavía no disponible" })).toBeTruthy();
++  expect(api.workflow.getPhase).not.toHaveBeenCalled();
++});
++
+ it("refreshes_recovery_after_a_failed_pdf_selection_and_when_entering_settings", async () => {
+   api.settings.getLibraryStatus
+     .mockResolvedValueOnce(status(false))
+diff --git a/src/app/App.tsx b/src/app/App.tsx
+index a8e86d6..5ee48ba 100644
+--- a/src/app/App.tsx
++++ b/src/app/App.tsx
+@@ -15,10 +15,13 @@ import {
+ import { LibraryHome } from "../features/library/LibraryHome";
+ import { LibraryPage } from "../features/library/LibraryPage";
+ import { PaperReader } from "../features/reader/PaperReader";
++import { PhaseWorkspace } from "../features/workflow/PhaseWorkspace";
++import { createWorkflowSession } from "../features/workflow/useWorkflow";
+ 
+ export function App() {
+   const [view, setView] = useState<ShellView>({ kind: "Home" });
+   const [opened, setOpened] = useState<OpenPaperDto | null>(null);
++  const [workflowSession] = useState(createWorkflowSession);
+   const [info, setInfo] = useState<AppInfoDto | null>(null);
+   const [library, setLibrary] = useState<LibraryInfoDto | null>(null);
+   const [libraryStatus, setLibraryStatus] = useState<{
+@@ -80,7 +83,11 @@ export function App() {
+   }
+   function showReader(document: OpenPaperDto) {
+     setOpened(document);
+-    setView({ kind: "PaperWorkspace", paperId: document.paper.id });
++    setView({ kind: "PaperWorkspace", paperId: document.paper.id, section: "reader" });
++    void refreshLibraryStatus();
++  }
++  function showWorkflow(paperId: string) {
++    setView({ kind: "PaperWorkspace", paperId, section: "workflow" });
+     void refreshLibraryStatus();
+   }
+   function closeReader() {
+@@ -89,7 +96,7 @@ export function App() {
+   }
+   const activeView =
+     view.kind === "PaperWorkspace"
+-      ? "Lector"
++      ? view.section === "workflow" ? "Procesamiento" : "Lector"
+       : view.kind === "Library"
+         ? "Biblioteca"
+         : view.kind === "Settings"
+@@ -176,16 +183,35 @@ export function App() {
+             api={api.library}
+             readerApi={api.reader}
+             onOpenPaper={showReader}
++            onOpenWorkflow={showWorkflow}
+             onLibraryChanged={() => void refreshLibraryStatus()}
+           />
+         ) : view.kind === "PaperWorkspace" ? (
+-          opened ? (
++          view.section === "reader" && opened?.paper.id === view.paperId ? (
+             <PaperReader
+               key={opened.document.id}
+               opened={opened}
+               api={api.reader}
+               onClose={closeReader}
+             />
++          ) : view.section === "workflow" ? (
++            info.capabilities.workflow ? (
++              <PhaseWorkspace
++                key={view.paperId}
++                paperId={view.paperId}
++                api={api.workflow}
++                libraryApi={api.library}
++                session={workflowSession}
++                writable={Boolean(library?.writable && libraryStatus?.writable && !libraryStatus.recoveryRequired && !statusError)}
++                onClose={() => setView({ kind: "Library" })}
++              />
++            ) : (
++              <section role="status">
++                <h1>Procesamiento todavía no disponible</h1>
++                <p>La biblioteca actual no ofrece las operaciones Workflow.</p>
++                <button type="button" onClick={() => setView({ kind: "Library" })}>Volver a Biblioteca</button>
++              </section>
++            )
+           ) : (
+             <section role="status">
+               <p>Preparando el lector…</p>
+diff --git a/src/app/ShellView.ts b/src/app/ShellView.ts
+index 4d854b2..e28cb54 100644
+--- a/src/app/ShellView.ts
++++ b/src/app/ShellView.ts
+@@ -1 +1 @@
+-export type ShellView = {kind:'Home'} | {kind:'Library'} | {kind:'PaperWorkspace';paperId:string} | {kind:'Knowledge';conceptId:string|null} | {kind:'Settings'};
++export type ShellView = {kind:'Home'} | {kind:'Library'} | {kind:'PaperWorkspace';paperId:string;section:'reader'|'workflow'} | {kind:'Knowledge';conceptId:string|null} | {kind:'Settings'};
+diff --git a/src/app/tokens.css b/src/app/tokens.css
+index 0a54bb9..b9f6b71 100644
+--- a/src/app/tokens.css
++++ b/src/app/tokens.css
+@@ -51,7 +51,8 @@ button:disabled {
+ }
+ button:focus-visible,
+ input:focus-visible,
+-select:focus-visible {
++select:focus-visible,
++textarea:focus-visible {
+   outline: 3px solid #b45309;
+   outline-offset: 2px;
+ }
+@@ -373,6 +374,152 @@ dd {
+   background: white;
+   box-shadow: 0 4px 18px #18343e20;
+ }
++.workflow-workspace {
++  max-width: 1180px;
++  padding-top: 24px;
++}
++.workflow-toolbar,
++.workflow-phase-nav,
++.workflow-gate-actions,
++.workflow-answer-actions {
++  display: flex;
++  align-items: center;
++  flex-wrap: wrap;
++  gap: 10px;
++}
++.workflow-toolbar {
++  justify-content: space-between;
++  padding-bottom: 16px;
++  border-bottom: 1px solid var(--line);
++  color: var(--muted);
++}
++.workflow-heading {
++  padding: 24px 0 16px;
++}
++.workflow-heading h1 {
++  overflow-wrap: anywhere;
++}
++.workflow-heading p:last-child,
++.workflow-definition,
++.workflow-answer > p,
++.workflow-notice,
++.workflow-context-action {
++  line-height: 1.55;
++}
++.workflow-phase-nav {
++  padding: 12px 0 20px;
++  border-bottom: 1px solid var(--line);
++}
++.workflow-phase-nav [aria-current="step"] {
++  border-color: var(--accent);
++  background: var(--surface-soft);
++  font-weight: 700;
++}
++.workflow-notice,
++.workflow-context-action {
++  margin: 18px 0;
++  padding: 16px 18px;
++  border: 1px solid var(--line);
++  border-left: 4px solid var(--accent);
++  border-radius: 10px;
++  background: var(--surface-soft);
++}
++.workflow-definition {
++  margin: 20px 0;
++}
++.workflow-definition ul,
++.workflow-gate ul {
++  padding-left: 23px;
++}
++.workflow-definition li,
++.workflow-gate li {
++  margin: 6px 0;
++}
++.workflow-definition summary {
++  cursor: pointer;
++  font-weight: 650;
++}
++.workflow-answers {
++  display: grid;
++  gap: 16px;
++  margin: 22px 0;
++}
++.workflow-answer {
++  min-width: 0;
++  margin: 0;
++  padding: 20px;
++  border: 1px solid var(--line);
++  border-radius: 12px;
++  background: var(--surface);
++}
++.workflow-answer legend {
++  padding: 0 6px;
++  font-weight: 700;
++  color: #244750;
++}
++.workflow-answer label,
++.workflow-decision label,
++.workflow-special-choice label {
++  display: grid;
++  gap: 7px;
++  margin: 13px 0;
++  color: #3c565d;
++  font-size: 13px;
++  font-weight: 650;
++}
++.workflow-answer textarea,
++.workflow-answer select,
++.workflow-decision select,
++.workflow-special-choice select {
++  width: 100%;
++  min-height: 42px;
++  border: 1px solid #bfcfce;
++  border-radius: 8px;
++  padding: 9px 11px;
++  color: #203b43;
++  background: #fff;
++  font: inherit;
++}
++.workflow-answer textarea {
++  resize: vertical;
++  line-height: 1.5;
++}
++.workflow-decision {
++  display: grid;
++  grid-template-columns: repeat(2, minmax(0, 1fr));
++  gap: 14px;
++}
++.workflow-answer-actions {
++  margin-top: 14px;
++  padding-top: 12px;
++  border-top: 1px solid var(--line);
++}
++.workflow-answer-actions > span:first-child {
++  font-weight: 700;
++}
++.workflow-answer-actions > span:nth-child(2) {
++  flex-basis: 100%;
++  color: var(--muted);
++  font-size: 13px;
++}
++.workflow-gate {
++  margin-top: 20px;
++  padding: 20px;
++  border: 1px solid var(--line);
++  border-radius: 12px;
++  background: var(--surface);
++}
++.workflow-gate small {
++  color: var(--muted);
++}
++.workflow-gate a {
++  color: var(--accent-dark);
++  text-decoration-thickness: 1px;
++  text-underline-offset: 3px;
++}
++.workflow-answer[aria-invalid="true"] {
++  border-color: var(--danger);
++}
+ [role="alert"] {
+   color: var(--danger);
+   line-height: 1.5;
+@@ -454,7 +601,8 @@ dd {
+     font-size: 12px;
+   }
+   .library-filters,
+-  .metadata-form {
++  .metadata-form,
++  .workflow-decision {
+     grid-template-columns: 1fr;
+   }
+   .reader-pagination {
+diff --git a/src/features/library/LibraryPage.tsx b/src/features/library/LibraryPage.tsx
+index dd871ff..79c4d15 100644
+--- a/src/features/library/LibraryPage.tsx
++++ b/src/features/library/LibraryPage.tsx
+@@ -12,11 +12,13 @@ export function LibraryPage({
+   api,
+   readerApi,
+   onOpenPaper,
++  onOpenWorkflow,
+   onLibraryChanged = () => {},
+ }: {
+   api: LibraryApi;
+   readerApi: ReaderApi;
+   onOpenPaper: (opened: OpenPaperDto) => void;
++  onOpenWorkflow: (paperId: string) => void;
+   onLibraryChanged?: () => void;
+ }) {
+   const {
+@@ -71,6 +73,11 @@ export function LibraryPage({
+         );
+     }
+   }
++  function openWorkflow(paperId: string) {
++    openIntent.current++;
++    setActionError(null);
++    onOpenWorkflow(paperId);
++  }
+   async function archive(paper: PaperDto) {
+     setActionError(null);
+     const result = await api.archivePaper({
+@@ -187,6 +194,9 @@ export function LibraryPage({
+                 <button type="button" onClick={() => void open(paper.id)}>
+                   Leer
+                 </button>
++                <button type="button" onClick={() => openWorkflow(paper.id)}>
++                  Procesamiento
++                </button>
+                 <button type="button" onClick={() => selectPaper(paper)}>
+                   Editar
+                 </button>
+diff --git a/src/features/library/library.test.tsx b/src/features/library/library.test.tsx
+index 9663746..416ad65 100644
+--- a/src/features/library/library.test.tsx
++++ b/src/features/library/library.test.tsx
+@@ -106,6 +106,7 @@ it("empty_library_shows_import", async () => {
+         } as unknown as ReaderApi
+       }
+       onOpenPaper={vi.fn()}
++      onOpenWorkflow={vi.fn()}
+     />,
+   );
+   expect(
+@@ -115,6 +116,30 @@ it("empty_library_shows_import", async () => {
+     (await screen.findAllByRole("button", { name: "Importar PDF" })).length,
+   ).toBeGreaterThan(0);
+ });
++
++it("processing_entry_does_not_open_pdf_or_touch", async () => {
++  const archived = paper({ lifecycle: "ARCHIVED", processingInitialized: true, activePhaseCode: "P1" });
++  const api = makeApi({
++    listPapers: vi.fn().mockResolvedValue(ok({ items: [archived], nextCursor: null, total: 1 })),
++  });
++  const openPaper = vi.fn().mockRejectedValue(new Error("reader must not run"));
++  const onOpenWorkflow = vi.fn();
++  render(
++    <LibraryPage
++      api={api}
++      readerApi={{ openPaper } as unknown as ReaderApi}
++      onOpenPaper={vi.fn()}
++      onOpenWorkflow={onOpenWorkflow}
++    />,
++  );
++
++  fireEvent.click(await screen.findByRole("button", { name: "Procesamiento" }));
++
++  expect(onOpenWorkflow).toHaveBeenCalledWith(archived.id);
++  expect(openPaper).not.toHaveBeenCalled();
++  expect(api.restorePaper).not.toHaveBeenCalled();
++  expect(api.archivePaper).not.toHaveBeenCalled();
++});
+ it("picker_cancel_no_form", async () => {
+   const api = makeApi();
+   render(
+@@ -219,6 +244,7 @@ it("archive_filter_and_restore", async () => {
+       api={api}
+       readerApi={{ openPaper: vi.fn() } as unknown as ReaderApi}
+       onOpenPaper={vi.fn()}
++      onOpenWorkflow={vi.fn()}
+     />,
+   );
+   fireEvent.change(await screen.findByLabelText("Estado"), {
+@@ -246,6 +272,7 @@ it("conflict_preserves_draft", async () => {
+       api={api}
+       readerApi={{ openPaper: vi.fn() } as unknown as ReaderApi}
+       onOpenPaper={vi.fn()}
++      onOpenWorkflow={vi.fn()}
+     />,
+   );
+   fireEvent.click(await screen.findByRole("button", { name: "Editar" }));
+@@ -277,6 +304,7 @@ it("metadata_draft_never_moves_to_another_paper", async () => {
+       api={api}
+       readerApi={{ openPaper: vi.fn() } as unknown as ReaderApi}
+       onOpenPaper={vi.fn()}
++      onOpenWorkflow={vi.fn()}
+     />,
+   );
+   fireEvent.click(
+@@ -320,6 +348,7 @@ it("library_pages_forward_cursor_and_reset_after_filter_change", async () => {
+       api={api}
+       readerApi={{ openPaper: vi.fn() } as unknown as ReaderApi}
+       onOpenPaper={vi.fn()}
++      onOpenWorkflow={vi.fn()}
+     />,
+   );
+   fireEvent.click(
+@@ -458,7 +487,9 @@ it("out_of_order_open_responses_follow_the_latest_library_intent", async () => {
+   } as unknown as ReaderApi;
+   const onOpenPaper = vi.fn();
+   render(
+-    <LibraryPage api={api} readerApi={readerApi} onOpenPaper={onOpenPaper} />,
++    <LibraryPage api={api} readerApi={readerApi} onOpenPaper={onOpenPaper}
++      onOpenWorkflow={vi.fn()}
++    />,
+   );
+   const buttons = await screen.findAllByRole("button", { name: "Leer" });
+   fireEvent.click(buttons[0]);
+@@ -534,6 +565,7 @@ it("late_metadata_save_does_not_reselect_a_paper_the_user_left", async () => {
+       api={api}
+       readerApi={{ openPaper: vi.fn() } as unknown as ReaderApi}
+       onOpenPaper={vi.fn()}
++      onOpenWorkflow={vi.fn()}
+     />,
+   );
+   const editButtons = await screen.findAllByRole("button", { name: "Editar" });
+@@ -621,7 +653,9 @@ it.each(["selection pending", "preview visible"])(
+     } as unknown as ReaderApi;
+     const onOpenPaper = vi.fn();
+     render(
+-      <LibraryPage api={api} readerApi={readerApi} onOpenPaper={onOpenPaper} />,
++      <LibraryPage api={api} readerApi={readerApi} onOpenPaper={onOpenPaper}
++      onOpenWorkflow={vi.fn()}
++    />,
+     );
+     fireEvent.click(
+       (await screen.findAllByRole("button", { name: "Leer" }))[0],
+diff --git a/src/features/workflow/GateIssues.tsx b/src/features/workflow/GateIssues.tsx
+new file mode 100644
+index 0000000..7141430
+--- /dev/null
++++ b/src/features/workflow/GateIssues.tsx
+@@ -0,0 +1,21 @@
++import type { GateEvaluationDto } from "../../shared/contracts/generated/contracts";
++
++export function GateIssues({ gate, onFocusField }: { gate: GateEvaluationDto; onFocusField?: (key: string) => void }) {
++  if (gate.complete) return <section className="workflow-gate" role="status"><h2>Revisión preliminar completa</h2><p>La evaluación está lista; la fase sólo se completa con la acción explícita de avance.</p></section>;
++  return (
++    <section className="workflow-gate" aria-labelledby="workflow-gate-title">
++      <h2 id="workflow-gate-title">Elementos pendientes de la evaluación</h2>
++      {gate.issues.length ? (
++        <ul>
++          {gate.issues.map((issue, index) => {
++            const fieldId = `workflow-field-${gate.phaseCode}-${issue.requirementKey}`;
++            return <li key={`${issue.requirementKey}-${index}`}>
++              {document.getElementById(fieldId) ? <a href={`#${fieldId}`} onClick={() => onFocusField?.(issue.requirementKey)}>{issue.message}</a> : <span>{issue.message}</span>}
++              <small> {issue.status}</small>
++            </li>;
++          })}
++        </ul>
++      ) : <p>El servidor indica que aún faltan requisitos; vuelve a evaluar para ver el detalle.</p>}
++    </section>
++  );
++}
+diff --git a/src/features/workflow/PhaseAnswerForm.tsx b/src/features/workflow/PhaseAnswerForm.tsx
+new file mode 100644
+index 0000000..d64a181
+--- /dev/null
++++ b/src/features/workflow/PhaseAnswerForm.tsx
+@@ -0,0 +1,213 @@
++import type {
++  AnswerResolution,
++  JsonValue,
++  PaperDto,
++  PhaseCode,
++  PhaseRequiredOutputDto,
++  RelevanceRating,
++  ReadingDecision,
++} from "../../shared/contracts/generated/contracts";
++import type { WorkflowDraft } from "./useWorkflow";
++
++const relevanceOptions: RelevanceRating[] = ["sufficient", "use_with_caution", "weak_for_my_purpose"];
++const decisionOptions: ReadingDecision[] = ["continue", "light_read", "archive"];
++const resolutionLabels: Record<AnswerResolution, string> = {
++  PENDING: "Pendiente",
++  ANSWERED: "Respondida",
++  UNKNOWN: "Desconocida",
++  NOT_APPLICABLE: "No aplicable",
++};
++
++function fieldId(code: PhaseCode, key: string) {
++  return `workflow-field-${code}-${key}`;
++}
++
++export function PhaseAnswerForm({
++  phaseCode,
++  output,
++  draft,
++  reviewType,
++  writable,
++  busy,
++  mutationPending,
++  onEdit,
++  onSave,
++  onDiscard,
++  onReviewConflict,
++  onUseSaved,
++  onReapply,
++}: {
++  phaseCode: PhaseCode;
++  output: PhaseRequiredOutputDto;
++  draft: WorkflowDraft;
++  reviewType: PaperDto["reviewType"];
++  writable: boolean;
++  busy: boolean;
++  mutationPending: boolean;
++  onEdit: (patch: Partial<Pick<WorkflowDraft, "answerText" | "structuredValue" | "resolution" | "explanation">>) => void;
++  onSave: () => void;
++  onDiscard: () => void;
++  onReviewConflict: () => void;
++  onUseSaved: () => void;
++  onReapply: () => void;
++}) {
++  const id = fieldId(phaseCode, output.key);
++  const readOnly = !writable || draft.status === "conflict";
++  const value = draft.structuredValue && typeof draft.structuredValue === "object" && !Array.isArray(draft.structuredValue)
++    ? draft.structuredValue as Record<string, JsonValue>
++    : {};
++  const isReviewType = phaseCode === "PRE" && output.key === "review_type";
++  const isDecision = phaseCode === "P1" && output.key === "relevance_decision";
++  const decisionIncomplete = isDecision && draft.resolution === "ANSWERED"
++    && (!relevanceOptions.includes(value.relevance as RelevanceRating) || !decisionOptions.includes(value.readingDecision as ReadingDecision));
++  const decisionPartial = isDecision && draft.structuredValue !== null
++    && !(relevanceOptions.includes(value.relevance as RelevanceRating) && decisionOptions.includes(value.readingDecision as ReadingDecision));
++  const needsExplanation = draft.resolution === "UNKNOWN" || draft.resolution === "NOT_APPLICABLE";
++  const canSave = !readOnly && !busy && !mutationPending && draft.status !== "saved" && draft.status !== "saving" && !decisionIncomplete && !decisionPartial
++    && (!needsExplanation || Boolean(draft.explanation.trim()));
++
++  return (
++    <fieldset className="workflow-answer" id={id} aria-describedby={draft.error ? `${id}-error` : undefined} aria-invalid={Boolean(draft.error)}>
++      <legend>{output.label}{output.required ? " · requerida" : " · opcional"}</legend>
++      <p>{output.prompt}</p>
++      {isReviewType ? (
++        <div className="workflow-special-choice">
++          <p>Tipo bibliográfico registrado: <strong>{reviewType}</strong></p>
++          {(draft.resolution === "ANSWERED" || draft.resolution === "UNKNOWN") && value.reviewType !== reviewType && <p role="alert">La respuesta guardada confirma otro tipo. Vuelve a confirmar el metadato actual.</p>}
++          {reviewType === "unknown" ? (
++            <label>
++              Confirmación
++              <select
++                aria-label="Resolución del tipo bibliográfico"
++                value={draft.resolution}
++                disabled={readOnly}
++                onChange={(event) => onEdit({
++                  resolution: event.target.value as AnswerResolution,
++                  structuredValue: event.target.value === "UNKNOWN" ? { reviewType: "unknown" } : null,
++                  answerText: "",
++                })}
++              >
++                <option value="PENDING">Pendiente</option>
++                <option value="UNKNOWN">Desconocido</option>
++              </select>
++            </label>
++          ) : (
++            <button
++              type="button"
++              disabled={readOnly}
++              aria-pressed={draft.resolution === "ANSWERED" && value.reviewType === reviewType}
++              onClick={() => onEdit({ resolution: "ANSWERED", structuredValue: { reviewType }, answerText: "", explanation: "" })}
++            >
++              Confirmar {reviewType}
++            </button>
++          )}
++        </div>
++      ) : isDecision ? (
++        <div className="workflow-decision">
++          <label>
++            Relevancia para mi propósito
++            <select
++              value={typeof value.relevance === "string" ? value.relevance : ""}
++              disabled={readOnly}
++              onChange={(event) => {
++                const next = { ...value };
++                if (event.target.value) next.relevance = event.target.value;
++                else delete next.relevance;
++                const complete = relevanceOptions.includes(next.relevance as RelevanceRating) && decisionOptions.includes(next.readingDecision as ReadingDecision);
++                onEdit({ structuredValue: Object.keys(next).length ? next as JsonValue : null, resolution: complete ? "ANSWERED" : "PENDING" });
++              }}
++            >
++              <option value="">Elige una valoración</option>
++              {relevanceOptions.map((option) => <option key={option} value={option}>{option}</option>)}
++            </select>
++          </label>
++          <label>
++            Decisión de lectura
++            <select
++              value={typeof value.readingDecision === "string" ? value.readingDecision : ""}
++              disabled={readOnly}
++              onChange={(event) => {
++                const next = { ...value };
++                if (event.target.value) next.readingDecision = event.target.value;
++                else delete next.readingDecision;
++                const complete = relevanceOptions.includes(next.relevance as RelevanceRating) && decisionOptions.includes(next.readingDecision as ReadingDecision);
++                onEdit({ structuredValue: Object.keys(next).length ? next as JsonValue : null, resolution: complete ? "ANSWERED" : "PENDING" });
++              }}
++            >
++              <option value="">Elige una decisión</option>
++              {decisionOptions.map((option) => <option key={option} value={option}>{option === "archive" ? "Archivar" : option === "light_read" ? "Lectura ligera" : "Continuar"}</option>)}
++            </select>
++          </label>
++          {decisionIncomplete && <p role="status">Completa ambas elecciones antes de guardar la respuesta.</p>}
++          {decisionPartial && <p role="status">El borrador conserva tu elección parcial. El objeto estructurado sólo se enviará cuando completes ambas opciones.</p>}
++        </div>
++      ) : (
++        <label htmlFor={`${id}-answer`}>
++          Respuesta
++          <textarea
++            id={`${id}-answer`}
++            value={draft.answerText}
++            disabled={readOnly}
++            rows={4}
++            onChange={(event) => onEdit({ answerText: event.target.value })}
++          />
++        </label>
++      )}
++      {!isReviewType && !isDecision && (
++        <label htmlFor={`${id}-resolution`}>
++          Resolución
++          <select
++            id={`${id}-resolution`}
++            value={draft.resolution}
++            disabled={readOnly}
++            onChange={(event) => onEdit({ resolution: event.target.value as AnswerResolution })}
++          >
++            {output.allowedResolutions.map((resolution) => <option key={resolution} value={resolution}>{resolutionLabels[resolution]}</option>)}
++          </select>
++        </label>
++      )}
++      {needsExplanation && (
++        <label htmlFor={`${id}-explanation`}>
++          Explicación necesaria
++          <textarea
++            id={`${id}-explanation`}
++            value={draft.explanation}
++            disabled={readOnly}
++            rows={3}
++            onChange={(event) => onEdit({ explanation: event.target.value })}
++          />
++        </label>
++      )}
++      {draft.error && <p id={`${id}-error`} role="alert">{draft.error}</p>}
++      {draft.status === "conflict" && (
++        <div className="workflow-conflict" aria-live="polite">
++          {!draft.conflictReviewed ? (
++            <button type="button" disabled={busy} onClick={onReviewConflict}>Revisar versión guardada</button>
++          ) : (
++            <>
++              <p>Compara la versión local con la que está guardada actualmente y elige qué versión conservar.</p>
++              <dl className="workflow-conflict-values">
++                <dt>Texto guardado</dt><dd>{draft.observed?.answerText || "(vacío)"}</dd>
++                <dt>Valor estructurado guardado</dt><dd>{draft.observed?.structuredValue === null || draft.observed?.structuredValue === undefined ? "(vacío)" : JSON.stringify(draft.observed.structuredValue)}</dd>
++                <dt>Resolución guardada</dt><dd>{draft.observed?.resolution ?? "Sin respuesta guardada"}</dd>
++                <dt>Explicación guardada</dt><dd>{draft.observed?.explanation || "(vacía)"}</dd>
++                <dt>Texto de mi borrador</dt><dd>{draft.answerText || "(vacío)"}</dd>
++                <dt>Valor estructurado de mi borrador</dt><dd>{draft.structuredValue === null ? "(vacío)" : JSON.stringify(draft.structuredValue)}</dd>
++                <dt>Resolución de mi borrador</dt><dd>{draft.resolution}</dd>
++                <dt>Explicación de mi borrador</dt><dd>{draft.explanation || "(vacía)"}</dd>
++              </dl>
++              <button type="button" disabled={busy} onClick={onUseSaved}>Usar versión guardada</button>
++              <button type="button" disabled={busy} onClick={onReapply}>Conservar mi borrador</button>
++            </>
++          )}
++        </div>
++      )}
++      <div className="workflow-answer-actions">
++        <span role="status">{draft.status === "saving" ? "Guardando…" : draft.status === "saved" ? draft.resolution === "PENDING" ? "Guardado · pendiente" : "Guardado" : draft.status === "empty" ? "Sin respuesta guardada" : draft.status === "conflict" ? "Conflicto" : draft.status === "unknown" ? "Resultado sin confirmar" : draft.status === "error" ? "No guardado" : "Borrador sin guardar"}</span>
++        {draft.status === "dirty" && <span>Este borrador sólo se conserva mientras la aplicación esté abierta.</span>}
++        <button type="button" disabled={!canSave} onClick={onSave}>Guardar respuesta</button>
++        {(draft.status === "dirty" || draft.status === "error" || draft.status === "unknown") && <button type="button" disabled={busy} onClick={onDiscard}>Descartar cambios</button>}
++      </div>
++    </fieldset>
++  );
++}
+diff --git a/src/features/workflow/PhaseWorkspace.tsx b/src/features/workflow/PhaseWorkspace.tsx
+new file mode 100644
+index 0000000..cda5064
+--- /dev/null
++++ b/src/features/workflow/PhaseWorkspace.tsx
+@@ -0,0 +1,175 @@
++import type { LibraryApi, WorkflowApi } from "../../shared/contracts/ports";
++import type { PhaseCode } from "../../shared/contracts/generated/contracts";
++import { GateIssues } from "./GateIssues";
++import { PhaseAnswerForm } from "./PhaseAnswerForm";
++import { useWorkflow, type WorkflowSession } from "./useWorkflow";
++
++export type PhaseWorkspaceProps = {
++  paperId: string;
++  api: WorkflowApi;
++  libraryApi: Pick<LibraryApi, "getPaper">;
++  session: WorkflowSession;
++  writable: boolean;
++  onClose: () => void;
++};
++
++const phases: PhaseCode[] = ["PRE", "P1", "P2"];
++
++export function PhaseWorkspace({ paperId, api, libraryApi, session, writable, onClose }: PhaseWorkspaceProps) {
++  const workflow = useWorkflow({ api, libraryApi, paperId, session, writable });
++  const { paper, phaseCode, phase, activePhase, definition } = workflow;
++  const archived = paper?.lifecycle === "ARCHIVED";
++  const reserved = paper?.lifecycle === "COMPLETED";
++  const p2 = phaseCode === "P2";
++  const mutable = Boolean(writable && !archived && !reserved && !p2 && phaseCode && phase && phase.state !== "NOT_STARTED" && definition);
++  const outputs = workflow.fields;
++  const p1Decision = outputs.find(({ output }) => output.key === "relevance_decision")?.draft;
++  const p1Branch = p1Decision?.structuredValue && typeof p1Decision.structuredValue === "object" && !Array.isArray(p1Decision.structuredValue)
++    ? p1Decision.structuredValue.readingDecision
++    : null;
++  const mutationPending = Boolean(workflow.pending || workflow.pendingAction || workflow.refreshRequired);
++  const canAdvance = Boolean(mutable && activePhase?.code === phaseCode && (phase?.state === "IN_PROGRESS" || phase?.state === "NEEDS_REVIEW")
++    && workflow.gate?.complete && !workflow.hasDirty && !workflow.busy && !mutationPending);
++
++  return (
++    <section className="workflow-workspace" aria-labelledby="workflow-title">
++      <div className="workflow-toolbar">
++        <button type="button" onClick={onClose}>Volver a Biblioteca</button>
++        <span>Procesamiento del paper</span>
++      </div>
++      {workflow.loading && <p role="status">Cargando el estado del procesamiento…</p>}
++      {workflow.error && (
++        <div role="alert">
++          <p>{workflow.error}</p>
++          <button type="button" disabled={workflow.loading || workflow.busy} onClick={() => void workflow.reload()}>Reintentar carga</button>
++        </div>
++      )}
++      {workflow.refreshRequired && !workflow.error && (
++        <div role="alert">
++          <p>La operación se confirmó, pero falta actualizar el estado actual. No repitas la operación.</p>
++          <button type="button" disabled={workflow.loading || workflow.busy} onClick={() => void workflow.reload()}>Reintentar carga</button>
++        </div>
++      )}
++      {paper && (
++        <>
++          <header className="workflow-heading">
++            <div>
++              <p className="eyebrow">{paper.lifecycle === "ARCHIVED" ? "Archivado · solo lectura" : paper.lifecycle === "COMPLETED" ? "Estado reservado · solo lectura" : "Procesamiento local"}</p>
++              <h1 id="workflow-title">{paper.title}</h1>
++              <p>Estado del paper: <strong>{paper.lifecycle}</strong>. El estado del PDF se comprueba al evaluar y no condiciona la consulta ni el borrador local.</p>
++            </div>
++          </header>
++          {!paper.processingInitialized ? (
++            <p role="status">El procesamiento todavía no está inicializado. Esta vista no lo inicializa.</p>
++          ) : !paper.activePhaseCode ? (
++            <p role="alert">No hay una fase activa registrada. No se activará PRE automáticamente.</p>
++          ) : (
++            <>
++              <nav className="workflow-phase-nav" aria-label="Fases de procesamiento">
++                {phases.map((code) => (
++                  <button key={code} type="button" aria-current={phaseCode === code ? "step" : undefined}
++                    disabled={workflow.busy || workflow.loading} onClick={() => workflow.selectPhase(code)}>
++                    {code === paper.activePhaseCode ? `Activa · ${code}` : `Consultar ${code}`}
++                  </button>
++                ))}
++                <button type="button" disabled aria-label="P3 no disponible">P3 · próximamente</button>
++                <button type="button" disabled aria-label="P4 no disponible">P4 · próximamente</button>
++              </nav>
++              {archived && <div className="workflow-notice" role="status"><strong>Paper archivado.</strong> Puedes consultar sus fases y respuestas. Para editar o cambiar el estado, vuelve a Biblioteca y restáuralo expresamente.</div>}
++              {reserved && <div className="workflow-notice" role="status">El estado COMPLETED está reservado. Se permite la consulta; las transiciones Workflow no están disponibles.</div>}
++              {phase?.state === "NOT_STARTED" && <div className="workflow-notice" role="status">Esta fase no se ha iniciado y debe activarse expresamente antes de guardar respuestas o evaluar su gate.</div>}
++              {!writable && !archived && <div className="workflow-notice" role="status">No se ha confirmado que la biblioteca permita escribir. Las respuestas se pueden consultar, pero no guardar ni cambiar de fase.</div>}
++              {paper.activePhaseCode && phaseCode && paper.activePhaseCode !== phaseCode && !archived && !reserved && (
++                <div className="workflow-context-action">
++                  <p>Consulta {phaseCode}. La fase activa de trabajo sigue siendo {paper.activePhaseCode}.</p>
++                  <button type="button" disabled={!activePhase || !writable || workflow.busy || workflow.hasDirty || mutationPending
++                    || (phase?.state === "NOT_STARTED" && phases.indexOf(phaseCode) < phases.indexOf(paper.activePhaseCode))}
++                    onClick={() => void workflow.transition(phaseCode, phases.indexOf(phaseCode) < phases.indexOf(paper.activePhaseCode!) ? "back" : "forward")}>
++                    {phases.indexOf(phaseCode) < phases.indexOf(paper.activePhaseCode)
++                      ? `Volver al contexto ${phaseCode}`
++                      : `Activar ${phaseCode} como fase de trabajo`}
++                  </button>
++                </div>
++              )}
++              {definition && phase && phaseCode && (
++                <>
++                  <p className="workflow-phase-state">Estado de {phaseCode}: <strong>{phase.state === "NEEDS_REVIEW" ? "requiere reconfirmación" : phase.state === "IN_PROGRESS" ? "en curso" : phase.state === "COMPLETED" ? "completada" : "sin iniciar"}</strong>
++                    {phase.completedAt && <> · Última finalización: {new Date(phase.completedAt).toLocaleDateString("es-ES")}</>}
++                  </p>
++                  <article className="workflow-definition card">
++                    <p className="eyebrow">{definition.name} · versión {definition.version}</p>
++                    <h2>{definition.objective}</h2>
++                    <ul>{definition.keyQuestions.map((item) => <li key={item}>{item}</li>)}</ul>
++                    <details>
++                      <summary>Orientaciones de esta fase</summary>
++                      <h3>Consideraciones</h3><ul>{definition.considerations.map((item) => <li key={item}>{item}</li>)}</ul>
++                      <h3>Conviene hacer</h3><ul>{definition.doItems.map((item) => <li key={item}>{item}</li>)}</ul>
++                      <h3>Evita</h3><ul>{definition.dontItems.map((item) => <li key={item}>{item}</li>)}</ul>
++                    </details>
++                  </article>
++                  {p2 ? (
++                    <div className="workflow-notice" role="status">
++                      <h2>P2 · Síntesis y conocimiento</h2>
++                      <p>Esta fase se puede consultar. Guardar respuestas, evaluar su gate y avanzar estarán disponibles en una fase posterior.</p>
++                      <h3>Respuestas existentes</h3>
++                      {outputs.length ? <dl className="workflow-readonly-outputs">{outputs.map(({ output, draft }) => (
++                        <div key={output.key}><dt>{output.label}</dt><dd>{draft.baseline ? <>
++                          <p>{draft.baseline.answerText || "Sin texto de respuesta."}</p>
++                          <p>Resolución: {draft.baseline.resolution}</p>
++                          {draft.baseline.structuredValue !== null && <p>Valor estructurado: {JSON.stringify(draft.baseline.structuredValue)}</p>}
++                          {draft.baseline.explanation && <p>Explicación: {draft.baseline.explanation}</p>}
++                        </> : <p>Sin respuesta guardada.</p>}</dd></div>
++                      ))}</dl> : <p>No hay respuestas guardadas para mostrar.</p>}
++                    </div>
++                  ) : (
++                    <div className="workflow-answers">
++                      <h2>Respuestas de {phaseCode}</h2>
++                      {outputs.map(({ output, draft }) => (
++                        <PhaseAnswerForm key={`${phaseCode}-${output.key}`} phaseCode={phaseCode} output={output} draft={draft}
++                          reviewType={paper.reviewType} writable={mutable} busy={workflow.busy}
++                          mutationPending={mutationPending}
++                          onEdit={(patch) => workflow.edit(phaseCode, output.key, patch)}
++                          onSave={() => void workflow.save(phaseCode, output.key)}
++                          onDiscard={() => workflow.discardDraft(phaseCode, output.key)}
++                          onReviewConflict={() => void workflow.reviewConflict(phaseCode, output.key)}
++                          onUseSaved={() => workflow.useSavedConflict(phaseCode, output.key)}
++                          onReapply={() => workflow.reapplyConflict(phaseCode, output.key)} />
++                      ))}
++                    </div>
++                  )}
++                  {workflow.pending && <div className="workflow-notice" role="alert">
++                    <p>Hay un guardado cuyo resultado no se ha confirmado. Reintenta la misma solicitud para resolverlo antes de otra mutación de este paper.</p>
++                    <button type="button" disabled={workflow.busy || !writable} onClick={() => void workflow.retry()}>Reintentar el mismo guardado</button>
++                  </div>}
++                  {workflow.pendingAction && <div className="workflow-notice" role="alert">
++                    <p>El resultado de la transición no se confirmó. Reintenta con la misma solicitud antes de iniciar otra mutación.</p>
++                    <button type="button" disabled={workflow.busy} onClick={() => void workflow.retryAction()}>Reintentar la misma transición</button>
++                  </div>}
++                  {workflow.message && <p role="status">{workflow.message}</p>}
++                  {workflow.gateRejected && <button type="button" disabled={!mutable || workflow.busy || workflow.hasDirty || mutationPending}
++                    onClick={() => void workflow.evaluate()}>Volver a evaluar fase</button>}
++                  <div className="workflow-gate-actions">
++                    {!archived && !reserved && !p2 && (
++                      <>
++                        <button type="button" disabled={!mutable || workflow.busy || workflow.hasDirty || mutationPending}
++                          onClick={() => void workflow.evaluate()}>Evaluar fase</button>
++                        {phaseCode === "PRE" && <button type="button" className="primary" disabled={!canAdvance}
++                          onClick={() => void workflow.advance()}>Completar PRE y continuar</button>}
++                        {phaseCode === "P1" && <button type="button" className="primary" disabled={!canAdvance}
++                          onClick={() => void workflow.advance()}>
++                          {p1Branch === "archive" ? "Completar P1 y archivar" : p1Branch === "light_read" ? "Completar P1 con lectura ligera" : "Completar P1 y continuar"}
++                        </button>}
++                      </>
++                    )}
++                  </div>
++                  {workflow.gate && workflow.gate.phaseCode === phaseCode && <GateIssues gate={workflow.gate} />}
++                  {workflow.message?.includes("capacidad") && <p role="status">La capacidad de esta operación aún no está disponible.</p>}
++                </>
++              )}
++            </>
++          )}
++        </>
++      )}
++    </section>
++  );
++}
+diff --git a/src/features/workflow/useWorkflow.ts b/src/features/workflow/useWorkflow.ts
+new file mode 100644
+index 0000000..43f346a
+--- /dev/null
++++ b/src/features/workflow/useWorkflow.ts
+@@ -0,0 +1,569 @@
++import { useCallback, useEffect, useMemo, useRef, useState } from "react";
++import type { LibraryApi, WorkflowApi } from "../../shared/contracts/ports";
++import type {
++  AnswerResolution,
++  GateEvaluationDto,
++  JsonValue,
++  PaperDto,
++  PhaseAnswerDto,
++  PhaseCode,
++  PhaseDefinitionDto,
++  PhaseDto,
++} from "../../shared/contracts/generated/contracts";
++
++export type WorkflowDraft = {
++  answerText: string;
++  structuredValue: JsonValue | null;
++  resolution: AnswerResolution;
++  explanation: string;
++  revision: number;
++  baseline: PhaseAnswerDto | null;
++  editVersion: number;
++  savedEditVersion: number;
++  status: "empty" | "saved" | "dirty" | "saving" | "error" | "conflict" | "unknown";
++  error: string | null;
++  observed: PhaseAnswerDto | null;
++  conflictReviewed: boolean;
++};
++
++type PendingSave = {
++  kind: "save";
++  args: Parameters<WorkflowApi["savePhaseAnswer"]>[0];
++  key: string;
++  phaseCode: PhaseCode;
++  editVersion: number;
++};
++
++type PendingAction =
++  | { kind: "back"; args: Parameters<WorkflowApi["goBackToPhase"]>[0]; target: PhaseCode }
++  | { kind: "touch"; args: Parameters<WorkflowApi["touchPhase"]>[0]; target: PhaseCode }
++  | { kind: "advance"; args: Parameters<WorkflowApi["advancePhase"]>[0] };
++
++type PaperSession = {
++  drafts: Map<string, WorkflowDraft>;
++  busy: boolean;
++  pending: PendingSave | null;
++  pendingAction: PendingAction | null;
++  refreshRequired: boolean;
++  refreshVersion: number;
++  listeners: Set<(confirmed: boolean, source: symbol) => void>;
++  editSequences: Map<string, number>;
++};
++
++export type WorkflowSession = { papers: Map<string, PaperSession> };
++
++export function createWorkflowSession(): WorkflowSession {
++  return { papers: new Map() };
++}
++
++function paperSession(session: WorkflowSession, paperId: string): PaperSession {
++  let current = session.papers.get(paperId);
++  if (!current) {
++    current = { drafts: new Map(), busy: false, pending: null, pendingAction: null, refreshRequired: false, refreshVersion: 0, listeners: new Set(), editSequences: new Map() };
++    session.papers.set(paperId, current);
++  }
++  return current;
++}
++
++function draftId(phaseCode: PhaseCode, questionKey: string) {
++  return `${phaseCode}:${questionKey}`;
++}
++
++function fromAnswer(answer: PhaseAnswerDto | undefined, editVersion = 0): WorkflowDraft {
++  return {
++    answerText: answer?.answerText ?? "",
++    structuredValue: answer?.structuredValue ?? null,
++    resolution: answer?.resolution ?? "PENDING",
++    explanation: answer?.explanation ?? "",
++    revision: answer?.revision ?? 0,
++    baseline: answer ?? null,
++    editVersion,
++    savedEditVersion: editVersion,
++    status: answer ? "saved" : "empty",
++    error: null,
++    observed: null,
++    conflictReviewed: false,
++  };
++}
++
++type HookOptions = {
++  api: WorkflowApi;
++  libraryApi: Pick<LibraryApi, "getPaper">;
++  paperId: string;
++  session: WorkflowSession;
++  writable: boolean;
++};
++
++export function useWorkflow({ api, libraryApi, paperId, session, writable }: HookOptions) {
++  const [paper, setPaper] = useState<PaperDto | null>(null);
++  const [phaseCode, setPhaseCode] = useState<PhaseCode | null>(null);
++  const [phase, setPhase] = useState<PhaseDto | null>(null);
++  const [activePhase, setActivePhase] = useState<PhaseDto | null>(null);
++  const [answers, setAnswers] = useState<PhaseAnswerDto[]>([]);
++  const [definition, setDefinition] = useState<PhaseDefinitionDto | null>(null);
++  const [gate, setGate] = useState<GateEvaluationDto | null>(null);
++  const [loading, setLoading] = useState(true);
++  const [error, setError] = useState<string | null>(null);
++  const [message, setMessage] = useState<string | null>(null);
++  const [gateRejected, setGateRejected] = useState(false);
++  const [changed, setChanged] = useState(0);
++  const generation = useRef(0);
++  const contentGeneration = useRef(0);
++  const mounted = useRef(true);
++  const consumerId = useRef(Symbol("workflow-consumer"));
++  const paperRef = useRef<PaperDto | null>(null);
++  const state = paperSession(session, paperId);
++  const activePaper = paper?.id === paperId ? paper : null;
++  const selectedPhase = phaseCode;
++  const selectedPhaseRef = useRef<PhaseCode | null>(null);
++  selectedPhaseRef.current = selectedPhase;
++
++  const bump = useCallback((confirmed = false) => {
++    setChanged((value) => value + 1);
++    for (const listener of state.listeners) listener(confirmed, consumerId.current);
++  }, [state]);
++
++  const loadPaper = useCallback(async (): Promise<boolean> => {
++    const request = ++generation.current;
++    setLoading(true);
++    setError(null);
++    try {
++      const result = await libraryApi.getPaper({ requestId: crypto.randomUUID(), paperId });
++      if (!mounted.current || request !== generation.current) return false;
++      if (!result.ok) {
++        setError(result.error.message);
++        setLoading(false);
++        return false;
++      }
++      setPaper(result.data);
++      paperRef.current = result.data;
++      if (!result.data.processingInitialized) {
++        setPhaseCode(null);
++        setError("El procesamiento de este paper todavía no está disponible.");
++      } else if (!result.data.activePhaseCode) {
++        setPhaseCode(null);
++        setError("No hay una fase activa registrada. Comprueba de nuevo el estado.");
++      } else {
++        setPhaseCode((current) => current ?? result.data.activePhaseCode);
++        setError(null);
++      }
++      setLoading(false);
++      return true;
++    } catch {
++      if (!mounted.current || request !== generation.current) return false;
++      setError("No se pudo cargar el paper. Puedes intentarlo de nuevo.");
++      setLoading(false);
++      return false;
++    }
++  }, [libraryApi, paperId]);
++
++  const loadPhase = useCallback(async (requestedCode: PhaseCode): Promise<boolean> => {
++    const request = ++generation.current;
++    setLoading(true);
++    setError(null);
++    setGate(null);
++    setPhase(null);
++    setActivePhase(null);
++    setAnswers([]);
++    setDefinition(null);
++    try {
++      const phaseResult = await api.getPhase({ requestId: crypto.randomUUID(), paperId, phaseCode: requestedCode });
++      const answersResult = await api.getPhaseAnswers({ requestId: crypto.randomUUID(), paperId, phaseCode: requestedCode });
++      if (!mounted.current || request !== generation.current || !phaseResult.ok || !answersResult.ok) {
++        if (mounted.current && request === generation.current) {
++          setError(!phaseResult.ok ? phaseResult.error.message : !answersResult.ok ? answersResult.error.message : null);
++          setLoading(false);
++        }
++        return false;
++      }
++      const definitionResult = await api.getPhaseDefinition({
++        requestId: crypto.randomUUID(),
++        phaseCode: requestedCode,
++        version: phaseResult.data.definitionVersion,
++      });
++      if (!mounted.current || request !== generation.current) return false;
++      if (!definitionResult.ok) {
++        setError(definitionResult.error.message);
++        setLoading(false);
++        return false;
++      }
++      setPhase(phaseResult.data);
++      const currentActiveCode = paperRef.current?.activePhaseCode;
++      if (currentActiveCode === requestedCode) setActivePhase(phaseResult.data);
++      else if (currentActiveCode) {
++        const activeResult = await api.getPhase({ requestId: crypto.randomUUID(), paperId, phaseCode: currentActiveCode });
++        if (!mounted.current || request !== generation.current) return false;
++        if (!activeResult.ok) {
++          setError(activeResult.error.message);
++          setLoading(false);
++          return false;
++        }
++        setActivePhase(activeResult.data);
++      }
++      setAnswers(answersResult.data);
++      setDefinition(definitionResult.data);
++      const drafts = state.drafts;
++      for (const output of definitionResult.data.requiredOutputs) {
++        const key = draftId(requestedCode, output.key);
++        const saved = answersResult.data.find((item) => item.questionKey === output.key);
++        const existing = drafts.get(key);
++        const version = Math.max(state.editSequences.get(key) ?? 0, existing?.editVersion ?? 0);
++        if (!existing) drafts.set(key, fromAnswer(saved, version));
++        else if (existing.status === "saved" || existing.status === "empty") drafts.set(key, fromAnswer(saved, version));
++      }
++      setError(null);
++      setLoading(false);
++      bump();
++      return true;
++    } catch {
++      if (!mounted.current || request !== generation.current) return false;
++      setError("No se pudieron cargar las respuestas. Puedes intentarlo de nuevo.");
++      setLoading(false);
++      return false;
++    }
++  }, [api, bump, paperId, state]);
++
++  const reload = useCallback(async (preferActive = false): Promise<boolean> => {
++    const refreshVersion = state.refreshVersion;
++    if (!await loadPaper()) return false;
++    if (!paperRef.current?.processingInitialized || !paperRef.current.activePhaseCode) return false;
++    const target = preferActive ? paperRef.current.activePhaseCode : selectedPhaseRef.current ?? paperRef.current.activePhaseCode;
++    if (!target || !await loadPhase(target)) return false;
++    if (preferActive) setPhaseCode(target);
++    if (refreshVersion === state.refreshVersion) state.refreshRequired = false;
++    bump();
++    return true;
++  }, [bump, loadPaper, loadPhase, state]);
++
++  useEffect(() => {
++    const listener = (confirmed: boolean, source: symbol) => {
++      if (mounted.current) setChanged((value) => value + 1);
++      if (confirmed && source !== consumerId.current && mounted.current) void reload();
++    };
++    state.listeners.add(listener);
++    return () => { state.listeners.delete(listener); };
++  }, [reload, state]);
++
++  useEffect(() => {
++    mounted.current = true;
++    void reload(true);
++    return () => {
++      mounted.current = false;
++      generation.current++;
++    };
++  }, [reload]);
++
++  const draft = useCallback((code: PhaseCode, key: string, fallback?: PhaseAnswerDto) => {
++    const id = draftId(code, key);
++    let value = state.drafts.get(id);
++    if (!value) {
++      value = fromAnswer(fallback, state.editSequences.get(id) ?? 0);
++      state.drafts.set(id, value);
++    }
++    return value;
++  }, [changed, state]);
++
++  const edit = useCallback((code: PhaseCode, key: string, patch: Partial<Pick<WorkflowDraft, "answerText" | "structuredValue" | "resolution" | "explanation">>) => {
++    contentGeneration.current++;
++    const current = draft(code, key, answers.find((item) => item.questionKey === key));
++    const id = draftId(code, key);
++    const editVersion = Math.max(current.editVersion, state.editSequences.get(id) ?? 0) + 1;
++    state.editSequences.set(id, editVersion);
++    state.drafts.set(id, {
++      ...current,
++      ...patch,
++      editVersion,
++      status: "dirty",
++      error: null,
++    });
++    setGate(null);
++    setMessage(null);
++    bump();
++  }, [answers, bump, draft, state]);
++
++  const save = useCallback(async (code: PhaseCode, key: string, retry = false) => {
++    if (!writable || !activePaper) return;
++    if (state.refreshRequired) return;
++    if (state.busy || state.pendingAction || (state.pending && !retry)) return;
++    let pending = retry ? state.pending : null;
++    if (retry && !pending) return;
++    if (!pending && (activePaper.lifecycle === "ARCHIVED" || activePaper.lifecycle === "COMPLETED")) return;
++    if (!pending) {
++      const current = draft(code, key, answers.find((item) => item.questionKey === key));
++      const args = {
++        requestId: crypto.randomUUID(), paperId, phaseCode: code, questionKey: key,
++        expectedRevision: current.revision,
++        answerText: current.answerText,
++        structuredValue: current.structuredValue,
++        resolution: current.resolution,
++        explanation: current.explanation.trim() || null,
++      } as const;
++      pending = { kind: "save", args, key, phaseCode: code, editVersion: current.editVersion };
++      state.pending = pending;
++    }
++    state.busy = true;
++    const id = draftId(pending.phaseCode, pending.key);
++    const current = state.drafts.get(id);
++    if (current) state.drafts.set(id, { ...current, status: "saving", error: null });
++    bump();
++    try {
++      const result = await api.savePhaseAnswer(pending.args);
++      if (!result.ok) {
++        const latest = state.drafts.get(id);
++        const conflict = result.error.code === "Conflict";
++        if (latest) state.drafts.set(id, { ...latest, status: conflict ? "conflict" : "error", error: result.error.message });
++        state.pending = result.error.retryable ? pending : null;
++        setMessage(result.error.message);
++      } else {
++        const latest = state.drafts.get(id);
++        if (latest) {
++          const saved = fromAnswer(result.data, latest.editVersion);
++          state.drafts.set(id, latest.editVersion === pending.editVersion
++            ? saved
++            : { ...latest, baseline: result.data, revision: result.data.revision, status: "dirty", error: null });
++        }
++        state.pending = null;
++        setAnswers((currentAnswers) => [
++          ...currentAnswers.filter((item) => item.questionKey !== pending.key), result.data,
++        ]);
++        setMessage("Respuesta guardada.");
++        requireRefresh(state);
++        bump(true);
++        const refreshed = await reload();
++        if (refreshed) {
++          setMessage("Respuesta guardada.");
++        } else {
++          setMessage("La respuesta se guardó, pero no se pudo actualizar la vista. No repitas el guardado.");
++        }
++      }
++    } catch {
++      const latest = state.drafts.get(id);
++      if (latest) state.drafts.set(id, { ...latest, status: "unknown", error: "No se confirmó el resultado del guardado." });
++      state.pending = pending;
++      setMessage("No se confirmó el resultado. Reintenta esta misma operación antes de guardar otra respuesta.");
++    } finally {
++      state.busy = false;
++      bump();
++    }
++  }, [activePaper, answers, api, bump, draft, paperId, reload, state, writable]);
++
++  const evaluate = useCallback(async () => {
++    if (!selectedPhase || !phase || state.busy || state.pending || state.pendingAction || state.refreshRequired || hasUnresolvedDrafts(state)) return;
++    const request = generation.current;
++    const contentRequest = contentGeneration.current;
++    setGate(null);
++    setGateRejected(false);
++    setMessage(null);
++    state.busy = true;
++    bump();
++    try {
++      const result = await api.evaluateGate({ requestId: crypto.randomUUID(), paperId, phaseCode: selectedPhase });
++      if (request === generation.current && contentRequest === contentGeneration.current && selectedPhase === phaseCode) {
++        if (result.ok) setGate(result.data);
++        else setMessage(result.error.message);
++      }
++    } catch {
++      if (request === generation.current && contentRequest === contentGeneration.current && selectedPhase === phaseCode) setMessage("No se pudo evaluar la fase. Puedes volver a intentarlo.");
++    } finally {
++      state.busy = false;
++      bump();
++    }
++  }, [api, bump, paperId, phase, phaseCode, selectedPhase, state]);
++
++  const runAction = useCallback(async (action: PendingAction) => {
++    if (state.busy || state.pending || state.refreshRequired || (state.pendingAction && state.pendingAction !== action)) return;
++    state.busy = true;
++    setMessage(null);
++    bump();
++    try {
++      if (action.kind === "back") {
++        const result = await api.goBackToPhase(action.args);
++        if (!result.ok) {
++          setMessage(result.error.message);
++          state.pendingAction = result.error.retryable ? action : null;
++        } else {
++          state.pendingAction = null;
++          setMessage("La transición se confirmó. Actualizando el estado actual del paper…");
++          requireRefresh(state);
++          bump(true);
++          if (!await reload(true)) setMessage("El contexto se actualizó, pero no se pudo actualizar la vista. Reintenta la carga; no repitas la transición.");
++          else setMessage("Contexto de trabajo actualizado.");
++        }
++      } else if (action.kind === "touch") {
++        const result = await api.touchPhase(action.args);
++        if (!result.ok) {
++          setMessage(result.error.message);
++          state.pendingAction = result.error.retryable ? action : null;
++        } else {
++          state.pendingAction = null;
++          setMessage("La transición se confirmó. Actualizando el estado actual del paper…");
++          requireRefresh(state);
++          bump(true);
++          if (!await reload(true)) setMessage("La fase se activó, pero no se pudo actualizar la vista. Reintenta la carga; no repitas la transición.");
++          else setMessage("Fase activada.");
++        }
++      } else {
++        const result = await api.advancePhase(action.args);
++        if (!result.ok) {
++          setMessage(result.error.message);
++          state.pendingAction = result.error.code === "GateBlocked" ? null : result.error.retryable ? action : null;
++          const gateBlocked = result.error.code === "GateBlocked";
++          if (gateBlocked) setGate(null);
++          setGateRejected(gateBlocked);
++        } else {
++          state.pendingAction = null;
++          setGate(null);
++          setMessage("La transición se confirmó. Actualizando el estado actual del paper…");
++          requireRefresh(state);
++          bump(true);
++          const refreshed = await reload(true);
++          if (!refreshed) setMessage("La transición se confirmó, pero no se pudo actualizar la vista. Reintenta la carga; no repitas la transición.");
++          else setMessage(paperRef.current?.lifecycle === "ARCHIVED" ? "Paper archivado." : paperRef.current?.activePhaseCode === "P2" ? "P1 completada. P2 está disponible para consulta; su edición llegará en una fase posterior." : "Fase completada.");
++        }
++      }
++    } catch {
++      state.pendingAction = action;
++      setMessage("No se confirmó el resultado. Reintenta esta misma operación para resolverlo antes de otra mutación.");
++    } finally {
++      state.busy = false;
++      bump();
++    }
++  }, [api, bump, paperId, reload, state]);
++
++  const transition = useCallback(async (target: PhaseCode, direction: "back" | "forward") => {
++    if (!activePaper?.activePhaseCode || !activePhase || state.busy || state.pending || state.pendingAction || state.refreshRequired || hasUnresolvedDrafts(state)) return;
++    const action: PendingAction = direction === "back"
++      ? { kind: "back", target, args: { requestId: crypto.randomUUID(), paperId, targetPhase: target, expectedActivePhaseRevision: activePhase.revision } }
++      : { kind: "touch", target, args: { requestId: crypto.randomUUID(), paperId, phaseCode: target, expectedActivePhaseRevision: activePhase.revision } };
++    await runAction(action);
++  }, [activePaper, activePhase, paperId, runAction, selectedPhase, state]);
++
++  const advance = useCallback(async () => {
++    if (!activePaper?.activePhaseCode || !phase || !selectedPhase || selectedPhase !== activePaper.activePhaseCode || state.busy || state.pending || state.pendingAction || state.refreshRequired || hasUnresolvedDrafts(state)) return;
++    await runAction({ kind: "advance", args: { requestId: crypto.randomUUID(), paperId, fromPhase: activePaper.activePhaseCode, expectedPhaseRevision: phase.revision } });
++  }, [activePaper, paperId, phase, runAction, selectedPhase, state]);
++
++  const retryAction = useCallback(() => state.pendingAction ? runAction(state.pendingAction) : undefined, [runAction, state]);
++
++  const selectPhase = useCallback((code: PhaseCode) => {
++    generation.current++;
++    setPhaseCode(code);
++    setError(null);
++    void loadPhase(code);
++  }, [loadPhase]);
++
++  const discardDraft = useCallback((code: PhaseCode, key: string) => {
++    const saved = answers.find((item) => item.questionKey === key);
++    const id = draftId(code, key);
++    const current = state.drafts.get(id);
++    state.drafts.set(id, fromAnswer(saved, Math.max(current?.editVersion ?? 0, state.editSequences.get(id) ?? 0)));
++    bump();
++  }, [answers, bump, state]);
++
++  const reviewConflict = useCallback(async (code: PhaseCode, key: string) => {
++    const request = ++generation.current;
++    try {
++      const [paperResult, phaseResult, result] = await Promise.all([
++        libraryApi.getPaper({ requestId: crypto.randomUUID(), paperId }),
++        api.getPhase({ requestId: crypto.randomUUID(), paperId, phaseCode: code }),
++        api.getPhaseAnswers({ requestId: crypto.randomUUID(), paperId, phaseCode: code }),
++      ]);
++      if (request !== generation.current || selectedPhase !== code) return;
++      if (!paperResult.ok) { setMessage(paperResult.error.message); return; }
++      if (!phaseResult.ok) { setMessage(phaseResult.error.message); return; }
++      if (!result.ok) {
++        setMessage(result.error.message);
++        return;
++      }
++      const definitionResult = await api.getPhaseDefinition({
++        requestId: crypto.randomUUID(), phaseCode: code, version: phaseResult.data.definitionVersion,
++      });
++      if (request !== generation.current || selectedPhase !== code) return;
++      if (!definitionResult.ok) { setMessage(definitionResult.error.message); return; }
++      const activeResult = paperResult.data.activePhaseCode === code ? phaseResult : paperResult.data.activePhaseCode
++        ? await api.getPhase({ requestId: crypto.randomUUID(), paperId, phaseCode: paperResult.data.activePhaseCode })
++        : null;
++      if (request !== generation.current || selectedPhase !== code) return;
++      paperRef.current = paperResult.data;
++      setPaper(paperResult.data);
++      setPhase(phaseResult.data);
++      setActivePhase(activeResult?.ok ? activeResult.data : null);
++      setDefinition(definitionResult.data);
++      setAnswers(result.data);
++      const current = state.drafts.get(draftId(code, key));
++      if (!current) return;
++      const observed = result.data.find((item) => item.questionKey === key) ?? null;
++      state.drafts.set(draftId(code, key), { ...current, observed, conflictReviewed: true });
++      setMessage("Versión guardada cargada. Elige qué versión conservar.");
++      bump();
++    } catch {
++      if (request === generation.current && selectedPhase === code) {
++        setMessage("No se pudo leer la versión guardada. El borrador local se conserva.");
++      }
++    }
++  }, [api, bump, libraryApi, paperId, selectedPhase, state]);
++
++  const useSavedConflict = useCallback((code: PhaseCode, key: string) => {
++    const current = state.drafts.get(draftId(code, key));
++    if (!current || !current.conflictReviewed) return;
++    const saved = current.observed ?? undefined;
++    const id = draftId(code, key);
++    const version = Math.max(current.editVersion, state.editSequences.get(id) ?? 0) + 1;
++    state.editSequences.set(id, version);
++    state.drafts.set(id, fromAnswer(saved, version));
++    setAnswers((currentAnswers) => [
++      ...currentAnswers.filter((item) => item.questionKey !== key),
++      ...(saved ? [saved] : []),
++    ]);
++    setMessage("Se está usando la versión guardada.");
++    bump();
++  }, [bump, state]);
++
++  const reapplyConflict = useCallback((code: PhaseCode, key: string) => {
++    const current = state.drafts.get(draftId(code, key));
++    if (!current || !current.conflictReviewed) return;
++    const id = draftId(code, key);
++    const version = Math.max(current.editVersion, state.editSequences.get(id) ?? 0) + 1;
++    state.editSequences.set(id, version);
++    state.drafts.set(draftId(code, key), {
++      ...current,
++      baseline: current.observed,
++      revision: current.observed?.revision ?? 0,
++      observed: null,
++      conflictReviewed: false,
++      status: "dirty",
++      error: null,
++      editVersion: version,
++    });
++    setMessage("Borrador conservado. Guardar creará una operación nueva sobre la revisión observada.");
++    bump();
++  }, [bump, state]);
++
++  const fields = useMemo(() => definition?.requiredOutputs.map((output) => ({
++    output,
++    draft: draft(output.key ? selectedPhase ?? "PRE" : "PRE", output.key, answers.find((item) => item.questionKey === output.key)),
++  })) ?? [], [answers, definition, draft, selectedPhase]);
++
++  return {
++    paper: activePaper, phaseCode: selectedPhase, phase, activePhase, answers, definition, gate, loading, error, message,
++    busy: state.busy, pending: state.pending, pendingAction: state.pendingAction, fields,
++    refreshRequired: state.refreshRequired,
++    hasDirty: hasUnresolvedDrafts(state),
++    gateRejected,
++    selectPhase, loadPaper, loadPhase, reload, edit, save,
++    retry: () => state.pending ? save(state.pending.phaseCode, state.pending.key, true) : undefined,
++    retryAction, evaluate, transition, advance, discardDraft, reviewConflict, useSavedConflict, reapplyConflict,
++  };
++}
++
++function hasUnresolvedDrafts(state: PaperSession): boolean {
++  for (const value of state.drafts.values()) {
++    if (value.status === "dirty" || value.status === "saving" || value.status === "error" || value.status === "unknown" || value.status === "conflict") return true;
++  }
++  return false;
++}
++
++function requireRefresh(state: PaperSession): void {
++  state.refreshVersion += 1;
++  state.refreshRequired = true;
++}
+diff --git a/src/features/workflow/workflow.test.tsx b/src/features/workflow/workflow.test.tsx
+new file mode 100644
+index 0000000..79fab18
+--- /dev/null
++++ b/src/features/workflow/workflow.test.tsx
+@@ -0,0 +1,1309 @@
++import { afterEach, expect, it, vi } from "vitest";
++import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
++import type { LibraryApi, WorkflowApi } from "../../shared/contracts/ports";
++import type {
++  GateEvaluationDto,
++  IpcResult,
++  PaperDto,
++  PhaseAnswerDto,
++  PhaseDefinitionDto,
++  PhaseDto,
++  WorkflowAdvancePhaseOutput,
++} from "../../shared/contracts/generated/contracts";
++import { PhaseWorkspace } from "./PhaseWorkspace";
++import { createWorkflowSession } from "./useWorkflow";
++
++afterEach(cleanup);
++
++const paperId = "00000000-0000-4000-8000-000000000201";
++const requestId = "00000000-0000-4000-8000-000000000202";
++const ok = <T,>(data: T): IpcResult<T> => ({
++  contractVersion: 1,
++  requestId,
++  ok: true,
++  data,
++});
++const failed = (code: string, retryable = false): IpcResult<never> => ({
++  contractVersion: 1,
++  requestId,
++  ok: false,
++  error: { code: code as never, message: "No se pudo completar la operación.", retryable },
++});
++const paper = (patch: Partial<PaperDto> = {}): PaperDto => ({
++  id: paperId,
++  documentId: "00000000-0000-4000-8000-000000000203",
++  title: "Estudio sintético",
++  authors: [],
++  year: null,
++  doi: null,
++  venue: null,
++  reviewType: "unknown",
++  domain: null,
++  lifecycle: "ACTIVE",
++  archivedFromLifecycle: null,
++  activePhaseCode: "PRE",
++  processingInitialized: true,
++  revision: 1,
++  createdAt: "2026-10-03T00:00:00Z",
++  updatedAt: "2026-10-03T00:00:00Z",
++  lastOpenedAt: null,
++  ...patch,
++});
++const definition: PhaseDefinitionDto = {
++  code: "PRE",
++  version: 3,
++  name: "PRE sintética v3",
++  objective: "Aclarar el propósito.",
++  keyQuestions: ["¿Qué buscas?"],
++  doItems: ["Explica tu criterio."],
++  dontItems: ["No inventes."],
++  considerations: ["El PDF puede faltar."],
++  requiredOutputs: [
++    {
++      key: "purpose",
++      label: "Propósito de lectura",
++      prompt: "¿Para qué lees?",
++      required: true,
++      allowedResolutions: ["PENDING", "ANSWERED"],
++      ruleKey: "answerProcessed",
++    },
++    {
++      key: "review_type",
++      label: "Tipo bibliográfico confirmado",
++      prompt: "Confirma el tipo.",
++      required: true,
++      allowedResolutions: ["PENDING", "ANSWERED", "UNKNOWN"],
++      ruleKey: "answerProcessed",
++    },
++  ],
++  completionRules: ["answerProcessed", "paperHasActiveDocument"],
++  definitionHash: "hash-v3",
++};
++const p1Definition: PhaseDefinitionDto = {
++  ...definition,
++  code: "P1",
++  version: 1,
++  name: "P1 sintética",
++  requiredOutputs: [
++    { key: "scope", label: "Alcance", prompt: "Qué aborda.", required: true, allowedResolutions: ["PENDING", "ANSWERED", "UNKNOWN"], ruleKey: "answerProcessed" },
++    { key: "out_of_scope", label: "Fuera de alcance", prompt: "Qué excluye.", required: true, allowedResolutions: ["PENDING", "ANSWERED", "UNKNOWN", "NOT_APPLICABLE"], ruleKey: "answerProcessed" },
++    { key: "review_type", label: "Enfoque de revisión según la fuente", prompt: "Describe la metodología.", required: true, allowedResolutions: ["PENDING", "ANSWERED", "UNKNOWN"], ruleKey: "answerProcessed" },
++    { key: "literature_cutoff", label: "Horizonte de literatura", prompt: "Fecha de corte.", required: true, allowedResolutions: ["PENDING", "ANSWERED", "UNKNOWN", "NOT_APPLICABLE"], ruleKey: "answerProcessed" },
++    { key: "core_message", label: "Mensaje principal", prompt: "Mensaje central.", required: true, allowedResolutions: ["PENDING", "ANSWERED", "UNKNOWN"], ruleKey: "answerProcessed" },
++    { key: "relevance_decision", label: "Relevancia y decisión de lectura", prompt: "Elige ambas opciones.", required: true, allowedResolutions: ["PENDING", "ANSWERED"], ruleKey: "p1DecisionProcessed" },
++    { key: "field_organization", label: "Organización del campo", prompt: "Organización opcional.", required: false, allowedResolutions: ["PENDING", "ANSWERED", "UNKNOWN", "NOT_APPLICABLE"], ruleKey: "answerProcessed" },
++  ],
++};
++const phase = (code: "PRE" | "P1" | "P2", state: PhaseDto["state"] = "IN_PROGRESS"): PhaseDto => ({
++  paperId,
++  code,
++  definitionVersion: code === "PRE" ? 3 : 1,
++  state,
++  revision: code === "PRE" ? 9 : 2,
++  completedAt: null,
++});
++const answer: PhaseAnswerDto = {
++  paperId,
++  phaseCode: "PRE",
++  questionKey: "purpose",
++  answerText: "Seguir la hipótesis marcada.",
++  structuredValue: null,
++  resolution: "ANSWERED",
++  explanation: null,
++  revision: 4,
++  updatedAt: "2026-10-03T00:00:00Z",
++};
++const gate: GateEvaluationDto = {
++  paperId,
++  phaseCode: "PRE",
++  definitionVersion: 3,
++  complete: false,
++  issues: [],
++  phaseRevision: 9,
++  inputSnapshotHash: "snapshot",
++  evaluatedAt: "2026-10-03T00:00:00Z",
++};
++
++function makeWorkflow(overrides: Partial<WorkflowApi> = {}): WorkflowApi {
++  return {
++    getPhase: vi.fn(async ({ phaseCode }) => ok(phase(phaseCode as "PRE" | "P1" | "P2"))),
++    getPhaseAnswers: vi.fn(async ({ phaseCode }) =>
++      ok(phaseCode === "PRE" ? [answer] : []),
++    ),
++    getPhaseDefinition: vi.fn(async ({ phaseCode, version }) =>
++      ok({ ...(phaseCode === "P1" ? p1Definition : definition), code: phaseCode, version: version ?? 1 }),
++    ),
++    savePhaseAnswer: vi.fn(),
++    evaluateGate: vi.fn(async () => ok(gate)),
++    advancePhase: vi.fn(),
++    goBackToPhase: vi.fn(),
++    touchPhase: vi.fn(),
++    setP3Candidate: vi.fn(),
++    getP3CandidateSummary: vi.fn(),
++    ...overrides,
++  } as unknown as WorkflowApi;
++}
++
++function renderWorkspace({
++  api = makeWorkflow(),
++  currentPaper = paper(),
++  writable = true,
++  session = createWorkflowSession(),
++  libraryApi: suppliedLibraryApi,
++  workspacePaperId = paperId,
++}: {
++  api?: WorkflowApi;
++  currentPaper?: PaperDto;
++  writable?: boolean;
++  session?: ReturnType<typeof createWorkflowSession>;
++  libraryApi?: Pick<LibraryApi, "getPaper">;
++  workspacePaperId?: string;
++} = {}) {
++  const libraryApi = suppliedLibraryApi ?? {
++    getPaper: vi.fn().mockResolvedValue(ok(currentPaper)),
++  } as unknown as Pick<LibraryApi, "getPaper">;
++  const view = render(
++    <PhaseWorkspace
++      paperId={workspacePaperId}
++      api={api}
++      libraryApi={libraryApi}
++      session={session}
++      writable={writable}
++      onClose={vi.fn()}
++    />,
++  );
++  return { api, libraryApi, ...view };
++}
++
++it("loads_pinned_definition_and_saved_values", async () => {
++  const api = makeWorkflow();
++  renderWorkspace({ api });
++
++  expect(await screen.findByText(/PRE sintética v3/)).toBeTruthy();
++  expect((screen.getByLabelText("Respuesta") as HTMLTextAreaElement).value).toBe(
++    "Seguir la hipótesis marcada.",
++  );
++  expect(api.getPhaseDefinition).toHaveBeenCalledWith({
++    requestId: expect.any(String),
++    phaseCode: "PRE",
++    version: 3,
++  });
++});
++
++it("pre_renders_six_canonical_required_outputs", async () => {
++  const keys = ["purpose", "uncertainty_target", "baseline", "expected_outcome", "desired_depth", "review_type"];
++  const canonical = {
++    ...definition,
++    requiredOutputs: keys.map((key) => ({
++      key,
++      label: `Etiqueta ${key}`,
++      prompt: `Pregunta ${key}`,
++      required: true,
++      allowedResolutions: key === "review_type" ? ["PENDING", "ANSWERED", "UNKNOWN"] as const
++        : key === "baseline" ? ["PENDING", "ANSWERED", "UNKNOWN", "NOT_APPLICABLE"] as const
++          : key === "expected_outcome" ? ["PENDING", "ANSWERED", "UNKNOWN"] as const
++            : ["PENDING", "ANSWERED"] as const,
++      ruleKey: "answerProcessed",
++    })),
++  } as PhaseDefinitionDto;
++  const api = makeWorkflow({ getPhaseDefinition: vi.fn().mockResolvedValue(ok(canonical)) });
++  renderWorkspace({ api });
++  await screen.findByText("Etiqueta uncertainty_target · requerida");
++
++  for (const key of keys) expect(document.getElementById(`workflow-field-PRE-${key}`)).toBeTruthy();
++  expect(api.getPhaseDefinition).toHaveBeenCalledWith(expect.objectContaining({ phaseCode: "PRE", version: 3 }));
++});
++
++it("consultation_does_not_activate_phase", async () => {
++  const api = makeWorkflow();
++  renderWorkspace({ api });
++
++  fireEvent.click(await screen.findByRole("button", { name: "Consultar P1" }));
++
++  await waitFor(() => expect(api.getPhase).toHaveBeenCalledWith({
++    requestId: expect.any(String),
++    paperId,
++    phaseCode: "P1",
++  }));
++  expect(api.touchPhase).not.toHaveBeenCalled();
++  expect(api.goBackToPhase).not.toHaveBeenCalled();
++  expect(api.savePhaseAnswer).not.toHaveBeenCalled();
++});
++
++it("pre_type_requires_explicit_confirmation", async () => {
++  const api = makeWorkflow();
++  renderWorkspace({ api, currentPaper: paper({ reviewType: "survey" }) });
++
++  fireEvent.click(await screen.findByRole("button", { name: "Confirmar survey" }));
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[1]);
++
++  await waitFor(() => expect(api.savePhaseAnswer).toHaveBeenCalledWith(expect.objectContaining({
++    phaseCode: "PRE",
++    questionKey: "review_type",
++    expectedRevision: 0,
++    resolution: "ANSWERED",
++    answerText: "",
++    structuredValue: { reviewType: "survey" },
++  })));
++});
++
++it("unknown_and_na_keep_explanation", async () => {
++  const api = makeWorkflow();
++  renderWorkspace({ api });
++
++  fireEvent.change(await screen.findByLabelText("Resolución del tipo bibliográfico"), { target: { value: "UNKNOWN" } });
++  const save = screen.getAllByRole("button", { name: "Guardar respuesta" })[1];
++  expect((save as HTMLButtonElement).disabled).toBe(true);
++  fireEvent.change(screen.getByLabelText("Explicación necesaria"), { target: { value: "No se identifica en la ficha." } });
++  fireEvent.click(save);
++
++  await waitFor(() => expect(api.savePhaseAnswer).toHaveBeenCalledWith(expect.objectContaining({
++    questionKey: "review_type",
++    answerText: "",
++    structuredValue: { reviewType: "unknown" },
++    resolution: "UNKNOWN",
++    explanation: "No se identifica en la ficha.",
++  })));
++});
++
++it("p1_decision_is_structured_and_save_does_not_archive", async () => {
++  const api = makeWorkflow();
++  renderWorkspace({ api });
++  await screen.findByText(/PRE sintética v3/);
++  fireEvent.click(await screen.findByRole("button", { name: "Consultar P1" }));
++  await screen.findByText(/P1 sintética/);
++  fireEvent.change(screen.getByLabelText("Relevancia para mi propósito"), { target: { value: "use_with_caution" } });
++  const save = within(document.getElementById("workflow-field-P1-relevance_decision")!).getByRole("button", { name: "Guardar respuesta" });
++  expect((save as HTMLButtonElement).disabled).toBe(true);
++  fireEvent.change(screen.getByLabelText("Decisión de lectura"), { target: { value: "archive" } });
++  fireEvent.click(save);
++
++  await waitFor(() => expect(api.savePhaseAnswer).toHaveBeenCalledWith(expect.objectContaining({
++    phaseCode: "P1",
++    questionKey: "relevance_decision",
++    resolution: "ANSWERED",
++    structuredValue: { relevance: "use_with_caution", readingDecision: "archive" },
++  })));
++  expect(api.advancePhase).not.toHaveBeenCalled();
++});
++
++it("disallowed_resolution_is_not_offered", async () => {
++  renderWorkspace();
++  await screen.findByText(/PRE sintética v3/);
++  const purpose = screen.getAllByLabelText("Resolución")[0] as HTMLSelectElement;
++  expect([...purpose.options].map((option) => option.value)).toEqual(["PENDING", "ANSWERED"]);
++});
++
++it("saved_only_after_success", async () => {
++  let settle!: (result: IpcResult<PhaseAnswerDto>) => void;
++  const api = makeWorkflow({
++    savePhaseAnswer: vi.fn(() => new Promise<IpcResult<PhaseAnswerDto>>((resolve) => { settle = resolve; })),
++  });
++  renderWorkspace({ api });
++  const input = await screen.findByLabelText("Respuesta") as HTMLTextAreaElement;
++  fireEvent.change(input, { target: { value: "Texto enviado" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  expect(screen.getAllByText("Guardando…").length).toBe(1);
++  expect(api.advancePhase).not.toHaveBeenCalled();
++
++  await act(async () => settle(ok({ ...answer, answerText: "Texto enviado", revision: 5 })));
++
++  expect((await screen.findAllByText("Guardado")).length).toBeGreaterThan(0);
++  expect(api.savePhaseAnswer).toHaveBeenCalledWith(expect.objectContaining({ expectedRevision: 4, answerText: "Texto enviado" }));
++});
++
++it("confirmed_save_refreshes_phase_token_before_advance", async () => {
++  const activePhase = vi.fn()
++    .mockResolvedValueOnce(ok(phase("PRE")))
++    .mockResolvedValue(ok({ ...phase("PRE"), revision: 10 }));
++  const completeGate = { ...gate, complete: true, issues: [] };
++  const api = makeWorkflow({
++    getPhase: activePhase,
++    savePhaseAnswer: vi.fn().mockResolvedValue(ok({ ...answer, answerText: "Guardado confirmado", revision: 5 })),
++    evaluateGate: vi.fn().mockResolvedValue(ok(completeGate)),
++    advancePhase: vi.fn().mockResolvedValue(ok({ phase: { ...phase("PRE", "COMPLETED"), revision: 11 }, gate: completeGate, nextPhase: "P1", paperLifecycle: "ACTIVE" })),
++  });
++  renderWorkspace({ api });
++  const input = await screen.findByLabelText("Respuesta") as HTMLTextAreaElement;
++  fireEvent.change(input, { target: { value: "Guardado confirmado" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  await screen.findByText("Guardado");
++  fireEvent.click(screen.getByRole("button", { name: "Evaluar fase" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Completar PRE y continuar" }));
++
++  await waitFor(() => expect(api.advancePhase).toHaveBeenCalledWith(expect.objectContaining({ fromPhase: "PRE", expectedPhaseRevision: 10 })));
++});
++
++it("double_submit_serializes_per_paper", async () => {
++  let settle!: (result: IpcResult<PhaseAnswerDto>) => void;
++  const save = vi.fn(() => new Promise<IpcResult<PhaseAnswerDto>>((resolve) => { settle = resolve; }));
++  const api = makeWorkflow({ savePhaseAnswer: save });
++  renderWorkspace({ api });
++  const input = await screen.findByLabelText("Respuesta");
++  fireEvent.change(input, { target: { value: "Un solo envío" } });
++  const button = screen.getAllByRole("button", { name: "Guardar respuesta" })[0];
++  fireEvent.click(button);
++  fireEvent.click(button);
++
++  expect(save).toHaveBeenCalledTimes(1);
++  await act(async () => settle(ok({ ...answer, answerText: "Un solo envío", revision: 5 })));
++});
++
++it("edit_during_save_remains_dirty", async () => {
++  let settle!: (result: IpcResult<PhaseAnswerDto>) => void;
++  const api = makeWorkflow({
++    savePhaseAnswer: vi.fn(() => new Promise<IpcResult<PhaseAnswerDto>>((resolve) => { settle = resolve; })),
++  });
++  renderWorkspace({ api });
++  const input = await screen.findByLabelText("Respuesta") as HTMLTextAreaElement;
++  fireEvent.change(input, { target: { value: "Texto enviado" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  fireEvent.change(input, { target: { value: "Edición posterior" } });
++  await act(async () => settle(ok({ ...answer, answerText: "Texto enviado", revision: 5 })));
++
++  expect(input.value).toBe("Edición posterior");
++  expect(await screen.findByText("Borrador sin guardar")).toBeTruthy();
++});
++
++it("transport_retry_reuses_exact_request_and_payload", async () => {
++  const save = vi.fn<WorkflowApi["savePhaseAnswer"]>()
++    .mockRejectedValueOnce(new Error("respuesta perdida"))
++    .mockResolvedValueOnce(ok({ ...answer, answerText: "Texto inicial", revision: 5 }));
++  const api = makeWorkflow({ savePhaseAnswer: save });
++  renderWorkspace({ api });
++  const input = await screen.findByLabelText("Respuesta") as HTMLTextAreaElement;
++  fireEvent.change(input, { target: { value: "Texto inicial" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  fireEvent.change(input, { target: { value: "Sigo editando" } });
++  expect(screen.getAllByRole("button", { name: "Guardar respuesta" })[0].hasAttribute("disabled")).toBe(true);
++  fireEvent.click(await screen.findByRole("button", { name: "Reintentar el mismo guardado" }));
++
++  await waitFor(() => expect(save).toHaveBeenCalledTimes(2));
++  expect(save.mock.calls[1][0]).toEqual(save.mock.calls[0][0]);
++  expect(input.value).toBe("Sigo editando");
++  expect(await screen.findByText("Borrador sin guardar")).toBeTruthy();
++});
++
++it("conflict_preserves_draft_and_requires_explicit_resolution", async () => {
++  const latest = { ...answer, answerText: "Versión externa", structuredValue: { observed: true }, resolution: "UNKNOWN" as const, explanation: "Motivo externo", revision: 5 };
++  const save = vi.fn<WorkflowApi["savePhaseAnswer"]>()
++    .mockResolvedValueOnce(failed("Conflict"))
++    .mockResolvedValueOnce(ok({ ...answer, answerText: "Borrador propio", revision: 6 }));
++  const api = makeWorkflow({
++    savePhaseAnswer: save,
++    getPhaseAnswers: vi.fn()
++      .mockResolvedValueOnce(ok([answer]))
++      .mockResolvedValueOnce(ok([latest]))
++      .mockResolvedValue(ok([{ ...answer, answerText: "Borrador propio", revision: 6 }])),
++  });
++  const updatedContext = paper({ activePhaseCode: "P1", reviewType: "slr" });
++  const getPaper = vi.fn().mockResolvedValueOnce(ok(paper())).mockResolvedValue(ok(updatedContext));
++  renderWorkspace({ api, libraryApi: { getPaper } });
++  const input = await screen.findByLabelText("Respuesta") as HTMLTextAreaElement;
++  fireEvent.change(input, { target: { value: "Borrador propio" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  fireEvent.click(await screen.findByRole("button", { name: "Revisar versión guardada" }));
++  expect(await screen.findByText("Versión externa")).toBeTruthy();
++  expect(screen.getByText('{"observed":true}')).toBeTruthy();
++  expect(screen.getByText("UNKNOWN")).toBeTruthy();
++  expect(screen.getByText("Motivo externo")).toBeTruthy();
++  expect(screen.getAllByText("Borrador propio").length).toBeGreaterThan(0);
++  expect(await screen.findByRole("button", { name: "Activa · P1" })).toBeTruthy();
++  expect(screen.getByText(/Tipo bibliográfico registrado:/).textContent).toContain("slr");
++  fireEvent.click(await screen.findByRole("button", { name: "Conservar mi borrador" }));
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++
++  await waitFor(() => expect(save).toHaveBeenCalledTimes(2));
++  expect(input.value).toBe("Borrador propio");
++  expect(save.mock.calls[1][0].expectedRevision).toBe(5);
++  expect(save.mock.calls[1][0].requestId).not.toBe(save.mock.calls[0][0].requestId);
++});
++
++it("late_conflict_read_error_does_not_replace_new_phase_message", async () => {
++  let rejectReview!: (reason: Error) => void;
++  const getPhaseAnswers = vi.fn()
++    .mockResolvedValueOnce(ok([answer]))
++    .mockImplementationOnce(() => new Promise<IpcResult<PhaseAnswerDto[]>>((_resolve, reject) => { rejectReview = reject; }))
++    .mockResolvedValue(ok([]));
++  const api = makeWorkflow({
++    savePhaseAnswer: vi.fn().mockResolvedValue(failed("Conflict")),
++    getPhaseAnswers,
++  });
++  renderWorkspace({ api });
++  const input = await screen.findByLabelText("Respuesta");
++  fireEvent.change(input, { target: { value: "Borrador propio" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  fireEvent.click(await screen.findByRole("button", { name: "Revisar versión guardada" }));
++  fireEvent.click(screen.getByRole("button", { name: "Consultar P2" }));
++  await screen.findByText("P2 · Síntesis y conocimiento");
++  await act(async () => rejectReview(new Error("lectura tardía fallida")));
++
++  expect(screen.queryByText("No se pudo leer la versión guardada. El borrador local se conserva.")).toBeNull();
++});
++
++it("archived_is_readonly_without_restore", async () => {
++  const api = makeWorkflow();
++  const archived = paper({ lifecycle: "ARCHIVED", activePhaseCode: "PRE" });
++  renderWorkspace({ api, currentPaper: archived });
++  await screen.findByText("Paper archivado.");
++  fireEvent.click(screen.getByRole("button", { name: "Consultar P2" }));
++  await screen.findByText("P2 · Síntesis y conocimiento");
++
++  expect(api.getPhase).toHaveBeenCalled();
++  expect(api.touchPhase).not.toHaveBeenCalled();
++  expect(api.goBackToPhase).not.toHaveBeenCalled();
++  expect(api.savePhaseAnswer).not.toHaveBeenCalled();
++  expect(api.evaluateGate).not.toHaveBeenCalled();
++  expect(api.advancePhase).not.toHaveBeenCalled();
++});
++
++it("context_commands_use_active_not_target_revision", async () => {
++  const api = makeWorkflow();
++  renderWorkspace({ api, currentPaper: paper({ activePhaseCode: "P1" }) });
++  await screen.findByText(/P1 sintética/);
++  fireEvent.click(screen.getByRole("button", { name: "Activa · P1" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Consultar PRE" }));
++  await screen.findByText(/PRE sintética v3/);
++  fireEvent.click(screen.getByRole("button", { name: "Volver al contexto PRE" }));
++
++  await waitFor(() => expect(api.goBackToPhase).toHaveBeenCalledWith(expect.objectContaining({
++    targetPhase: "PRE",
++    expectedActivePhaseRevision: 2,
++  })));
++  expect(api.touchPhase).not.toHaveBeenCalled();
++});
++
++it("unknown_transition_retry_reuses_the_same_frozen_command", async () => {
++  const touch = vi.fn<WorkflowApi["touchPhase"]>()
++    .mockRejectedValueOnce(new Error("respuesta perdida"))
++    .mockResolvedValueOnce(ok(phase("P2")));
++  const api = makeWorkflow({ touchPhase: touch });
++  renderWorkspace({ api, currentPaper: paper({ activePhaseCode: "P1" }) });
++  await screen.findByText(/P1 sintética/);
++  fireEvent.click(screen.getByRole("button", { name: "Activa · P1" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Consultar P2" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Activar P2 como fase de trabajo" }));
++  await screen.findByRole("button", { name: "Reintentar la misma transición" });
++  expect(screen.getByRole("button", { name: "Activar P2 como fase de trabajo" }).hasAttribute("disabled")).toBe(true);
++  fireEvent.click(await screen.findByRole("button", { name: "Reintentar la misma transición" }));
++
++  await waitFor(() => expect(touch).toHaveBeenCalledTimes(2));
++  expect(touch.mock.calls[1][0]).toEqual(touch.mock.calls[0][0]);
++});
++
++it("successful_transition_with_failed_refresh_is_not_retried", async () => {
++  const touch = vi.fn<WorkflowApi["touchPhase"]>().mockResolvedValue(ok(phase("P2")));
++  const getPaper = vi.fn()
++    .mockResolvedValueOnce(ok(paper({ activePhaseCode: "P1" })))
++    .mockRejectedValueOnce(new Error("no se pudo refrescar"))
++    .mockResolvedValue(ok(paper({ activePhaseCode: "P1", revision: 2 })));
++  const api = makeWorkflow({ touchPhase: touch });
++  renderWorkspace({ api, currentPaper: paper({ activePhaseCode: "P1" }), libraryApi: { getPaper } });
++  await screen.findByText(/P1 sintética/);
++  fireEvent.click(screen.getByRole("button", { name: "Activa · P1" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Consultar P2" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Activar P2 como fase de trabajo" }));
++
++  expect(await screen.findByText("La fase se activó, pero no se pudo actualizar la vista. Reintenta la carga; no repitas la transición.")).toBeTruthy();
++  expect(screen.queryByRole("button", { name: "Reintentar la misma transición" })).toBeNull();
++  expect((screen.getByRole("button", { name: "Activar P2 como fase de trabajo" }) as HTMLButtonElement).disabled).toBe(true);
++  fireEvent.click(screen.getByRole("button", { name: "Reintentar carga" }));
++  const newContextAction = await screen.findByRole("button", { name: "Activar P2 como fase de trabajo" });
++  await waitFor(() => expect((newContextAction as HTMLButtonElement).disabled).toBe(false));
++  expect(touch).toHaveBeenCalledTimes(1);
++});
++
++it("p1_continue_opens_readonly_p2", async () => {
++  const p1Gate = { ...gate, phaseCode: "P1" as const, definitionVersion: 1, phaseRevision: 2, complete: true };
++  const api = makeWorkflow({
++    evaluateGate: vi.fn().mockResolvedValue(ok(p1Gate)),
++    advancePhase: vi.fn().mockResolvedValue(ok({ phase: phase("P1", "COMPLETED"), gate: p1Gate, nextPhase: "P2", paperLifecycle: "ACTIVE" })),
++  });
++  const refreshed = paper({ activePhaseCode: "P2" });
++  const getPaper = vi.fn().mockResolvedValueOnce(ok(paper({ activePhaseCode: "P1" }))).mockResolvedValue(ok(refreshed));
++  renderWorkspace({ api, currentPaper: paper({ activePhaseCode: "P1" }), libraryApi: { getPaper } });
++  await screen.findByText(/P1 sintética/);
++  fireEvent.click(screen.getByRole("button", { name: "Evaluar fase" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Completar P1 y continuar" }));
++
++  expect(await screen.findByText("P2 · Síntesis y conocimiento")).toBeTruthy();
++  expect(screen.getByText(/edición llegará en una fase posterior/)).toBeTruthy();
++  expect(api.advancePhase).toHaveBeenCalledWith(expect.objectContaining({ fromPhase: "P1", expectedPhaseRevision: 2 }));
++  expect(api.savePhaseAnswer).not.toHaveBeenCalled();
++});
++
++it("p1_light_read_stays_active", async () => {
++  const p1Gate = { ...gate, phaseCode: "P1" as const, definitionVersion: 1, phaseRevision: 2, complete: true };
++  const api = makeWorkflow({
++    evaluateGate: vi.fn().mockResolvedValue(ok(p1Gate)),
++    getPhaseAnswers: vi.fn(async ({ phaseCode }) => ok(phaseCode === "P1" ? [
++      { ...answer, phaseCode: "P1", questionKey: "relevance_decision", resolution: "ANSWERED", structuredValue: { relevance: "sufficient", readingDecision: "light_read" }, answerText: "", revision: 1 } as PhaseAnswerDto,
++    ] : [])),
++    advancePhase: vi.fn().mockResolvedValue(ok({ phase: phase("P1", "COMPLETED"), gate: p1Gate, nextPhase: null, paperLifecycle: "ACTIVE" })),
++  });
++  const getPaper = vi.fn().mockResolvedValue(ok(paper({ activePhaseCode: "P1" })));
++  renderWorkspace({ api, currentPaper: paper({ activePhaseCode: "P1" }), libraryApi: { getPaper } });
++  await screen.findByText(/P1 sintética/);
++  fireEvent.click(screen.getByRole("button", { name: "Evaluar fase" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Completar P1 con lectura ligera" }));
++
++  await screen.findByText("Fase completada.");
++  expect(api.advancePhase).toHaveBeenCalledWith(expect.objectContaining({ fromPhase: "P1", expectedPhaseRevision: 2 }));
++  expect(screen.getByText(/Estado del paper:/).textContent).toContain("ACTIVE");
++});
++
++it("p1_archive_becomes_readonly_only_after_success", async () => {
++  const p1Gate = { ...gate, phaseCode: "P1" as const, definitionVersion: 1, phaseRevision: 2, complete: true };
++  const api = makeWorkflow({
++    evaluateGate: vi.fn().mockResolvedValue(ok(p1Gate)),
++    getPhaseAnswers: vi.fn(async ({ phaseCode }) => ok(phaseCode === "P1" ? [
++      { ...answer, phaseCode: "P1", questionKey: "relevance_decision", resolution: "ANSWERED", structuredValue: { relevance: "weak_for_my_purpose", readingDecision: "archive" }, answerText: "", revision: 1 } as PhaseAnswerDto,
++    ] : [])),
++    advancePhase: vi.fn().mockResolvedValue(ok({ phase: phase("P1", "COMPLETED"), gate: p1Gate, nextPhase: null, paperLifecycle: "ARCHIVED" })),
++  });
++  const archivedPaper = paper({ activePhaseCode: "P1", lifecycle: "ARCHIVED", archivedFromLifecycle: "ACTIVE" });
++  const getPaper = vi.fn().mockResolvedValueOnce(ok(paper({ activePhaseCode: "P1" }))).mockResolvedValue(ok(archivedPaper));
++  renderWorkspace({ api, currentPaper: paper({ activePhaseCode: "P1" }), libraryApi: { getPaper } });
++  await screen.findByText(/P1 sintética/);
++  fireEvent.click(screen.getByRole("button", { name: "Evaluar fase" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Completar P1 y archivar" }));
++
++  expect(await screen.findByText("Paper archivado.", { selector: "strong" })).toBeTruthy();
++  expect(screen.getAllByRole("button", { name: "Guardar respuesta" }).every((button) => button.hasAttribute("disabled"))).toBe(true);
++  expect(api.advancePhase).toHaveBeenCalledTimes(1);
++});
++
++it("needs_review_preserves_later_data", async () => {
++  const savedP1 = { ...answer, phaseCode: "P1" as const, questionKey: "scope", answerText: "Mantener el límite original", revision: 3 };
++  const api = makeWorkflow({
++    getPhase: vi.fn(async ({ phaseCode }) => ok(phase(phaseCode as "PRE" | "P1" | "P2", phaseCode === "P1" ? "NEEDS_REVIEW" : "IN_PROGRESS"))),
++    getPhaseAnswers: vi.fn(async ({ phaseCode }) => ok(phaseCode === "P1" ? [savedP1] : [])),
++  });
++  renderWorkspace({ api, currentPaper: paper({ activePhaseCode: "P2" }) });
++  fireEvent.click(await screen.findByRole("button", { name: "Consultar P1" }));
++
++  expect(await screen.findByText("requiere reconfirmación")).toBeTruthy();
++  expect((document.getElementById("workflow-field-P1-scope-answer") as HTMLTextAreaElement).value).toBe("Mantener el límite original");
++  expect(api.touchPhase).not.toHaveBeenCalled();
++  expect(api.goBackToPhase).not.toHaveBeenCalled();
++});
++
++it.each(["PRE", "P1"] as const)("needs_review_%s_can_be_reconfirmed_explicitly", async (code) => {
++  const targetDefinition = code === "P1" ? p1Definition : definition;
++  const currentPhase = { ...phase(code, "NEEDS_REVIEW"), revision: 11 };
++  const activePaper = paper({ activePhaseCode: code });
++  const api = makeWorkflow({
++    getPhase: vi.fn(async ({ phaseCode }) => ok(phaseCode === code ? currentPhase : phase(phaseCode as "PRE" | "P1" | "P2"))),
++    getPhaseDefinition: vi.fn(async ({ phaseCode, version }) => ok({ ...targetDefinition, code: phaseCode, version: version ?? targetDefinition.version })),
++    evaluateGate: vi.fn().mockResolvedValue(ok({ ...gate, phaseCode: code, definitionVersion: targetDefinition.version, complete: true, phaseRevision: 11 })),
++    advancePhase: vi.fn().mockResolvedValue(ok({ phase: phase(code, "COMPLETED"), gate, nextPhase: code === "PRE" ? "P1" : "P2", paperLifecycle: "ACTIVE" })),
++  });
++  renderWorkspace({ api, currentPaper: activePaper });
++  await screen.findByText(new RegExp(`${code} sintética`));
++  fireEvent.click(screen.getByRole("button", { name: "Evaluar fase" }));
++  const advanceName = code === "PRE" ? "Completar PRE y continuar" : "Completar P1 y continuar";
++  expect(await screen.findByRole("button", { name: advanceName })).not.toHaveProperty("disabled", true);
++  fireEvent.click(screen.getByRole("button", { name: advanceName }));
++  await waitFor(() => expect(api.advancePhase).toHaveBeenCalledWith(expect.objectContaining({
++    fromPhase: code,
++    expectedPhaseRevision: 11,
++  })));
++});
++
++it("missing_answer_is_initial_and_discard_keeps_it_initial", async () => {
++  const api = makeWorkflow({ getPhaseAnswers: vi.fn().mockResolvedValue(ok([])) });
++  renderWorkspace({ api });
++  const input = await screen.findByLabelText("Respuesta");
++  expect(screen.getAllByText("Sin respuesta guardada").length).toBeGreaterThan(0);
++  fireEvent.change(input, { target: { value: "Temporal" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Descartar cambios" })[0]);
++  expect(screen.getAllByText("Sin respuesta guardada").length).toBeGreaterThan(0);
++  expect(screen.queryByText("Guardado")).toBeNull();
++});
++
++it("gate_blocked_requires_explicit_reevaluation_and_never_becomes_pending", async () => {
++  const api = makeWorkflow({
++    evaluateGate: vi.fn().mockResolvedValueOnce(ok({ ...gate, complete: true })),
++    advancePhase: vi.fn().mockResolvedValue(failed("GateBlocked", true)),
++  });
++  renderWorkspace({ api });
++  await screen.findByText(/PRE sintética v3/);
++  fireEvent.click(screen.getByRole("button", { name: "Evaluar fase" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Completar PRE y continuar" }));
++  await screen.findByText("No se pudo completar la operación.");
++  expect(api.evaluateGate).toHaveBeenCalledTimes(1);
++  expect(screen.queryByRole("button", { name: "Reintentar la misma transición" })).toBeNull();
++  expect(screen.getByRole("button", { name: "Evaluar fase" })).not.toHaveProperty("disabled", true);
++});
++
++it("gate_blocked_invalidates_previous_complete_preview_until_explicit_reevaluation", async () => {
++  const completeGate = { ...gate, complete: true };
++  const evaluateGate = vi.fn().mockResolvedValue(ok(completeGate));
++  const api = makeWorkflow({
++    evaluateGate,
++    advancePhase: vi.fn().mockResolvedValue(failed("GateBlocked", true)),
++  });
++  renderWorkspace({ api });
++  await screen.findByText(/PRE sintética v3/);
++  fireEvent.click(screen.getByRole("button", { name: "Evaluar fase" }));
++  expect(await screen.findByText("Revisión preliminar completa")).toBeTruthy();
++  fireEvent.click(await screen.findByRole("button", { name: "Completar PRE y continuar" }));
++  await screen.findByText("No se pudo completar la operación.");
++
++  expect(screen.queryByText("Revisión preliminar completa")).toBeNull();
++  expect((screen.getByRole("button", { name: "Completar PRE y continuar" }) as HTMLButtonElement).disabled).toBe(true);
++  expect(evaluateGate).toHaveBeenCalledTimes(1);
++  expect(api.advancePhase).toHaveBeenCalledTimes(1);
++
++  fireEvent.click(screen.getByRole("button", { name: "Volver a evaluar fase" }));
++  expect(await screen.findByText("Revisión preliminar completa")).toBeTruthy();
++  expect((screen.getByRole("button", { name: "Completar PRE y continuar" }) as HTMLButtonElement).disabled).toBe(false);
++  expect(evaluateGate).toHaveBeenCalledTimes(2);
++  expect(api.advancePhase).toHaveBeenCalledTimes(1);
++});
++
++it("gate_reevaluation_read_failure_does_not_create_transition_replay", async () => {
++  const evaluateGate = vi.fn()
++    .mockResolvedValueOnce(ok({ ...gate, complete: true }))
++    .mockRejectedValueOnce(new Error("lectura fallida"));
++  const api = makeWorkflow({ evaluateGate, advancePhase: vi.fn().mockResolvedValue(failed("GateBlocked")) });
++  renderWorkspace({ api });
++  await screen.findByText(/PRE sintética v3/);
++  fireEvent.click(screen.getByRole("button", { name: "Evaluar fase" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Completar PRE y continuar" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Volver a evaluar fase" }));
++  expect(await screen.findByText("No se pudo evaluar la fase. Puedes volver a intentarlo.")).toBeTruthy();
++  expect(evaluateGate).toHaveBeenCalledTimes(2);
++  expect(api.advancePhase).toHaveBeenCalledTimes(1);
++  expect(screen.queryByRole("button", { name: "Reintentar la misma transición" })).toBeNull();
++  expect(screen.getByRole("button", { name: "Evaluar fase" }).hasAttribute("disabled")).toBe(false);
++});
++
++it("durable_pending_answer_is_distinct_from_an_absent_answer", async () => {
++  const pending = { ...answer, answerText: "", resolution: "PENDING" as const };
++  const api = makeWorkflow({ getPhaseAnswers: vi.fn().mockResolvedValue(ok([pending])) });
++  renderWorkspace({ api });
++  await screen.findByText(/PRE sintética v3/);
++  expect(within(document.getElementById("workflow-field-PRE-purpose")!).getByText("Guardado · pendiente")).toBeTruthy();
++  expect(within(document.getElementById("workflow-field-PRE-review_type")!).getByText("Sin respuesta guardada")).toBeTruthy();
++});
++
++it.each([["PRE", "P1"], ["P1", "PRE"]] as const)("unresolved_%s_draft_blocks_%s_gate_and_transition", async (dirtyCode, activeCode) => {
++  const api = makeWorkflow({
++    getPhase: vi.fn(async ({ phaseCode }) => ok(phase(phaseCode as "PRE" | "P1" | "P2"))),
++    getPhaseDefinition: vi.fn(async ({ phaseCode, version }) => ok({ ...(phaseCode === "P1" ? p1Definition : definition), code: phaseCode, version: version ?? 1 })),
++    savePhaseAnswer: vi.fn().mockResolvedValue(failed("InvalidInput")),
++  });
++  renderWorkspace({ api, currentPaper: paper({ activePhaseCode: activeCode }) });
++  await screen.findByText(new RegExp(`${activeCode} sintética`));
++  if (dirtyCode !== activeCode) {
++    fireEvent.click(await screen.findByRole("button", { name: `Consultar ${dirtyCode}` }));
++    await screen.findByText(new RegExp(`${dirtyCode} sintética`));
++  }
++  const inputId = dirtyCode === "P1" ? "workflow-field-P1-scope-answer" : "workflow-field-PRE-purpose-answer";
++  const input = await screen.findByLabelText("Respuesta", { selector: `#${inputId}` });
++  fireEvent.change(input, { target: { value: "Intención sin resolver" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  await screen.findByText("No guardado");
++  if (dirtyCode !== activeCode) {
++    fireEvent.click(await screen.findByRole("button", { name: `Activa · ${activeCode}` }));
++    await screen.findByText(new RegExp(`${activeCode} sintética`));
++  }
++  expect((screen.getByRole("button", { name: "Evaluar fase" }) as HTMLButtonElement).disabled).toBe(true);
++  expect(api.evaluateGate).not.toHaveBeenCalled();
++  expect(api.touchPhase).not.toHaveBeenCalled();
++  expect(api.goBackToPhase).not.toHaveBeenCalled();
++  if (dirtyCode !== activeCode) {
++    fireEvent.click(await screen.findByRole("button", { name: `Consultar ${dirtyCode}` }));
++    await screen.findByText(new RegExp(`${dirtyCode} sintética`));
++  }
++  fireEvent.click(within(document.getElementById(`workflow-field-${dirtyCode}-${dirtyCode === "P1" ? "scope" : "purpose"}`)!).getByRole("button", { name: "Descartar cambios" }));
++  if (dirtyCode !== activeCode) fireEvent.click(await screen.findByRole("button", { name: `Activa · ${activeCode}` }));
++  await waitFor(() => expect((screen.getByRole("button", { name: "Evaluar fase" }) as HTMLButtonElement).disabled).toBe(false));
++});
++
++it("p2_displays_existing_outputs_as_readonly", async () => {
++  const p2 = {
++    ...p1Definition,
++    code: "P2" as const,
++    name: "P2 · Síntesis y conocimiento",
++    requiredOutputs: [
++      { key: "main_questions_processed", label: "Preguntas principales", prompt: "", required: true, allowedResolutions: ["PENDING", "ANSWERED"] as const, ruleKey: "answerProcessed" },
++    ],
++  } as PhaseDefinitionDto;
++  const saved = { ...answer, phaseCode: "P2" as const, questionKey: "main_questions_processed", answerText: "Lectura de solo consulta", revision: 2 };
++  const api = makeWorkflow({
++    getPhaseDefinition: vi.fn(async ({ phaseCode, version }) => ok({ ...p2, code: phaseCode, version: version ?? 1 })),
++    getPhaseAnswers: vi.fn(async ({ phaseCode }) => ok(phaseCode === "P2" ? [saved] : [])),
++  });
++  renderWorkspace({ api, currentPaper: paper({ activePhaseCode: "P1" }) });
++  fireEvent.click(await screen.findByRole("button", { name: "Consultar P2" }));
++  expect(await screen.findByText("Lectura de solo consulta")).toBeTruthy();
++  expect(screen.queryByRole("button", { name: "Guardar respuesta" })).toBeNull();
++  expect(screen.queryByRole("button", { name: "Evaluar fase" })).toBeNull();
++  expect(api.savePhaseAnswer).not.toHaveBeenCalled();
++  expect(api.evaluateGate).not.toHaveBeenCalled();
++  expect(api.advancePhase).not.toHaveBeenCalled();
++});
++
++it("p2_empty_outputs_are_reported_honestly", async () => {
++  const api = makeWorkflow({
++    getPhaseDefinition: vi.fn(async ({ phaseCode, version }) => ok({ ...p1Definition, code: phaseCode, version: version ?? 1 })),
++    getPhaseAnswers: vi.fn().mockResolvedValue(ok([])),
++  });
++  renderWorkspace({ api, currentPaper: paper({ activePhaseCode: "P1" }) });
++  fireEvent.click(await screen.findByRole("button", { name: "Consultar P2" }));
++  expect((await screen.findAllByText("Sin respuesta guardada.")).length).toBeGreaterThan(0);
++  expect(api.savePhaseAnswer).not.toHaveBeenCalled();
++  expect(api.evaluateGate).not.toHaveBeenCalled();
++  expect(api.advancePhase).not.toHaveBeenCalled();
++});
++
++it("unknown_save_replay_after_discard_keeps_later_edit_dirty", async () => {
++  const save = vi.fn<WorkflowApi["savePhaseAnswer"]>()
++    .mockRejectedValueOnce(new Error("respuesta perdida"))
++    .mockResolvedValueOnce(ok({ ...answer, answerText: "Primera edición", revision: 5 }));
++  const api = makeWorkflow({ savePhaseAnswer: save });
++  renderWorkspace({ api });
++  const input = await screen.findByLabelText("Respuesta") as HTMLTextAreaElement;
++  fireEvent.change(input, { target: { value: "Primera edición" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  await screen.findByRole("button", { name: "Reintentar el mismo guardado" });
++  fireEvent.click(screen.getAllByRole("button", { name: "Descartar cambios" })[0]);
++  fireEvent.change(input, { target: { value: "Edición posterior" } });
++  fireEvent.click(await screen.findByRole("button", { name: "Reintentar el mismo guardado" }));
++  await waitFor(() => expect(save).toHaveBeenCalledTimes(2));
++  expect(save.mock.calls[1][0]).toEqual(save.mock.calls[0][0]);
++  expect(input.value).toBe("Edición posterior");
++  expect(await screen.findByText("Borrador sin guardar")).toBeTruthy();
++});
++
++it("remounted_consumer_reconciles_confirmed_save_without_extra_input", async () => {
++  let settle!: (result: IpcResult<PhaseAnswerDto>) => void;
++  let confirmed = false;
++  const api = makeWorkflow({
++    getPhaseAnswers: vi.fn(async () => ok([{ ...answer, revision: confirmed ? 5 : 4, answerText: confirmed ? "Guardado por A" : answer.answerText }])),
++    savePhaseAnswer: vi.fn(() => new Promise<IpcResult<PhaseAnswerDto>>((resolve) => { settle = resolve; })),
++  });
++  const session = createWorkflowSession();
++  const first = renderWorkspace({ api, session });
++  const input = await screen.findByLabelText("Respuesta");
++  fireEvent.change(input, { target: { value: "Guardado por A" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  first.unmount();
++
++  const second = renderWorkspace({ api, session });
++  expect(await screen.findByText("Guardando…")).toBeTruthy();
++  const readsBeforeSaveReceipt = (second.libraryApi as { getPaper: ReturnType<typeof vi.fn> }).getPaper.mock.calls.length;
++  const answersBeforeSaveReceipt = (api.getPhaseAnswers as ReturnType<typeof vi.fn>).mock.calls.length;
++  confirmed = true;
++  await act(async () => settle(ok({ ...answer, revision: 5, answerText: "Guardado por A" })));
++
++  expect(await screen.findByText("Guardado")).toBeTruthy();
++  await waitFor(() => expect((second.libraryApi as { getPaper: ReturnType<typeof vi.fn> }).getPaper).toHaveBeenCalledTimes(readsBeforeSaveReceipt + 1));
++  await waitFor(() => expect((api.getPhaseAnswers as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThan(answersBeforeSaveReceipt));
++  expect((screen.getByLabelText("Respuesta") as HTMLTextAreaElement).value).toBe("Guardado por A");
++  expect(api.savePhaseAnswer).toHaveBeenCalledTimes(1);
++});
++
++it("late_paper_hydration_from_a_cannot_replace_remounted_paper_b", async () => {
++  const otherId = "00000000-0000-4000-8000-000000000297";
++  let settleA!: (result: IpcResult<PaperDto>) => void;
++  const getPaper = vi.fn(({ paperId: requestedId }: { paperId: string }) => requestedId === paperId
++    ? new Promise<IpcResult<PaperDto>>((resolve) => { settleA = resolve; })
++    : Promise.resolve(ok(paper({ id: otherId, title: "Paper B", activePhaseCode: "PRE" }))));
++  const api = makeWorkflow({ getPhaseAnswers: vi.fn(async () => ok([])) });
++  const libraryApi = { getPaper } as unknown as Pick<LibraryApi, "getPaper">;
++  const first = renderWorkspace({ api, libraryApi });
++  await waitFor(() => expect(getPaper).toHaveBeenCalled());
++  first.unmount();
++  renderWorkspace({ api, libraryApi, workspacePaperId: otherId, currentPaper: paper({ id: otherId, title: "Paper B" }) });
++  expect(await screen.findByRole("heading", { name: "Paper B" })).toBeTruthy();
++  await act(async () => settleA(ok(paper({ title: "Paper A tardío" }))));
++  expect(screen.getByRole("heading", { name: "Paper B" })).toBeTruthy();
++  expect(screen.queryByRole("heading", { name: "Paper A tardío" })).toBeNull();
++});
++
++it("late_phase_hydration_from_a_cannot_paint_over_remounted_paper_b", async () => {
++  const otherId = "00000000-0000-4000-8000-000000000296";
++  let settlePhaseA!: (result: IpcResult<PhaseDto>) => void;
++  const api = makeWorkflow({
++    getPhase: vi.fn(({ paperId: requestedId, phaseCode }) => requestedId === paperId && phaseCode === "P1"
++      ? new Promise<IpcResult<PhaseDto>>((resolve) => { settlePhaseA = resolve; })
++      : Promise.resolve(ok(phase(phaseCode as "PRE" | "P1" | "P2")))),
++    getPhaseAnswers: vi.fn(async () => ok([])),
++  });
++  const libraryApi = { getPaper: vi.fn(async ({ paperId: requestedId }) => ok(requestedId === paperId
++    ? paper({ activePhaseCode: "P1" })
++    : paper({ id: otherId, title: "Paper B", activePhaseCode: "PRE" }))) } as unknown as Pick<LibraryApi, "getPaper">;
++  const first = renderWorkspace({ api, libraryApi, currentPaper: paper({ activePhaseCode: "P1" }) });
++  await waitFor(() => expect(api.getPhase).toHaveBeenCalledWith(expect.objectContaining({ paperId, phaseCode: "P1" })));
++  first.unmount();
++  renderWorkspace({ api, libraryApi, workspacePaperId: otherId, currentPaper: paper({ id: otherId, title: "Paper B" }) });
++  expect(await screen.findByRole("heading", { name: "Paper B" })).toBeTruthy();
++  await act(async () => settlePhaseA(ok({ ...phase("P1"), paperId })));
++  expect(screen.getByRole("heading", { name: "Paper B" })).toBeTruthy();
++  expect(screen.queryByText(/P1 sintética/)).toBeNull();
++});
++
++it("archived_remount_can_resolve_original_unknown_save_but_cannot_start_a_new_save", async () => {
++  const archived = paper({ lifecycle: "ARCHIVED", archivedFromLifecycle: "ACTIVE" });
++  let currentPaper = paper();
++  const save = vi.fn<WorkflowApi["savePhaseAnswer"]>()
++    .mockRejectedValueOnce(new Error("respuesta perdida"))
++    .mockResolvedValueOnce(ok({ ...answer, revision: 5, answerText: "Respuesta admitida antes del archivo" }));
++  const api = makeWorkflow({ savePhaseAnswer: save });
++  const libraryApi = { getPaper: vi.fn(async () => ok(currentPaper)) } as unknown as Pick<LibraryApi, "getPaper">;
++  const session = createWorkflowSession();
++  const first = renderWorkspace({ api, session, libraryApi });
++  const input = await screen.findByLabelText("Respuesta") as HTMLTextAreaElement;
++  fireEvent.change(input, { target: { value: "Respuesta admitida antes del archivo" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  await screen.findByRole("button", { name: "Reintentar el mismo guardado" });
++  const frozen = save.mock.calls[0][0];
++  first.unmount();
++
++  currentPaper = archived;
++  renderWorkspace({ api, session, libraryApi });
++  await screen.findByText("Paper archivado.");
++  expect((screen.getByLabelText("Respuesta") as HTMLTextAreaElement).disabled).toBe(true);
++  fireEvent.click(screen.getByRole("button", { name: "Reintentar el mismo guardado" }));
++  await waitFor(() => expect(save).toHaveBeenCalledTimes(2));
++  expect(save.mock.calls[1][0]).toEqual(frozen);
++  await screen.findByText("Guardado");
++  expect((screen.getByLabelText("Respuesta") as HTMLTextAreaElement).disabled).toBe(true);
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  expect(save).toHaveBeenCalledTimes(2);
++});
++
++it("archived_replay_remains_blocked_when_library_is_not_writable", async () => {
++  const archived = paper({ lifecycle: "ARCHIVED", archivedFromLifecycle: "ACTIVE" });
++  const save = vi.fn<WorkflowApi["savePhaseAnswer"]>().mockRejectedValueOnce(new Error("respuesta perdida"));
++  const api = makeWorkflow({ savePhaseAnswer: save });
++  const session = createWorkflowSession();
++  const first = renderWorkspace({ api, session });
++  fireEvent.change(await screen.findByLabelText("Respuesta"), { target: { value: "Pendiente" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  await screen.findByRole("button", { name: "Reintentar el mismo guardado" });
++  first.unmount();
++  renderWorkspace({ api, session, currentPaper: archived, writable: false });
++  const retry = await screen.findByRole("button", { name: "Reintentar el mismo guardado" }) as HTMLButtonElement;
++  expect(retry.disabled).toBe(true);
++  fireEvent.click(retry);
++  expect(save).toHaveBeenCalledTimes(1);
++});
++
++it("retry_after_refresh_failure_reloads_paper_before_phase_and_does_not_resend_save", async () => {
++  const archived = paper({ lifecycle: "ARCHIVED", archivedFromLifecycle: "ACTIVE", activePhaseCode: "P1", reviewType: "slr" });
++  const getPaper = vi.fn()
++    .mockResolvedValueOnce(ok(paper()))
++    .mockRejectedValueOnce(new Error("lectura temporal"))
++    .mockResolvedValueOnce(ok(archived));
++  const getPhase = vi.fn(async ({ phaseCode }) => ok(phase(phaseCode as "PRE" | "P1" | "P2")));
++  const save = vi.fn().mockResolvedValue(ok({ ...answer, answerText: "Guardado", revision: 5 }));
++  const api = makeWorkflow({ getPhase, savePhaseAnswer: save });
++  renderWorkspace({ api, currentPaper: paper(), libraryApi: { getPaper } });
++  fireEvent.change(await screen.findByLabelText("Respuesta"), { target: { value: "Guardado" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  expect(await screen.findByText(/no se pudo actualizar la vista/)).toBeTruthy();
++  fireEvent.click(screen.getByRole("button", { name: "Reintentar carga" }));
++  expect(await screen.findByText("Paper archivado.", { selector: "strong" })).toBeTruthy();
++  expect(screen.getByText(/Estado del paper:/).textContent).toContain("ARCHIVED");
++  expect((screen.getByLabelText("Respuesta") as HTMLTextAreaElement).disabled).toBe(true);
++  expect(save).toHaveBeenCalledTimes(1);
++  expect(getPaper).toHaveBeenCalledTimes(3);
++  expect(getPhase).toHaveBeenCalledWith(expect.objectContaining({ phaseCode: "PRE" }));
++});
++
++it("confirmed_save_without_consumer_is_reconciled_on_later_mount", async () => {
++  let settle!: (result: IpcResult<PhaseAnswerDto>) => void;
++  let confirmed = false;
++  const getPaper = vi.fn(async () => ok(paper()));
++  const getPhase = vi.fn(async () => ok({ ...phase("PRE"), revision: confirmed ? 10 : 9 }));
++  const getPhaseAnswers = vi.fn(async () => ok(confirmed ? [{ ...answer, answerText: "Confirmada sin consumidor", revision: 5 }] : [answer]));
++  const save = vi.fn(() => new Promise<IpcResult<PhaseAnswerDto>>((resolve) => { settle = resolve; }));
++  const completeGate = { ...gate, complete: true, phaseRevision: 10 };
++  const api = makeWorkflow({
++    getPhase,
++    getPhaseAnswers,
++    savePhaseAnswer: save,
++    evaluateGate: vi.fn().mockResolvedValue(ok(completeGate)),
++    advancePhase: vi.fn().mockResolvedValue(ok({ phase: phase("PRE", "COMPLETED"), gate: completeGate, nextPhase: "P1", paperLifecycle: "ACTIVE" })),
++  });
++  const session = createWorkflowSession();
++  const libraryApi = { getPaper } as unknown as Pick<LibraryApi, "getPaper">;
++  const first = renderWorkspace({ api, session, libraryApi });
++  fireEvent.change(await screen.findByLabelText("Respuesta"), { target: { value: "Confirmada sin consumidor" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  first.unmount();
++
++  confirmed = true;
++  await act(async () => settle(ok({ ...answer, answerText: "Confirmada sin consumidor", revision: 5 })));
++  renderWorkspace({ api, session, libraryApi });
++
++  await waitFor(() => expect((screen.getAllByLabelText("Respuesta")[0] as HTMLTextAreaElement).value).toBe("Confirmada sin consumidor"));
++  expect(screen.queryByRole("button", { name: "Reintentar carga" })).toBeNull();
++  fireEvent.click(screen.getByRole("button", { name: "Evaluar fase" }));
++  await waitFor(() => expect(api.evaluateGate).toHaveBeenCalledTimes(1));
++  fireEvent.click(await screen.findByRole("button", { name: "Completar PRE y continuar" }));
++  await waitFor(() => expect(api.advancePhase).toHaveBeenCalledWith(expect.objectContaining({ fromPhase: "PRE", expectedPhaseRevision: 10 })));
++  expect(save).toHaveBeenCalledTimes(1);
++});
++
++it("confirmed_transition_without_consumer_uses_the_current_active_token_on_later_mount", async () => {
++  let settle!: (result: IpcResult<{ activePhaseCode: "PRE" | "P1" | "P2"; activePhaseRevision: number }>) => void;
++  let confirmed = false;
++  let currentPaper = paper({ activePhaseCode: "P1" });
++  const completeGate = { ...gate, complete: true, phaseRevision: 10 };
++  const getPaper = vi.fn(async () => ok(currentPaper));
++  const goBack = vi.fn(() => new Promise<IpcResult<{ activePhaseCode: "PRE" | "P1" | "P2"; activePhaseRevision: number }>>((resolve) => { settle = resolve; }));
++  const api = makeWorkflow({
++    getPhase: vi.fn(async ({ phaseCode }) => ok({ ...phase(phaseCode as "PRE" | "P1" | "P2"), revision: confirmed && phaseCode === "PRE" ? 10 : phaseCode === "PRE" ? 9 : 2 })),
++    getPhaseDefinition: vi.fn(async ({ phaseCode, version }) => ok({ ...(phaseCode === "P1" ? p1Definition : definition), code: phaseCode, version: version ?? 1 })),
++    evaluateGate: vi.fn().mockResolvedValue(ok(completeGate)),
++    goBackToPhase: goBack,
++    advancePhase: vi.fn().mockResolvedValue(ok({ phase: phase("PRE", "COMPLETED"), gate: completeGate, nextPhase: "P1", paperLifecycle: "ACTIVE" })),
++  });
++  const session = createWorkflowSession();
++  const libraryApi = { getPaper } as unknown as Pick<LibraryApi, "getPaper">;
++  const first = renderWorkspace({ api, session, libraryApi, currentPaper });
++  await screen.findByText(/P1 sintética/);
++  fireEvent.click(screen.getByRole("button", { name: "Consultar PRE" }));
++  await screen.findByText(/PRE sintética v3/);
++  fireEvent.click(screen.getByRole("button", { name: "Volver al contexto PRE" }));
++  first.unmount();
++
++  confirmed = true;
++  currentPaper = paper({ activePhaseCode: "PRE", revision: 2 });
++  await act(async () => settle(ok({ activePhaseCode: "PRE", activePhaseRevision: 10 })));
++  renderWorkspace({ api, session, libraryApi, currentPaper });
++
++  await screen.findByText(/PRE sintética v3/);
++  fireEvent.click(screen.getByRole("button", { name: "Evaluar fase" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Completar PRE y continuar" }));
++  await waitFor(() => expect(api.advancePhase).toHaveBeenCalledWith(expect.objectContaining({ expectedPhaseRevision: 10 })));
++  expect(goBack).toHaveBeenCalledTimes(1);
++});
++
++it("failed_refresh_survives_unmount_and_remount_recovers_without_resending", async () => {
++  const refreshed = paper({ activePhaseCode: "PRE", revision: 2 });
++  const getPaper = vi.fn()
++    .mockResolvedValueOnce(ok(paper()))
++    .mockRejectedValueOnce(new Error("lectura temporal"))
++    .mockResolvedValue(ok(refreshed));
++  const completeGate = { ...gate, complete: true, phaseRevision: 10 };
++  const save = vi.fn().mockResolvedValue(ok({ ...answer, answerText: "Guardado", revision: 5 }));
++  const api = makeWorkflow({
++    getPhase: vi.fn(async () => ok({ ...phase("PRE"), revision: getPaper.mock.calls.length > 2 ? 10 : 9 })),
++    evaluateGate: vi.fn().mockResolvedValue(ok(completeGate)),
++    advancePhase: vi.fn().mockResolvedValue(ok({ phase: phase("PRE", "COMPLETED"), gate: completeGate, nextPhase: "P1", paperLifecycle: "ACTIVE" })),
++    savePhaseAnswer: save,
++  });
++  const session = createWorkflowSession();
++  const libraryApi = { getPaper } as unknown as Pick<LibraryApi, "getPaper">;
++  const first = renderWorkspace({ api, session, libraryApi });
++  fireEvent.change(await screen.findByLabelText("Respuesta"), { target: { value: "Guardado" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  await screen.findByRole("button", { name: "Reintentar carga" });
++  first.unmount();
++
++  renderWorkspace({ api, session, libraryApi, currentPaper: refreshed });
++  await screen.findByText(/PRE sintética v3/);
++  expect(screen.queryByRole("button", { name: "Reintentar carga" })).toBeNull();
++  expect(getPaper).toHaveBeenCalledTimes(3);
++  expect(save).toHaveBeenCalledTimes(1);
++  fireEvent.click(screen.getByRole("button", { name: "Evaluar fase" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Completar PRE y continuar" }));
++  await waitFor(() => expect(api.advancePhase).toHaveBeenCalledWith(expect.objectContaining({ expectedPhaseRevision: 10 })));
++});
++
++it("refresh_recovery_remains_available_after_consulting_another_phase", async () => {
++  const archived = paper({ lifecycle: "ARCHIVED", archivedFromLifecycle: "ACTIVE", activePhaseCode: "PRE" });
++  const getPaper = vi.fn()
++    .mockResolvedValueOnce(ok(paper()))
++    .mockRejectedValueOnce(new Error("lectura temporal"))
++    .mockResolvedValue(ok(archived));
++  const save = vi.fn().mockResolvedValue(ok({ ...answer, answerText: "Guardado", revision: 5 }));
++  const api = makeWorkflow({ savePhaseAnswer: save });
++  renderWorkspace({ api, libraryApi: { getPaper } });
++  fireEvent.change(await screen.findByLabelText("Respuesta"), { target: { value: "Guardado" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  await screen.findByRole("button", { name: "Reintentar carga" });
++
++  fireEvent.click(screen.getByRole("button", { name: "Consultar P1" }));
++  await screen.findByText(/P1 sintética/);
++  const retry = screen.getByRole("button", { name: "Reintentar carga" }) as HTMLButtonElement;
++  expect(retry.disabled).toBe(false);
++  fireEvent.click(retry);
++
++  expect(await screen.findByText("Paper archivado.", { selector: "strong" })).toBeTruthy();
++  expect(screen.getByText(/Estado del paper:/).textContent).toContain("ARCHIVED");
++  expect(getPaper).toHaveBeenCalledTimes(3);
++  expect(save).toHaveBeenCalledTimes(1);
++});
++
++it("active_phase_refresh_failure_keeps_recovery_after_partial_phase_read", async () => {
++  const archived = paper({ lifecycle: "ARCHIVED", archivedFromLifecycle: "ACTIVE", activePhaseCode: "P1" });
++  const getPaper = vi.fn().mockResolvedValueOnce(ok(paper())).mockResolvedValue(ok(archived));
++  let failActiveRead = true;
++  const getPhase = vi.fn(async ({ phaseCode }) => {
++    if (phaseCode === "P1" && failActiveRead) {
++      failActiveRead = false;
++      return failed("Unavailable");
++    }
++    return ok(phase(phaseCode as "PRE" | "P1" | "P2"));
++  });
++  const save = vi.fn().mockResolvedValue(ok({ ...answer, answerText: "Guardado", revision: 5 }));
++  const api = makeWorkflow({ getPhase, savePhaseAnswer: save });
++  renderWorkspace({ api, libraryApi: { getPaper } });
++  fireEvent.change(await screen.findByLabelText("Respuesta"), { target: { value: "Guardado" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  await screen.findByRole("button", { name: "Reintentar carga" });
++  expect(screen.getByRole("alert").textContent).toContain("No se pudo completar la operación.");
++
++  fireEvent.click(screen.getByRole("button", { name: "Consultar P2" }));
++  await screen.findByText("P2 · Síntesis y conocimiento");
++  expect(screen.getByRole("button", { name: "Reintentar carga" })).toBeTruthy();
++  fireEvent.click(screen.getByRole("button", { name: "Reintentar carga" }));
++  await screen.findByText("Paper archivado.");
++  expect(screen.getByText(/Estado del paper:/).textContent).toContain("ARCHIVED");
++  expect(screen.getByRole("button", { name: "Activa · P1" })).toBeTruthy();
++  expect(getPaper).toHaveBeenCalledTimes(3);
++  expect(getPhase).toHaveBeenCalledWith(expect.objectContaining({ phaseCode: "P1" }));
++  expect(save).toHaveBeenCalledTimes(1);
++});
++
++it("mount_reconciliation_started_before_confirmation_cannot_clear_newer_refresh", async () => {
++  let settleOldRead!: (result: IpcResult<PaperDto>) => void;
++  let consumerBReads = 0;
++  let consumerAReads = 0;
++  const currentPaper = paper({ title: "Estado actual tras confirmación", revision: 2 });
++  const consumerALibrary = {
++    getPaper: vi.fn(() => ++consumerAReads === 1 ? Promise.resolve(ok(paper())) : Promise.reject(new Error("refresh fallido"))),
++  } as unknown as Pick<LibraryApi, "getPaper">;
++  const consumerBLibrary = {
++    getPaper: vi.fn(() => {
++      consumerBReads += 1;
++      if (consumerBReads === 1) return new Promise<IpcResult<PaperDto>>((resolve) => { settleOldRead = resolve; });
++      if (consumerBReads === 2) return Promise.reject(new Error("refresh concurrente fallido"));
++      return Promise.resolve(ok(currentPaper));
++    }),
++  } as unknown as Pick<LibraryApi, "getPaper">;
++  const save = vi.fn().mockResolvedValue(ok({ ...answer, answerText: "Confirmada", revision: 5 }));
++  const api = makeWorkflow({ savePhaseAnswer: save });
++  const session = createWorkflowSession();
++  renderWorkspace({ api, session, libraryApi: consumerALibrary });
++  fireEvent.change(await screen.findByLabelText("Respuesta"), { target: { value: "Confirmada" } });
++  const second = renderWorkspace({ api, session, libraryApi: consumerBLibrary });
++  await waitFor(() => expect(consumerBLibrary.getPaper).toHaveBeenCalledTimes(1));
++
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  await waitFor(() => expect(save).toHaveBeenCalledTimes(1));
++  await waitFor(() => expect(consumerBLibrary.getPaper).toHaveBeenCalledTimes(2));
++  await act(async () => settleOldRead(ok(paper({ title: "Lectura anterior al guardado" }))));
++
++  expect(within(second.container).getByRole("button", { name: "Reintentar carga" })).toBeTruthy();
++  expect(within(second.container).queryByRole("heading", { name: "Lectura anterior al guardado" })).toBeNull();
++  fireEvent.click(within(second.container).getByRole("button", { name: "Reintentar carga" }));
++  expect(await within(second.container).findByRole("heading", { name: "Estado actual tras confirmación" })).toBeTruthy();
++  expect(within(second.container).queryByRole("button", { name: "Reintentar carga" })).toBeNull();
++  expect(save).toHaveBeenCalledTimes(1);
++});
++
++it("remounted_archived_consumer_ignores_historical_active_transition_receipt", async () => {
++  const archived = paper({ lifecycle: "ARCHIVED", archivedFromLifecycle: "ACTIVE", activePhaseCode: "P1" });
++  let currentPaper = paper({ activePhaseCode: "P1" });
++  let settle!: (result: IpcResult<WorkflowAdvancePhaseOutput>) => void;
++  const p1Gate = { ...gate, phaseCode: "P1" as const, definitionVersion: 1, phaseRevision: 2, complete: true };
++  const api = makeWorkflow({
++    getPhaseAnswers: vi.fn(async ({ phaseCode }) => ok(phaseCode === "P1" ? [
++      { ...answer, phaseCode: "P1", questionKey: "relevance_decision", resolution: "ANSWERED", structuredValue: { relevance: "weak_for_my_purpose", readingDecision: "archive" }, answerText: "", revision: 1 } as PhaseAnswerDto,
++    ] : [answer])),
++    getPhaseDefinition: vi.fn(async ({ phaseCode, version }) => ok({ ...(phaseCode === "P1" ? p1Definition : definition), code: phaseCode, version: version ?? 1 })),
++    evaluateGate: vi.fn().mockResolvedValue(ok(p1Gate)),
++    advancePhase: vi.fn(() => new Promise<IpcResult<WorkflowAdvancePhaseOutput>>((resolve) => { settle = resolve; })),
++  });
++  const getPaper = vi.fn(async () => ok(currentPaper));
++  const libraryApi = { getPaper } as unknown as Pick<LibraryApi, "getPaper">;
++  const session = createWorkflowSession();
++  const first = renderWorkspace({ api, session, libraryApi, currentPaper: currentPaper });
++  await screen.findByText(/P1 sintética/);
++  fireEvent.click(screen.getByRole("button", { name: "Evaluar fase" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Completar P1 y archivar" }));
++  first.unmount();
++
++  currentPaper = archived;
++  renderWorkspace({ api, session, libraryApi, currentPaper: archived });
++  await screen.findByText("Paper archivado.");
++  const readsBeforeReceipt = getPaper.mock.calls.length;
++  await act(async () => settle(ok({ phase: phase("P1", "COMPLETED"), gate: p1Gate, nextPhase: "P2", paperLifecycle: "ACTIVE" })));
++
++  expect(await screen.findByText("Paper archivado.", { selector: "strong" })).toBeTruthy();
++  await waitFor(() => expect(getPaper.mock.calls.length).toBeGreaterThan(readsBeforeReceipt));
++  expect(screen.getByText(/Estado del paper:/).textContent).toContain("ARCHIVED");
++  expect((document.getElementById("workflow-field-P1-scope-answer") as HTMLTextAreaElement).disabled).toBe(true);
++  expect(api.advancePhase).toHaveBeenCalledTimes(1);
++});
++
++it("not_applicable_requires_and_persists_its_own_explanation", async () => {
++  const api = makeWorkflow({
++    getPhaseDefinition: vi.fn(async ({ phaseCode, version }) => ok({ ...(phaseCode === "P1" ? p1Definition : definition), code: phaseCode, version: version ?? 1 })),
++  });
++  renderWorkspace({ api });
++  fireEvent.click(await screen.findByRole("button", { name: "Consultar P1" }));
++  await screen.findByText(/P1 sintética/);
++  fireEvent.change(document.getElementById("workflow-field-P1-out_of_scope-resolution")!, { target: { value: "NOT_APPLICABLE" } });
++  const explanation = screen.getAllByLabelText("Explicación necesaria")[0];
++  fireEvent.change(explanation, { target: { value: "La pregunta no aplica a este estudio." } });
++  const field = document.getElementById("workflow-field-P1-out_of_scope")!;
++  fireEvent.click(within(field).getByRole("button", { name: "Guardar respuesta" }));
++  await waitFor(() => expect(api.savePhaseAnswer).toHaveBeenCalledWith(expect.objectContaining({
++    phaseCode: "P1", questionKey: "out_of_scope", resolution: "NOT_APPLICABLE",
++    answerText: "", explanation: "La pregunta no aplica a este estudio.",
++  })));
++});
++
++it("not_started_phase_is_consultable_but_not_editable", async () => {
++  const api = makeWorkflow({
++    getPhase: vi.fn(async ({ phaseCode }) => ok(phase(phaseCode as "PRE" | "P1" | "P2", phaseCode === "PRE" ? "NOT_STARTED" : "IN_PROGRESS"))),
++  });
++  renderWorkspace({ api, currentPaper: paper({ activePhaseCode: "P1" }) });
++  await screen.findByText(/P1 sintética/);
++  fireEvent.click(screen.getByRole("button", { name: "Activa · P1" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Consultar PRE" }));
++
++  expect(await screen.findByText(/no se ha iniciado y debe activarse expresamente/)).toBeTruthy();
++  expect(screen.getAllByRole("button", { name: "Guardar respuesta" }).every((button) => button.hasAttribute("disabled"))).toBe(true);
++  expect(screen.getByRole("button", { name: "Evaluar fase" }).hasAttribute("disabled")).toBe(true);
++  expect(screen.getByRole("button", { name: "Volver al contexto PRE" }).hasAttribute("disabled")).toBe(true);
++  expect(api.touchPhase).not.toHaveBeenCalled();
++  expect(api.goBackToPhase).not.toHaveBeenCalled();
++  expect(api.savePhaseAnswer).not.toHaveBeenCalled();
++});
++
++it("drafts_survive_library_navigation_and_paper_switch", async () => {
++  const otherId = "00000000-0000-4000-8000-000000000299";
++  const session = createWorkflowSession();
++  const api = makeWorkflow({
++    getPhaseAnswers: vi.fn(async ({ paperId: requestedId }) => ok([
++      { ...answer, paperId: requestedId, answerText: requestedId === paperId ? "Borrador guardado en sesión" : "Respuesta de B" },
++    ])),
++  });
++  const first = renderWorkspace({ api, session });
++  const firstInput = await screen.findByLabelText("Respuesta") as HTMLTextAreaElement;
++  fireEvent.change(firstInput, { target: { value: "Borrador de A sin guardar" } });
++  first.unmount();
++
++  const second = renderWorkspace({ api, session, workspacePaperId: otherId, currentPaper: paper({ id: otherId, activePhaseCode: "PRE" }) });
++  expect((await screen.findByLabelText("Respuesta") as HTMLTextAreaElement).value).toBe("Respuesta de B");
++  second.unmount();
++
++  renderWorkspace({ api, session });
++  expect((await screen.findByLabelText("Respuesta") as HTMLTextAreaElement).value).toBe("Borrador de A sin guardar");
++  expect(screen.getByText("Borrador sin guardar")).toBeTruthy();
++});
++
++it("late_mutation_updates_only_original_paper", async () => {
++  const otherId = "00000000-0000-4000-8000-000000000298";
++  let settle!: (result: IpcResult<PhaseAnswerDto>) => void;
++  const api = makeWorkflow({
++    getPhaseAnswers: vi.fn(async ({ paperId: requestedId }) => ok([
++      { ...answer, paperId: requestedId, answerText: requestedId === paperId ? "A inicial" : "B intacta" },
++    ])),
++    savePhaseAnswer: vi.fn(() => new Promise<IpcResult<PhaseAnswerDto>>((resolve) => { settle = resolve; })),
++  });
++  const session = createWorkflowSession();
++  const first = renderWorkspace({ api, session });
++  const inputA = await screen.findByLabelText("Respuesta") as HTMLTextAreaElement;
++  fireEvent.change(inputA, { target: { value: "A enviada" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++  first.unmount();
++
++  renderWorkspace({ api, session, workspacePaperId: otherId, currentPaper: paper({ id: otherId, activePhaseCode: "PRE" }) });
++  const inputB = await screen.findByLabelText("Respuesta") as HTMLTextAreaElement;
++  expect(inputB.value).toBe("B intacta");
++  await act(async () => settle(ok({ ...answer, answerText: "A enviada", revision: 5 })));
++  expect(inputB.value).toBe("B intacta");
++  expect(screen.queryByText("Respuesta guardada.")).toBeNull();
++});
++
++it("preview_is_not_completion_and_dirties_on_edit", async () => {
++  const complete = { ...gate, complete: true, issues: [] };
++  const api = makeWorkflow({ evaluateGate: vi.fn().mockResolvedValue(ok(complete)) });
++  renderWorkspace({ api, currentPaper: paper({ lifecycle: "NEW" }) });
++  await screen.findByText(/PRE sintética v3/);
++  fireEvent.click(screen.getByRole("button", { name: "Evaluar fase" }));
++  expect(await screen.findByText("Revisión preliminar completa")).toBeTruthy();
++  expect(screen.getByRole("button", { name: "Completar PRE y continuar" }).hasAttribute("disabled")).toBe(false);
++  expect(screen.getByText(/Estado del paper:/).textContent).toContain("NEW");
++  expect(api.advancePhase).not.toHaveBeenCalled();
++
++  fireEvent.change(screen.getByLabelText("Respuesta"), { target: { value: "Editado tras preview" } });
++  expect(screen.queryByText("Revisión preliminar completa")).toBeNull();
++  expect(api.advancePhase).not.toHaveBeenCalled();
++});
++
++it("gate_blocked_keeps_phase_and_renders_server_issues", async () => {
++  const currentGate = { ...gate, complete: true, issues: [] };
++  const refreshedGate = { ...gate, complete: false, issues: [{ requirementKey: "purpose", message: "Falta el propósito.", status: "pending" as const }] };
++  const api = makeWorkflow({
++    evaluateGate: vi.fn().mockResolvedValueOnce(ok(currentGate)).mockResolvedValueOnce(ok(refreshedGate)),
++    advancePhase: vi.fn().mockResolvedValue(failed("GateBlocked")),
++  });
++  renderWorkspace({ api });
++  await screen.findByText(/PRE sintética v3/);
++  fireEvent.click(screen.getByRole("button", { name: "Evaluar fase" }));
++  fireEvent.click(await screen.findByRole("button", { name: "Completar PRE y continuar" }));
++
++  expect(await screen.findByRole("button", { name: "Volver a evaluar fase" })).toBeTruthy();
++  expect(api.advancePhase).toHaveBeenCalledTimes(1);
++  expect(api.evaluateGate).toHaveBeenCalledTimes(1);
++  fireEvent.click(screen.getByRole("button", { name: "Volver a evaluar fase" }));
++  expect(await screen.findByText("Falta el propósito.")).toBeTruthy();
++  expect(api.evaluateGate).toHaveBeenCalledTimes(2);
++  expect(screen.getByText(/Estado de PRE:/).textContent).toContain("en curso");
++  expect(api.touchPhase).not.toHaveBeenCalled();
++});
++
++it("late_preview_cannot_enable_advance", async () => {
++  let settle!: (result: IpcResult<GateEvaluationDto>) => void;
++  const api = makeWorkflow({
++    evaluateGate: vi.fn(() => new Promise<IpcResult<GateEvaluationDto>>((resolve) => { settle = resolve; })),
++  });
++  renderWorkspace({ api });
++  await screen.findByText(/PRE sintética v3/);
++  fireEvent.click(screen.getByRole("button", { name: "Evaluar fase" }));
++  fireEvent.change(screen.getByLabelText("Respuesta"), { target: { value: "Editada durante evaluación" } });
++  await act(async () => settle(ok({ ...gate, complete: true, issues: [] })));
++
++  expect(screen.queryByText("Revisión preliminar completa")).toBeNull();
++  expect(screen.getByRole("button", { name: "Completar PRE y continuar" }).hasAttribute("disabled")).toBe(true);
++  expect(api.advancePhase).not.toHaveBeenCalled();
++});
++
++it("unavailable_pdf_still_allows_processing_drafts", async () => {
++  const api = makeWorkflow({ savePhaseAnswer: vi.fn().mockResolvedValue(ok({ ...answer, answerText: "Se conserva sin leer PDF", revision: 5 })) });
++  renderWorkspace({ api });
++  const input = await screen.findByLabelText("Respuesta");
++  fireEvent.change(input, { target: { value: "Se conserva sin leer PDF" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++
++  await waitFor(() => expect(api.savePhaseAnswer).toHaveBeenCalledWith(expect.objectContaining({ answerText: "Se conserva sin leer PDF" })));
++  expect(api.evaluateGate).not.toHaveBeenCalled();
++  expect(api.advancePhase).not.toHaveBeenCalled();
++});
++
++it("workflow_keyboard_labels_and_error_associations", async () => {
++  const api = makeWorkflow({ savePhaseAnswer: vi.fn().mockResolvedValue(failed("InvalidInput")) });
++  renderWorkspace({ api });
++  const input = await screen.findByLabelText("Respuesta") as HTMLTextAreaElement;
++  fireEvent.change(input, { target: { value: "<img src=x onerror=alert(1)>" } });
++  fireEvent.click(screen.getAllByRole("button", { name: "Guardar respuesta" })[0]);
++
++  expect(await screen.findByRole("alert")).toBeTruthy();
++  const field = document.getElementById("workflow-field-PRE-purpose")!;
++  expect(field.getAttribute("aria-invalid")).toBe("true");
++  expect(field.getAttribute("aria-describedby")).toBe("workflow-field-PRE-purpose-error");
++  expect(document.querySelector("img")).toBeNull();
++  expect(input.value).toBe("<img src=x onerror=alert(1)>");
++});

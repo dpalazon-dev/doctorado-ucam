@@ -1,0 +1,102 @@
+{
+  "code": "PRE",
+  "version": 1,
+  "name": "PRE — Contexto previo",
+  "objective": "Explicitar el propósito, la incertidumbre y el punto de partida antes de orientar la lectura.",
+  "keyQuestions": [
+    "¿Para qué voy a leer este paper?",
+    "¿Qué incertidumbre quiero reducir?",
+    "¿Qué sé ya?",
+    "¿Qué espero obtener y con qué profundidad?",
+    "¿Qué tipo de revisión he comprobado?"
+  ],
+  "doItems": [
+    "Explicitar decisiones propias y desconocimientos.",
+    "Confirmar el tipo bibliográfico y la disponibilidad del PDF."
+  ],
+  "dontItems": [
+    "Inferir resultados a partir del título.",
+    "Tratar un tipo desconocido por defecto como revisado."
+  ],
+  "considerations": [
+    "Desconocido y no aplicable requieren explicación cuando estén permitidos.",
+    "La comprobación revisa si has procesado las salidas; no puntúa su calidad científica."
+  ],
+  "requiredOutputs": [
+    {
+      "key": "purpose",
+      "label": "Propósito de lectura",
+      "prompt": "Explica para qué lees este paper.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED"
+      ],
+      "ruleKey": "answerProcessed"
+    },
+    {
+      "key": "uncertainty_target",
+      "label": "Incertidumbre que quieres reducir",
+      "prompt": "Formula qué incertidumbre quieres reducir.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED"
+      ],
+      "ruleKey": "answerProcessed"
+    },
+    {
+      "key": "baseline",
+      "label": "Conocimiento previo",
+      "prompt": "Describe tu punto de partida; si no puedes establecerlo, explica el desconocimiento o la no aplicabilidad.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "ruleKey": "answerProcessed"
+    },
+    {
+      "key": "expected_outcome",
+      "label": "Resultado esperado de la lectura",
+      "prompt": "Explica qué esperas saber; si la lectura es exploratoria y todavía no puedes concretarlo, explica por qué.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED",
+        "UNKNOWN"
+      ],
+      "ruleKey": "answerProcessed"
+    },
+    {
+      "key": "desired_depth",
+      "label": "Profundidad prevista",
+      "prompt": "Describe la profundidad de lectura que has decidido.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED"
+      ],
+      "ruleKey": "answerProcessed"
+    },
+    {
+      "key": "review_type",
+      "label": "Tipo bibliográfico confirmado",
+      "prompt": "Confirma explícitamente el tipo bibliográfico registrado del paper, sin editarlo aquí. Si figura como desconocido, explica por qué no has podido determinarlo.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED",
+        "UNKNOWN"
+      ],
+      "ruleKey": "answerProcessed"
+    }
+  ],
+  "completionRules": [
+    "answerProcessed",
+    "paperHasActiveDocument"
+  ],
+  "definitionHash": "ee2f0e54c352475dc5896080b3a7ed8f5425b637a3712e4a77f721a942cc4a7f"
+}

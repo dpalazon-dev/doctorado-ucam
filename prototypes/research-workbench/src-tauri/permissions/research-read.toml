@@ -1,0 +1,4 @@
+[[permission]]
+identifier = "research-read"
+description = "Closed application command group"
+commands.allow = ["library_list_papers", "library_get_paper", "reader_get_last_opened_paper", "reader_get_reading_position", "workflow_get_phase", "workflow_get_phase_answers", "workflow_get_phase_definition", "workflow_evaluate_gate", "workflow_get_p3_candidate_summary", "knowledge_get_item", "knowledge_list_items", "concept_suggest", "concept_get", "concept_list_items", "relation_list", "provenance_get", "search_library", "search_knowledge", "operation_get_status", "settings_get_app_info", "settings_get_library_info", "settings_get_library_status"]

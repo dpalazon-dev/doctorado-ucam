@@ -1,0 +1,79 @@
+fn main() {
+    // Rust test executables also need the SxS Common-Controls v6 dependency.
+    // Without it, MockRuntime's Windows imports fail before the test harness starts.
+    if std::env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("windows") {
+        println!("cargo:rustc-link-arg-tests=/MANIFEST:EMBED");
+        println!(
+            "cargo:rustc-link-arg-tests=/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'"
+        );
+    }
+
+    tauri_build::try_build(tauri_build::Attributes::new().app_manifest(
+        tauri_build::AppManifest::new().commands(&[
+            "library_select_pdf",
+            "library_confirm_import",
+            "library_cancel_import",
+            "library_list_papers",
+            "library_get_paper",
+            "library_update_metadata",
+            "library_archive_paper",
+            "library_restore_paper",
+            "reader_open_paper",
+            "reader_get_last_opened_paper",
+            "reader_get_reading_position",
+            "reader_save_reading_position",
+            "workflow_get_phase",
+            "workflow_get_phase_answers",
+            "workflow_get_phase_definition",
+            "workflow_save_phase_answer",
+            "workflow_evaluate_gate",
+            "workflow_advance_phase",
+            "workflow_go_back_to_phase",
+            "workflow_touch_phase",
+            "workflow_set_p3_candidate",
+            "workflow_get_p3_candidate_summary",
+            "knowledge_create_item",
+            "knowledge_update_item",
+            "knowledge_archive_item",
+            "knowledge_restore_item",
+            "knowledge_get_item",
+            "knowledge_list_items",
+            "concept_suggest",
+            "concept_get",
+            "concept_list_items",
+            "concept_create",
+            "concept_update",
+            "concept_link",
+            "concept_archive",
+            "concept_restore",
+            "relation_create",
+            "relation_update",
+            "relation_list",
+            "relation_archive",
+            "relation_restore",
+            "provenance_attach_locator",
+            "provenance_update_locator",
+            "provenance_get",
+            "provenance_check_document_hash",
+            "search_library",
+            "search_knowledge",
+            "export_choose_destination",
+            "export_library",
+            "export_paper",
+            "backup_choose_destination",
+            "backup_create",
+            "backup_select",
+            "backup_choose_restore_target",
+            "backup_verify",
+            "backup_restore",
+            "operation_get_status",
+            "operation_cancel",
+            "settings_get_app_info",
+            "settings_get_library_info",
+            "settings_select_library",
+            "settings_switch_library",
+            "settings_get_library_status",
+        ]),
+    ))
+    .expect("Tauri application manifest must build");
+}

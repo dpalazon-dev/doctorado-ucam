@@ -769,3 +769,27 @@ The Knowledge graph is authoritative and machine-oriented but not legible; a wik
 - `AI_ARCHITECTURE.md` — the generated-wiki-as-projection principle and the human-gated Improvement Loop.
 - `SPEC_CATALOG.md` — `SPEC-011` Retrieval and Projection System, the evaluation home for the candidate.
 - `KNOWLEDGE_MODEL.md` — Knowledge forms and evolution that the projection renders.
+
+---
+
+# ADR-0013 · Imported Research Workbench Snapshot Boundary
+
+**Status:** Accepted
+**Date:** 2026-10-08
+
+## Context
+
+This repository now includes a public snapshot of the independent Research Workbench prototype under `prototypes/research-workbench/`. ResearchOS remains the future canonical architecture in the repository root. The prototype has its own historical domain contracts, implementation, and status. Placing those materials beside ResearchOS could imply that the prototype implements ResearchOS Specs or shares its canonical model.
+
+## Decision
+
+Import Research Workbench as a reproducible file snapshot, without importing its remote Git history. Preserve its local source history in the archived bundle and preserve ResearchOS history in this repository. Treat the prototype directory as a separate, bounded namespace: its documents govern only that prototype and have no authority over ResearchOS architecture, model, interfaces, or Specs. No product contract changes as a result of the import.
+
+The snapshot is partial and paused without active maintenance. Public availability permits inspection and forks; it makes no support or issue-response commitment. Research Workbench remains a Windows 11 x64 prototype without AI. ResearchOS remains a future multiplatform vision with optional Python cognitive processing.
+
+## Consequences
+
+- Readers can distinguish the future ResearchOS design from the existing independent prototype.
+- The prototype's historical contracts and status remain available in their original namespace.
+- The import does not claim v0.1 completion, clean-machine installation validation, or production behavior beyond recorded evidence.
+- Third-party dependencies continue under their own licenses and notices.

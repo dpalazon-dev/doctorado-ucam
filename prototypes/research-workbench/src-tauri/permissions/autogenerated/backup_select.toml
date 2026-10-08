@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-backup-select"
+description = "Enables the backup_select command without any pre-configured scope."
+commands.allow = ["backup_select"]
+
+[[permission]]
+identifier = "deny-backup-select"
+description = "Denies the backup_select command without any pre-configured scope."
+commands.deny = ["backup_select"]

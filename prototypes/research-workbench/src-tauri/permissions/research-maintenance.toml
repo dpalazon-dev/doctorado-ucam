@@ -1,0 +1,4 @@
+[[permission]]
+identifier = "research-maintenance"
+description = "Closed application command group"
+commands.allow = ["library_select_pdf", "library_confirm_import", "library_cancel_import", "provenance_check_document_hash", "export_choose_destination", "export_library", "export_paper", "backup_choose_destination", "backup_create", "backup_select", "backup_choose_restore_target", "backup_verify", "backup_restore", "operation_cancel", "settings_select_library", "settings_switch_library"]

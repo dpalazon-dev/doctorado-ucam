@@ -33,6 +33,10 @@ Its objective is to make the repository operable by both humans and coding agent
 
 The documentation is a governed graph, not a linear pile of Markdown files.
 
+## Imported prototype namespace
+
+`prototypes/research-workbench/` is a bounded imported namespace containing the historical documentation and contracts of an independent, partial Windows prototype. Those documents govern only the prototype. They are not ResearchOS production Specs or canonical authority, do not implement or extend the ResearchOS domain model, and cannot amend ResearchOS interfaces or contracts. The existing Document Contracts remain valid within their declared scopes; the namespace exception does not alter them. Root ResearchOS ownership and precedence rules continue to apply to ResearchOS documentation.
+
 ---
 
 ## Core Rule

@@ -1,0 +1,13 @@
+# T04c — preflight nativo de continuidad
+
+Estado: sólo lectura, /root/task04c_native_qa_preflight; integración d4a0c77 limpia. No app/driver/listener/instalación ejecutados ni WIP leído. No prueba nativa T04c.
+
+Runner reutilizable `work/qa/t03-native/native-qa-fix5.ps1`, SHA256 `1F986F2AA515F6257981122B00E280E0B5D354C5378632206806002C721B119A`. Autocontenido. Helpers: hashes17–22; puertos23–27/112–118; WebDriver28–51; interacciones52–81; procesos/ancestry82–131; canvas133–173; selectorWin32174–328; inicio/safehandle393–435; perfil/runtime436–466; cierre569–587; cleanup593–713. Pins/paths4–15; estado de ciclo371–391. No ejecutar modo sin switch como lectura: líneas330–351 invocan driver --version.
+
+Versiones observadas en archivos/registro: WebView2 y Edge154.0.4258.53. Driver correcto `work/tools/msedgedriver/154.0.4258.53/msedgedriver.exe`, SHA256 `008115B68B38437B1C0138F3CCED648F61F333CF4623A9895296E7C1C01ABCB8`. La ruta histórica no versionada sigue154.0.4258.48, no usar. tauri-driver2.1.0 (registro .crates.toml), hash `2684A7B9E1E667D6689BEA8EAFF2AEFE093C5B1F5CA329B3156B384A9CAB9286`. pwsh7.6.5 en `C:/Users/david/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe`, soporta -Environment/-SkipHttpErrorCheck. Volver a comprobar inmediatamente antes de ejecutar; no asumir estabilidad.
+
+Tras congelar UI: nuevo runner adaptado del existente, candidato debug identificado/hasheado y revisado antes de ExecuteAfterReview. Un dataRoot sintético común; dos ciclos con perfiles/sesiones/puertos/PIDs/fechas/SafeHandles diferentes. Reinicializar estado por ciclo y preservar resultados del primero. Segundo ciclo sin import/save compensatorio ni requisito de biblioteca vacía. Cierre normal CloseMainWindow/WaitForExit/ExitCode0 antes de DELETE por cada ciclo; cleanup completo antes de relanzar. Disponer Process sólo después de leer exit y cleanup. Forzar cierre nunca es PASS.
+
+Selector conserva allowlist de rutas+hashes, PID/HWND #32770/Open|Abrir, Edit1148/Button1, readback/revalidación. Tres ramas P1 necesitan tres PDFs de contenido/hash distintos; renombrar no basta. Selectores Workflow se fijarán desde UI congelada, guardados acotados por pregunta; no IPC writes ni React injection. Reutilizar regresión Reader separada. dataRoot debug efectivo contiene research.sqlite; no lanzar release cuyo override no se acepte.
+
+QA obligatoria del brief permanece: persistencia visible, tres ramas y restore sin reejecutar archive; PDF ausente/recuperado; drafts de sesión; teclado/foco/textoslargos/redimensionado/DPI disponibles; Reader. Herramientas compatibles por lectura no acreditan sesión nueva ni instalación.

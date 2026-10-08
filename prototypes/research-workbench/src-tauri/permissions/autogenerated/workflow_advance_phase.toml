@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-workflow-advance-phase"
+description = "Enables the workflow_advance_phase command without any pre-configured scope."
+commands.allow = ["workflow_advance_phase"]
+
+[[permission]]
+identifier = "deny-workflow-advance-phase"
+description = "Denies the workflow_advance_phase command without any pre-configured scope."
+commands.deny = ["workflow_advance_phase"]

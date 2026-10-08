@@ -1,0 +1,320 @@
+{
+  "contractVersion": 1,
+  "commands": [
+    {
+      "name": "library_select_pdf",
+      "permissionGroup": "research-maintenance",
+      "implemented": true
+    },
+    {
+      "name": "library_confirm_import",
+      "permissionGroup": "research-maintenance",
+      "implemented": true
+    },
+    {
+      "name": "library_cancel_import",
+      "permissionGroup": "research-maintenance",
+      "implemented": true
+    },
+    {
+      "name": "library_list_papers",
+      "permissionGroup": "research-read",
+      "implemented": true
+    },
+    {
+      "name": "library_get_paper",
+      "permissionGroup": "research-read",
+      "implemented": true
+    },
+    {
+      "name": "library_update_metadata",
+      "permissionGroup": "research-write",
+      "implemented": true
+    },
+    {
+      "name": "library_archive_paper",
+      "permissionGroup": "research-write",
+      "implemented": true
+    },
+    {
+      "name": "library_restore_paper",
+      "permissionGroup": "research-write",
+      "implemented": true
+    },
+    {
+      "name": "reader_open_paper",
+      "permissionGroup": "research-write",
+      "implemented": true
+    },
+    {
+      "name": "reader_get_last_opened_paper",
+      "permissionGroup": "research-read",
+      "implemented": true
+    },
+    {
+      "name": "reader_get_reading_position",
+      "permissionGroup": "research-read",
+      "implemented": true
+    },
+    {
+      "name": "reader_save_reading_position",
+      "permissionGroup": "research-write",
+      "implemented": true
+    },
+    {
+      "name": "workflow_get_phase",
+      "permissionGroup": "research-read",
+      "implemented": true
+    },
+    {
+      "name": "workflow_get_phase_answers",
+      "permissionGroup": "research-read",
+      "implemented": true
+    },
+    {
+      "name": "workflow_get_phase_definition",
+      "permissionGroup": "research-read",
+      "implemented": true
+    },
+    {
+      "name": "workflow_save_phase_answer",
+      "permissionGroup": "research-write",
+      "implemented": true
+    },
+    {
+      "name": "workflow_evaluate_gate",
+      "permissionGroup": "research-read",
+      "implemented": true
+    },
+    {
+      "name": "workflow_advance_phase",
+      "permissionGroup": "research-write",
+      "implemented": true
+    },
+    {
+      "name": "workflow_go_back_to_phase",
+      "permissionGroup": "research-write",
+      "implemented": true
+    },
+    {
+      "name": "workflow_touch_phase",
+      "permissionGroup": "research-write",
+      "implemented": true
+    },
+    {
+      "name": "workflow_set_p3_candidate",
+      "permissionGroup": "research-write",
+      "implemented": false
+    },
+    {
+      "name": "workflow_get_p3_candidate_summary",
+      "permissionGroup": "research-read",
+      "implemented": false
+    },
+    {
+      "name": "knowledge_create_item",
+      "permissionGroup": "research-write",
+      "implemented": false
+    },
+    {
+      "name": "knowledge_update_item",
+      "permissionGroup": "research-write",
+      "implemented": false
+    },
+    {
+      "name": "knowledge_archive_item",
+      "permissionGroup": "research-write",
+      "implemented": false
+    },
+    {
+      "name": "knowledge_restore_item",
+      "permissionGroup": "research-write",
+      "implemented": false
+    },
+    {
+      "name": "knowledge_get_item",
+      "permissionGroup": "research-read",
+      "implemented": false
+    },
+    {
+      "name": "knowledge_list_items",
+      "permissionGroup": "research-read",
+      "implemented": false
+    },
+    {
+      "name": "concept_suggest",
+      "permissionGroup": "research-read",
+      "implemented": false
+    },
+    {
+      "name": "concept_get",
+      "permissionGroup": "research-read",
+      "implemented": false
+    },
+    {
+      "name": "concept_list_items",
+      "permissionGroup": "research-read",
+      "implemented": false
+    },
+    {
+      "name": "concept_create",
+      "permissionGroup": "research-write",
+      "implemented": false
+    },
+    {
+      "name": "concept_update",
+      "permissionGroup": "research-write",
+      "implemented": false
+    },
+    {
+      "name": "concept_link",
+      "permissionGroup": "research-write",
+      "implemented": false
+    },
+    {
+      "name": "concept_archive",
+      "permissionGroup": "research-write",
+      "implemented": false
+    },
+    {
+      "name": "concept_restore",
+      "permissionGroup": "research-write",
+      "implemented": false
+    },
+    {
+      "name": "relation_create",
+      "permissionGroup": "research-write",
+      "implemented": false
+    },
+    {
+      "name": "relation_update",
+      "permissionGroup": "research-write",
+      "implemented": false
+    },
+    {
+      "name": "relation_list",
+      "permissionGroup": "research-read",
+      "implemented": false
+    },
+    {
+      "name": "relation_archive",
+      "permissionGroup": "research-write",
+      "implemented": false
+    },
+    {
+      "name": "relation_restore",
+      "permissionGroup": "research-write",
+      "implemented": false
+    },
+    {
+      "name": "provenance_attach_locator",
+      "permissionGroup": "research-write",
+      "implemented": false
+    },
+    {
+      "name": "provenance_update_locator",
+      "permissionGroup": "research-write",
+      "implemented": false
+    },
+    {
+      "name": "provenance_get",
+      "permissionGroup": "research-read",
+      "implemented": false
+    },
+    {
+      "name": "provenance_check_document_hash",
+      "permissionGroup": "research-maintenance",
+      "implemented": false
+    },
+    {
+      "name": "search_library",
+      "permissionGroup": "research-read",
+      "implemented": false
+    },
+    {
+      "name": "search_knowledge",
+      "permissionGroup": "research-read",
+      "implemented": false
+    },
+    {
+      "name": "export_choose_destination",
+      "permissionGroup": "research-maintenance",
+      "implemented": false
+    },
+    {
+      "name": "export_library",
+      "permissionGroup": "research-maintenance",
+      "implemented": false
+    },
+    {
+      "name": "export_paper",
+      "permissionGroup": "research-maintenance",
+      "implemented": false
+    },
+    {
+      "name": "backup_choose_destination",
+      "permissionGroup": "research-maintenance",
+      "implemented": false
+    },
+    {
+      "name": "backup_create",
+      "permissionGroup": "research-maintenance",
+      "implemented": false
+    },
+    {
+      "name": "backup_select",
+      "permissionGroup": "research-maintenance",
+      "implemented": false
+    },
+    {
+      "name": "backup_choose_restore_target",
+      "permissionGroup": "research-maintenance",
+      "implemented": false
+    },
+    {
+      "name": "backup_verify",
+      "permissionGroup": "research-maintenance",
+      "implemented": false
+    },
+    {
+      "name": "backup_restore",
+      "permissionGroup": "research-maintenance",
+      "implemented": false
+    },
+    {
+      "name": "operation_get_status",
+      "permissionGroup": "research-read",
+      "implemented": false
+    },
+    {
+      "name": "operation_cancel",
+      "permissionGroup": "research-maintenance",
+      "implemented": false
+    },
+    {
+      "name": "settings_get_app_info",
+      "permissionGroup": "research-read",
+      "implemented": true
+    },
+    {
+      "name": "settings_get_library_info",
+      "permissionGroup": "research-read",
+      "implemented": true
+    },
+    {
+      "name": "settings_select_library",
+      "permissionGroup": "research-maintenance",
+      "implemented": false
+    },
+    {
+      "name": "settings_switch_library",
+      "permissionGroup": "research-maintenance",
+      "implemented": false
+    },
+    {
+      "name": "settings_get_library_status",
+      "permissionGroup": "research-read",
+      "implemented": true
+    }
+  ]
+}

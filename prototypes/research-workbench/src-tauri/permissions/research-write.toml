@@ -1,0 +1,4 @@
+[[permission]]
+identifier = "research-write"
+description = "Closed application command group"
+commands.allow = ["library_update_metadata", "library_archive_paper", "library_restore_paper", "reader_open_paper", "reader_save_reading_position", "workflow_save_phase_answer", "workflow_advance_phase", "workflow_go_back_to_phase", "workflow_touch_phase", "workflow_set_p3_candidate", "knowledge_create_item", "knowledge_update_item", "knowledge_archive_item", "knowledge_restore_item", "concept_create", "concept_update", "concept_link", "concept_archive", "concept_restore", "relation_create", "relation_update", "relation_archive", "relation_restore", "provenance_attach_locator", "provenance_update_locator"]

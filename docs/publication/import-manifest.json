@@ -1,0 +1,1032 @@
+{
+  "format": "research-workbench-import-v1",
+  "date": "2026-10-08",
+  "source_commits": {
+    "integrated": "702d08b02f2d2655584a932455ac394fb026f8d2",
+    "documentation": "6e20428fe8267dddac3f4a8adca41a158314fd05",
+    "proposals": "1f598cbe0bb36d5b0fd8f65c530337a7b36378e6",
+    "pending_ui": "67446412f9c2f82cab63ccb5bf02d3dff695bb84"
+  },
+  "product_files": [
+    {
+      "path": ".node-version",
+      "source_git_blob": "8e350348905565c8a1e45b22ca8bff95238bfb41",
+      "sha256": "51849cee918b92b09b95121b54380f6124c0f578d8c2323221c0d75bbbadb08d"
+    },
+    {
+      "path": "contracts/fixtures/app-info.json",
+      "source_git_blob": "2e52f60981fd2b41ec7d4bc56e7bc7aa51d69027",
+      "sha256": "805e28a6f90c37fa588e36ce144942758a675748f3a1573ac0c0f1597b0df307"
+    },
+    {
+      "path": "contracts/fixtures/backup-aggregate.json",
+      "source_git_blob": "65b5b85ed99a64e04909d0447ab6d3e19690a178",
+      "sha256": "50f3e8f75adfa02be7a042bdbde2df575db65eae4bf2ad98bd2ff41cb37c4cc5"
+    },
+    {
+      "path": "contracts/fixtures/import-preview.json",
+      "source_git_blob": "e11ceeadeec3233f1e522269f0147eae09e26e6e",
+      "sha256": "21bf701b36711285cb2b9c52826bc60d7bb486dc4d5c5b052d61a1de638c288b"
+    },
+    {
+      "path": "contracts/fixtures/metadata.json",
+      "source_git_blob": "52e6b50547982c96461a65de0ec5ee55ebda8d4e",
+      "sha256": "c146b6bdd610608d72a91a792ed4542dd856fa16fc98281ae65558d995e645b1"
+    },
+    {
+      "path": "contracts/manifest.json",
+      "source_git_blob": "328a8edd63acc0a5f4ea9335f71b3ab912103c21",
+      "sha256": "1e1a1017c596ddc5fa3b7e681d2b974ea17237b234259f98c238cf16342f87e0"
+    },
+    {
+      "path": "index.html",
+      "source_git_blob": "927f146bb7781c4f2fcc4fa98cc538c06a533c9c",
+      "sha256": "314c96704b945e7dccddf78c5a0e4f4ecb31774cf88da811bd7f0b4a0ff3ab9d"
+    },
+    {
+      "path": "package-lock.json",
+      "source_git_blob": "8443751aea38391ee9e64d5ac44e92b9e9c7593f",
+      "sha256": "b18102e51420e4dd604260e38e48ee3e972834477456e6116a6714fb67680cc5"
+    },
+    {
+      "path": "package.json",
+      "source_git_blob": "9d20e545113fbfce12ac65d742d087ae1484f227",
+      "sha256": "6d27b5889cf6569fb9aabed37b4fbd12647c793b74e4fa12319f578634a7e6de"
+    },
+    {
+      "path": "rust-toolchain.toml",
+      "source_git_blob": "b432996f101609389fcd631582395680520eb494",
+      "sha256": "2ad6f15416572b4836585087f1d4abc53b8fa2dbd616f8dacfaa587ed6714228"
+    },
+    {
+      "path": "scripts/build-release.ps1",
+      "source_git_blob": "ea586b0bf11370c63b89c50e4d55c2d808f4fa84",
+      "sha256": "5508f55011ef56d9bbb75e9cad26bb190fb597a8229afb1f52d736eaa448cc59"
+    },
+    {
+      "path": "scripts/check.ps1",
+      "source_git_blob": "660935576a91231823636f32244cfe03e1735e6f",
+      "sha256": "8d251484fe85088a5287eaf35509ca7703630e32c52e2e08a4513eee1e4dfb50"
+    },
+    {
+      "path": "scripts/development-env.ps1",
+      "source_git_blob": "63f3368fa6cef18046a1a983d3dcb9921af083ed",
+      "sha256": "be1a29600292272e221563cc8313e0a422a6f596b0764e0b1a345c6d4f5aa5ff"
+    },
+    {
+      "path": "scripts/generate-contracts.ps1",
+      "source_git_blob": "2151aeecd4b41e202d249ada9f307b7d83a76b53",
+      "sha256": "520093cd40566dc497d2a6120fa369e69d3fa6ba2e7ae47ccd5e09e1a950838b"
+    },
+    {
+      "path": "scripts/tests/build-release.tests.ps1",
+      "source_git_blob": "65f754f5a40dabaae956fcad9956c783da6b8730",
+      "sha256": "753732384b0e03867d31065d1a47379ecd16adb61f7b325776ab437f9634a7d0"
+    },
+    {
+      "path": "scripts/tests/check-exitcode.ps1",
+      "source_git_blob": "b953e605f80d640c0370e8d10195a18ee338ad18",
+      "sha256": "7a35b3893a5ac60f0b2e87c34c0ed8432340771d5e8636de4e71413553555104"
+    },
+    {
+      "path": "src-tauri/Cargo.lock",
+      "source_git_blob": "e0255428c244f54aa294db3ed61ec952255d2b59",
+      "sha256": "dd882223ead4df7627f1909e683751fbe51570f7ead44b234ce6c83743a9f00c"
+    },
+    {
+      "path": "src-tauri/Cargo.toml",
+      "source_git_blob": "09a573ad284c80c84b5bb249538f7e3622310d0c",
+      "sha256": "0181425faf5022f59650c3c5cd42b84a0c099cc6fadfa0ed23fdb0430557af40"
+    },
+    {
+      "path": "src-tauri/build.rs",
+      "source_git_blob": "c5526d16e712dccd2ad5e52e597702f93804a19f",
+      "sha256": "5635d3db673508660710b50ff5f9dc0fb3393782715675765378b108a8609256"
+    },
+    {
+      "path": "src-tauri/capabilities/main-local.json",
+      "source_git_blob": "9eb01501e552ae24e75b1d90d3954d6bcc825bfb",
+      "sha256": "a05b0b3cc2a51a4c2343cd2d20f6975aa0714f6cdcd3d8e23aba569b88308d46"
+    },
+    {
+      "path": "src-tauri/icons/icon.ico",
+      "source_git_blob": "0f509f4a5c8298d89e8e9143e3871e4e1d45808c",
+      "sha256": "035b5df6e80e22106ba7513e7f25303129c8a1a9ec6bfac207e14d1fd9feb780"
+    },
+    {
+      "path": "src-tauri/icons/icon.png",
+      "source_git_blob": "83dcaa38a28950605812f88ca58992db131813bf",
+      "sha256": "24cc3ff8e09c4b6aeefafa6d5f83b5a47edf75df29abd23960538ff32f3fc8f0"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/backup_choose_destination.toml",
+      "source_git_blob": "c32b09fb84546b2eeb88d00c748bb815f6860143",
+      "sha256": "e4087876d7cf4970c9905e58657a6c27bc02d4fa502af3021924c17969d2bdd6"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/backup_choose_restore_target.toml",
+      "source_git_blob": "c408f4eb24daa5ca9d3f5bee0b662c0026815b08",
+      "sha256": "36a62f478a2cb7ec79cf3b44b454b49f81440d9daa4be98c5b6560742e23e512"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/backup_create.toml",
+      "source_git_blob": "78478a73dd42f1c46ccaf7c354f028da901a3df8",
+      "sha256": "8b541f39f196c9830b03249ee5f7d4ece75ff08e2487a618ffd6baa7d5d9e146"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/backup_restore.toml",
+      "source_git_blob": "1afefb7d28b45152ed834aa347c2e69059e2b611",
+      "sha256": "f044a977735fb717476eeb65eb173be51e841cfe9485eb7d1b8c4a0aa5c2b137"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/backup_select.toml",
+      "source_git_blob": "5b43e6cf10f52cbbd74df191f62233c8a90d249f",
+      "sha256": "5cec0086b2e1dfe1db667f99a0f5683f3b1c49784e26a34c9d441fc2cc59e114"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/backup_verify.toml",
+      "source_git_blob": "dee8100eddd10bbbe7b8f54670a6f7b286b7a6a6",
+      "sha256": "25cd8cff080b1a51735f9bf21b1286c6ad6ae9df7ac9f752f0fdcd5c76dcf117"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/concept_archive.toml",
+      "source_git_blob": "e85032132457bc2b20d885a64bd03db988ed774c",
+      "sha256": "8437abad52636ca8533e4db119e9d1d7a8a46867dc87f99e106ea4fd8d0d08bd"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/concept_create.toml",
+      "source_git_blob": "d7c96da54e50c9fe3f4cbc48cc638b67b774d25d",
+      "sha256": "e8f41b333a01d89cda0fd3d89e0c2e396d39794011bf554bbc5695d853fa10bd"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/concept_get.toml",
+      "source_git_blob": "d2482211dcb4b4501505ec6d762629b21fc3d6dc",
+      "sha256": "8fcd6d69e91dffe341c24501cf501ebb0d890073df8051a8bc2cf4cb08a1c473"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/concept_link.toml",
+      "source_git_blob": "719f5bd0c0c0871747825a601633bcfec9c7b1fd",
+      "sha256": "c87f444ad7feec4e49ac02b923e932b67adf1d49a85150374815ac4079ba69aa"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/concept_list_items.toml",
+      "source_git_blob": "2d83d65e63f8ada4d9501b9ddfb33ebdd37a7b9c",
+      "sha256": "eb3822e8b44e9f934520044ead9c7f5246be39166167d7593e60f53ccc93e492"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/concept_restore.toml",
+      "source_git_blob": "8d6cd903b0955ed79fa1edc3957c0308399010a2",
+      "sha256": "8b3c23221776ae6c855067d4e9420e372f0736ac37144ad75fc0fa55e4fa5b7a"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/concept_suggest.toml",
+      "source_git_blob": "e4e2450d70b45e5d50b08d69155b9dc277ba46c2",
+      "sha256": "87d31c81586bcb067eb1c27f1d79cef18351ffca3e020d428a6809af187dbf95"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/concept_update.toml",
+      "source_git_blob": "542e3c60d5c72cb153c2916d695ef41f153491c4",
+      "sha256": "3ec6eb19333b37c1f2a34790a31b42ff3aad0fe86a0dfa13169dc4a0fe98ee58"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/export_choose_destination.toml",
+      "source_git_blob": "0cc91809cdf97fde909433c250b729b3143ea269",
+      "sha256": "180257006609c966d89cdfb05c7e3e5a248388c5c5fcaaf3c16c843633dfbdff"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/export_library.toml",
+      "source_git_blob": "618a8e38f7f9ff7bae9c16d00990f817071a4526",
+      "sha256": "e2139964340c54ec9c50bf3682c2ca3b02e8e08e6b97262f7a4842272b680bcf"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/export_paper.toml",
+      "source_git_blob": "bdcd62a3a1a7f7a52ada9b16975681fab736fc1f",
+      "sha256": "b2384924a471ad8d5ed3f1fbab170c7c75b8fcbff670bc7b15640ec00e33ca09"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/knowledge_archive_item.toml",
+      "source_git_blob": "b9f327a9c8c1d94ea5ab1672cf19b6f9df427d3a",
+      "sha256": "e9fad6f35cebd8313a3440c38943f07944cee0115c85a41c0aa7e4b5229c31da"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/knowledge_create_item.toml",
+      "source_git_blob": "a7bc40fff95abe8b995bdddb6dec4bb55b500032",
+      "sha256": "c094deae8c6735fbc1aff8af014240c15825d9cb13303de2460c2d327ba661e0"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/knowledge_get_item.toml",
+      "source_git_blob": "50f6df50de5e08a97c392586bb58625b1e5cf497",
+      "sha256": "e0a323a0c391020ffbcdaf6d1abe049d71a3455a4925897d280e496e5a3e0253"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/knowledge_list_items.toml",
+      "source_git_blob": "12db398356814db525ab942a2dcfb583bf92ec38",
+      "sha256": "de4769851b39f561423edc1059912b164a41a4bc034cd4ea377109834292d681"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/knowledge_restore_item.toml",
+      "source_git_blob": "9706fa8348150cd86b68637af61bcc5d3d4ee23e",
+      "sha256": "183d30155d2863ca8e1cce6648aa8c504243b5e58b17542eb9dcd51d7e7e2f5a"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/knowledge_update_item.toml",
+      "source_git_blob": "4ef26986983f886850c5e15467b1c7d3b1c48eab",
+      "sha256": "b877ea2c08ac65285ff5ce2e31ae95d245841ad6fb15461e89ecd65aa3fa5636"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/library_archive_paper.toml",
+      "source_git_blob": "1aa514ba18d1c1dce62051f11b823c8d86fa05de",
+      "sha256": "bd21420604c779afdf906396a8ced022b319951babfcc136c25e5283902ed264"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/library_cancel_import.toml",
+      "source_git_blob": "fbe121255bdf8c1b6bd187a25882836b22413b1c",
+      "sha256": "68652640220c01eb459cb8b32596db8765f5e814478e91ec9eb3f78fc6d61561"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/library_confirm_import.toml",
+      "source_git_blob": "45e77d82998ed51eae704f47655a4cfe86c34c1e",
+      "sha256": "b31b8964f0f41d2661007da5f4aa5b1fbd49da21118522240eb862a090051d65"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/library_get_paper.toml",
+      "source_git_blob": "b0025b9078dbbb00eb7d7e63f888505a8b24deb4",
+      "sha256": "fa1add96546504afad20e8e19c7cead64bc31b1278a928af3d6fabe1382796ff"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/library_list_papers.toml",
+      "source_git_blob": "dab940a44fd3d38547a86714adaf9b2e2c3c074c",
+      "sha256": "c82792c57feb2a04bbdc47e2eb202c3c5042b0f969db95ab1443535e01d09cc5"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/library_restore_paper.toml",
+      "source_git_blob": "fc3b38e2b28e1dfe224fe205485d1bf8a634f63c",
+      "sha256": "141ddbc23f500dc87d8d335797a2e0eb7208eecc41b3858ceed47cd0ef9cb04f"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/library_select_pdf.toml",
+      "source_git_blob": "2cf2684fa22faf439f7a673735f0ed6d10396abc",
+      "sha256": "37d10e79fd0e3ff50400b14c45b2e7b1d99a8272ccef2183a8f4fdf9e6cf094c"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/library_update_metadata.toml",
+      "source_git_blob": "a7d9bc7a34e69ec1d8b022f39d2307d4d972cb5f",
+      "sha256": "de4e347264e3866989b9bf1e1daa6f7c989954af9865bf51dd1b9cb382a008cd"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/operation_cancel.toml",
+      "source_git_blob": "fc65b73e66eebcf4ac737d2aa6f3d31674ff0549",
+      "sha256": "a61481532779fcf9b4b66040fed3e12a309713c84bff2dc117ae18d3ea738428"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/operation_get_status.toml",
+      "source_git_blob": "7882309f8fb53b82c1ff4b4f88b48ee5e813b6f4",
+      "sha256": "5dfb43f956e228db61700ddb25965daed3c5240e94794ad5c4a8781df6c75a97"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/provenance_attach_locator.toml",
+      "source_git_blob": "641fe07b77a04df244cebffa5b138204245b4f23",
+      "sha256": "9dd0c904323cfb963b3e463be07d0c25c7a67c317545739aba8c8198d61435a8"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/provenance_check_document_hash.toml",
+      "source_git_blob": "5b887fe6a47026bafc7e3eaf6effa807d0a40ce6",
+      "sha256": "334158312f395f8d4d025db3fbd848a2ffdd47fb695e56fbcf76adb37b482fd4"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/provenance_get.toml",
+      "source_git_blob": "fb7012a102a9948e4d6457f243e47a534b310b8f",
+      "sha256": "cd4c1451e72b226690229e1398d4040fe2c77ca44ef049fd6d2e260e1dffb2b6"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/provenance_update_locator.toml",
+      "source_git_blob": "28e613d04144eaa57f24c3dd6f241555d2993a77",
+      "sha256": "53a9bbf360cd61c3ec49c1b920b33b88eea86df5102ddf247faff31f398660c1"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/reader_get_last_opened_paper.toml",
+      "source_git_blob": "ef2aa7b81a9e8f2a8f3d709e4c46b883863e5fd5",
+      "sha256": "b6704a9a99540fac803de7bdab4f95f124eb866776bd96740866d61d574cad55"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/reader_get_reading_position.toml",
+      "source_git_blob": "e580afa6ccf3449a1fa60e0c689cb7e9abd068bf",
+      "sha256": "c26bbd4aafd7715f23c5711b6390f42a4d0c6d9590007009983ada22188bc2fc"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/reader_open_paper.toml",
+      "source_git_blob": "785e18cecee4124cd51e77c5069cc33679435acf",
+      "sha256": "421142e3bd1375ae7a9c603c2d16a6038be892fe50689813d85b82cc2504a15b"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/reader_save_reading_position.toml",
+      "source_git_blob": "186dbc61e2abf89b42c84718198d1edb9b475626",
+      "sha256": "8444459e618e1afc0ec35839c9621e19b68b42ae4a3aa0efcbbee3955195911a"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/relation_archive.toml",
+      "source_git_blob": "4a20066a8928ac94ac5eb023838394376360c3c4",
+      "sha256": "4ab3ca5b8e00d4c5176e455e53b68aaed308fecc1a906a2d64bae170ddae3be3"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/relation_create.toml",
+      "source_git_blob": "85775a80f202593cf50746822001986792a9847f",
+      "sha256": "8ecffa29265df6daa8a88d71c9fb27584bd9fac74f02881d148ebdde4205f227"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/relation_list.toml",
+      "source_git_blob": "349097c13a7ac433069dca38a948bdbcd99ab85e",
+      "sha256": "f0b9af1c5367eb60dd80695a6ccbaac9604550b100652b50caa16bac4c5fd217"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/relation_restore.toml",
+      "source_git_blob": "8dc7cd4199ae1a50acad804c6ed913c0e3b85572",
+      "sha256": "02da8a8c7dd6a69c836b6816bb7f9b485da48c4bf863da2156ca1dc5f9fd8b06"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/relation_update.toml",
+      "source_git_blob": "94e44038742b3da93809622ffd51ebd877d09962",
+      "sha256": "6b2d4a3353de8db0a68606d37800e7e8678bb9d9fcc28811611309f84e365caa"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/search_knowledge.toml",
+      "source_git_blob": "c6f8414617261cb10bf753e34af65b4223c61cb7",
+      "sha256": "c9413abef2e9394866aa572bb584e7d7f5e15b0969959ee50b33e0ec83bad7a9"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/search_library.toml",
+      "source_git_blob": "35d69ce5095fd8b457a0530fb40c8fc0c3071ae2",
+      "sha256": "9254cf4355b8aa2f683e2348f4d91e340de76b84e33766d4ac428566b96a5491"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/settings_get_app_info.toml",
+      "source_git_blob": "4a9d32b9d97bb8c2b603a6619066552e69b60d69",
+      "sha256": "ad0e98ae2e8112374cbf2eba716ef777ae731daf858206b65ce4a0e987888c66"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/settings_get_library_info.toml",
+      "source_git_blob": "67521b5a4219e905c1c43634d083373272897534",
+      "sha256": "338319c589df079afe9052e22ed69ccc60d4f0302250d073bb65ccf9c864124f"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/settings_get_library_status.toml",
+      "source_git_blob": "b923cb4653e807aec9608c55a4958a1a65cbb37d",
+      "sha256": "be928d1f284f1b508d440a09817ec7676707ee9c330c392781a136f99ba942b7"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/settings_select_library.toml",
+      "source_git_blob": "9fe6076232534213f4b40498e9e680e09479a56f",
+      "sha256": "0fab463b4bcad64166fe9175852a4858b51f9ee8d6405feb1aeee5ceead05f6d"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/settings_switch_library.toml",
+      "source_git_blob": "43b168f81459e1116cc68f24dffca1b2b7724967",
+      "sha256": "75bb62c203b35545582263c2e2beb67f8c2f04c2eaae53fb31786f85bfbb2b9c"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/workflow_advance_phase.toml",
+      "source_git_blob": "632f7be08bf5c005855948de8d35fdfaceb9a165",
+      "sha256": "93793d09d30f35ab3098837f7d50b2285e509b538de4c92f105e7a46857be19d"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/workflow_evaluate_gate.toml",
+      "source_git_blob": "846ede1e110ab40c3adf380727b5b3847f9ee5f5",
+      "sha256": "ef2682df701778b55c597f0f74b3e2ac97921f7444d551e7e944ab6fa07d4bdf"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/workflow_get_p3_candidate_summary.toml",
+      "source_git_blob": "764391fd085bc89d9d3cfd4f501a860f0359e869",
+      "sha256": "b3e04279f33720f1b94658dba27284562f0ddfd4df93d3bd1f6c6d31cc7e4c19"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/workflow_get_phase.toml",
+      "source_git_blob": "bf0f1af0ac35b977a343cd4ca741f13cc167e9e2",
+      "sha256": "7d3e090346fcf651f5ac30d885110dee24d4550dc1cc9b8a032be50b0e6c8b12"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/workflow_get_phase_answers.toml",
+      "source_git_blob": "446e6009fc2693efb593bad375ac2af8e4622cd1",
+      "sha256": "9dc3472e940599523b2043b662538e7580b07b839f4a7806a12f11544134bd7f"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/workflow_get_phase_definition.toml",
+      "source_git_blob": "53eb6b91ec7116c104e2306569be244656536c62",
+      "sha256": "ed20b5a47173375e85d7e9cc3b8d4318aa0c7a20827d00dbdecf060e83d16246"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/workflow_go_back_to_phase.toml",
+      "source_git_blob": "d869717a521c1f28f7aaa74ad6456b5336164cf2",
+      "sha256": "b66172c218fe044d205e42693b291c5a1c45f3d752f375c49505084c2d692ea1"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/workflow_save_phase_answer.toml",
+      "source_git_blob": "48e3157f9a4ea16e95435445fd9589d01c033fb4",
+      "sha256": "4094f78246d5f15111bbb4aaa8dd0f22042703db88619ce7c7eef015796a3bf2"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/workflow_set_p3_candidate.toml",
+      "source_git_blob": "9d2ca16e6101db51e087dd3270f3929061145c0a",
+      "sha256": "05806c8aa1a19c54cd95c1fa9b07ac0f79d9f9479121aa75037f12be834b1d8d"
+    },
+    {
+      "path": "src-tauri/permissions/autogenerated/workflow_touch_phase.toml",
+      "source_git_blob": "8b1bd7d4f46544eebba57c50fdb3f6f2b45963c4",
+      "sha256": "d15900657322c3b1e6f6721de0263520425512113293187bd16b22fd1b9404be"
+    },
+    {
+      "path": "src-tauri/permissions/research-maintenance.toml",
+      "source_git_blob": "5b2a67bfb5df05953655a1ca43ca92ece86177c3",
+      "sha256": "0357b4312644ef84872d88ea73d08ee3f76844718089ba04729f8530fbab580b"
+    },
+    {
+      "path": "src-tauri/permissions/research-read.toml",
+      "source_git_blob": "efddbff076d7fe2dc1bbfcadbfbb3916ff6d8c25",
+      "sha256": "b076307ff0d777f96823829e0982c15979432d503b78aad542a7fe46ad424e68"
+    },
+    {
+      "path": "src-tauri/permissions/research-write.toml",
+      "source_git_blob": "5f837e4aae8fa61c30ddaab949a011feeb6615ae",
+      "sha256": "d71878d1e02b39a43afe063e1eddbcf2ddb4662921b862f2298c5668a6a724d5"
+    },
+    {
+      "path": "src-tauri/src/adapters/documents/imports.rs",
+      "source_git_blob": "5796b7cf9b5708f5bf0c1539591b077dbf774465",
+      "sha256": "4a11754e541e46fe80d2bd8a0da017a241b00a51f1cb2f0e77fa0d0b540c2ac2"
+    },
+    {
+      "path": "src-tauri/src/adapters/documents/mod.rs",
+      "source_git_blob": "98b4ffbbaca81f6df07a51844542f3dce97c8e62",
+      "sha256": "7a9d2408b2929233a7421054242e0a04500870c34f2028b141a9ff5f90325fce"
+    },
+    {
+      "path": "src-tauri/src/adapters/documents/pdf_probe.rs",
+      "source_git_blob": "89b5b07b5b13a764357bf5106b3fe46dc615c87b",
+      "sha256": "047f0d8c813db05f655ecc86078aa3589880ae267824a15f18c258f8e9af5bbe"
+    },
+    {
+      "path": "src-tauri/src/adapters/documents/store.rs",
+      "source_git_blob": "cace0f3aa09d0027f544dfe73cef3e273be10842",
+      "sha256": "1283676dc05fc821fb781db988fdf095300850f9a8faafeec74587d77ed7857c"
+    },
+    {
+      "path": "src-tauri/src/adapters/mod.rs",
+      "source_git_blob": "a88a4ba138a28f6403b2518da16724e4e64017a4",
+      "sha256": "492ed2e8d79aa59c1e64e8159fbc74a23c210d0699a66941cb389b258fb03805"
+    },
+    {
+      "path": "src-tauri/src/adapters/sqlite/actor.rs",
+      "source_git_blob": "7999ae790e2c1d99668670de6b0fe63367926d16",
+      "sha256": "cf3b19f5d249c8ba49f9d1f475e71e9bfe2204932d48448b672bb474217ec49f"
+    },
+    {
+      "path": "src-tauri/src/adapters/sqlite/library_repository.rs",
+      "source_git_blob": "091d926ec6df99128930d2a5d31546244ec8cebc",
+      "sha256": "27806d4f6bcd4df4222de0496f950679b7f6638d479e8bf34e2aeddd1b946e08"
+    },
+    {
+      "path": "src-tauri/src/adapters/sqlite/migrations.rs",
+      "source_git_blob": "68047c068baa1fcdd8567a64bf904c916c9640fa",
+      "sha256": "39738bc91186368e60e8015d54afd7b79f096c94930e7ce7c82954a63bb59777"
+    },
+    {
+      "path": "src-tauri/src/adapters/sqlite/migrations/0001_library.sql",
+      "source_git_blob": "57e2822dc1e5b2f1acb57930ffbbfd2019d4889d",
+      "sha256": "c5d755d0011cee319fea260635e91a2ad18f302c5be4eb8b60808584726b8a58"
+    },
+    {
+      "path": "src-tauri/src/adapters/sqlite/migrations/0002_workflow.sql",
+      "source_git_blob": "0394c1db6056b2ebf2697aa3da9c12ba8442a5f0",
+      "sha256": "c3e34d220038e9079ba4609b19c2c0562042670f3e9a0612d1f1b394d428a74b"
+    },
+    {
+      "path": "src-tauri/src/adapters/sqlite/mod.rs",
+      "source_git_blob": "80d83e1fadfe064012e24ed2e0ee5a1ac22f2955",
+      "sha256": "b67cf3cf1c8bbd0d4d6ccdf2c1e90c516a3c583a12abd8dde0990b9ae912b8cb"
+    },
+    {
+      "path": "src-tauri/src/adapters/sqlite/reader_repository.rs",
+      "source_git_blob": "b3bd83597a7bf8c32e9b0c239c26cee7ce30852c",
+      "sha256": "186d919c5672043dc7f7115da247ffeb7c81d31c05b4b17c6b7ca04cdc81b1c8"
+    },
+    {
+      "path": "src-tauri/src/adapters/sqlite/receipts.rs",
+      "source_git_blob": "7a6dda9afc46d20f480d0f6b443b09490de65745",
+      "sha256": "d97174888bef21ada4c1ae916b414db07c18d3d76259e284a4276b0d7363c623"
+    },
+    {
+      "path": "src-tauri/src/adapters/sqlite/schema_probe.rs",
+      "source_git_blob": "7babe142b6233dad53e31cf9e97ec83f493ba161",
+      "sha256": "13581f1d00b2bf97222a8dc6059f8a250f7b56f0ac21683d299e5a87afbe6501"
+    },
+    {
+      "path": "src-tauri/src/adapters/sqlite/settings.rs",
+      "source_git_blob": "e38fe0ae4c544575eb3e8dedafa29104fa9fc12c",
+      "sha256": "5c518f177d1e3b75a936ecc16c35ee5696e5615c996df32e3c004e0347768056"
+    },
+    {
+      "path": "src-tauri/src/adapters/sqlite/workflow_repository.rs",
+      "source_git_blob": "63a5b356603ff47d34312fe01ca4910f9ea7ef40",
+      "sha256": "e0470150977c0231360e82f58ecfc0c14e757e8ae81b6edec6a1899ad64b03d4"
+    },
+    {
+      "path": "src-tauri/src/adapters/windows/lock.rs",
+      "source_git_blob": "05429fe04ebaede331c856749a14ce267418c26d",
+      "sha256": "e8c426e0f9bf1ca0deb3bc87db006bd783bc74e52f0b6bd4177bc7d348079a36"
+    },
+    {
+      "path": "src-tauri/src/adapters/windows/managed_files.rs",
+      "source_git_blob": "8eff25329ef9a499c6f8c97fceddc23224223e71",
+      "sha256": "b584052cdc10e77b66db761f471bae6de782ea74b51fbe809abad0f661d65fe0"
+    },
+    {
+      "path": "src-tauri/src/adapters/windows/mod.rs",
+      "source_git_blob": "8f1cc98d67aad7428403f568242297c016b52426",
+      "sha256": "9aa3d90254f3e6e0ce0def58c661a695b205c3923914bc036432eb124b7e9598"
+    },
+    {
+      "path": "src-tauri/src/adapters/windows/paths.rs",
+      "source_git_blob": "73a718eb1bc6cfea9be42813d10ced8c7cf53b44",
+      "sha256": "1f91a0286ccfebec349c44122c97ff0cea3e67318d31bd436d35bfe5fe77a1ac"
+    },
+    {
+      "path": "src-tauri/src/adapters/windows/pdf_picker.rs",
+      "source_git_blob": "095cfb3065c89f16a55469bf2be00f3cd5a32b08",
+      "sha256": "bfcc65d06c688767911696688b5db1c5fa0fae26bf5bec1a9c58002c26f46618"
+    },
+    {
+      "path": "src-tauri/src/adapters/windows/startup.rs",
+      "source_git_blob": "1a6846447bcba47ceb54992b5ef34f584be5b4a8",
+      "sha256": "8bcb593346c8d10987155fe06cc0be3586bc53e68d1a7a6647e527a48fab8b17"
+    },
+    {
+      "path": "src-tauri/src/application/library.rs",
+      "source_git_blob": "dcaf5af5daf1ff40f111d9f846ccf95b2599523c",
+      "sha256": "f0dd4c25c238d20ac599c50a9db4b261660910b22e1365b69aeb9eb17ae18b76"
+    },
+    {
+      "path": "src-tauri/src/application/library_ports.rs",
+      "source_git_blob": "eb7e43e328abbd9732a32aec83a25aaad95ffb1b",
+      "sha256": "547731709d8c41a85604bcbbccc20685aa9e62f1b5c3fa500ab97829efdac3c9"
+    },
+    {
+      "path": "src-tauri/src/application/mod.rs",
+      "source_git_blob": "767bf8eea97393b35f603b90904d996eda284078",
+      "sha256": "44e2f062b65aed12fe8eccf66a25a68ee883828a491209d6c7dea1a3cd70aeab"
+    },
+    {
+      "path": "src-tauri/src/application/ports.rs",
+      "source_git_blob": "388a17a4995acfb3c759ec4a4e02f48a28c669d6",
+      "sha256": "69854bb85f2c85d63995dc1e649a19953cd1619288ee5dc75397fb1936790a69"
+    },
+    {
+      "path": "src-tauri/src/application/reader.rs",
+      "source_git_blob": "477cdc838015d8f8997237991522b3d83f543b38",
+      "sha256": "ddd2f57cdd6e904d3f24fa205878b15a77b6f39aed791ba0c4025a8b012b76c9"
+    },
+    {
+      "path": "src-tauri/src/application/reader_ports.rs",
+      "source_git_blob": "9148e27ebd74221819b61c22860c315be848ee49",
+      "sha256": "cc110c519dcae0fc29945d424ae8b47fe702ae7eacd64562191d34fae5cef6c6"
+    },
+    {
+      "path": "src-tauri/src/application/request_registry.rs",
+      "source_git_blob": "1b9b113bbc86f860c744eeca05109948efc25a0f",
+      "sha256": "5af78a4e9b151827369f4fb80339fd00b72c143ebe969da09c651b5da2a6ce87"
+    },
+    {
+      "path": "src-tauri/src/application/settings.rs",
+      "source_git_blob": "a831d4fb17d9e92b5a688e9905d64e56cafadab0",
+      "sha256": "621b35030dae9179b52d818c2728db5b16079af247dbf3049f0c63c040817fc9"
+    },
+    {
+      "path": "src-tauri/src/application/unit_of_work.rs",
+      "source_git_blob": "f57f1571be2df66d6dbb6b00b8c2b39179fe4047",
+      "sha256": "baac3110d5111d88804ea6fece24cac0c65f040deca954ee1b79408b3e227246"
+    },
+    {
+      "path": "src-tauri/src/application/workflow.rs",
+      "source_git_blob": "1eb7f474a50249ac32c215b9e7ddab4df6cef3b7",
+      "sha256": "703ceb7d072f7175951aa900ceaea0eb9a67ecee4903f89d6cddf9f0721a9574"
+    },
+    {
+      "path": "src-tauri/src/application/workflow_ports.rs",
+      "source_git_blob": "de576a727fbfdbdd9c5653b6331a1d4569388a9f",
+      "sha256": "c6f6c5217950aa5cab2528a971f2c8bdd6c880f9d618e9ecd3dc093ff3c145da"
+    },
+    {
+      "path": "src-tauri/src/bin/generate_contracts.rs",
+      "source_git_blob": "885ed08ff70d96528baa920cabc2ec83d3e93069",
+      "sha256": "d3b3e8f52ed1e2da296725f602de5029304da9ec5f4edef42fadcc45af326357"
+    },
+    {
+      "path": "src-tauri/src/desktop/lifecycle.rs",
+      "source_git_blob": "1dbd23d64cc42cbf1b7c21cdcbcb8dd548970fce",
+      "sha256": "bbff167cbfde0a224f1b79e3223f277972677b5780132f5bbe8fa46795b9839d"
+    },
+    {
+      "path": "src-tauri/src/desktop/maintenance.rs",
+      "source_git_blob": "6177fdba3a7a6879b8939e21b86d7bb15815b72f",
+      "sha256": "5fb1ce81389980fb0b789c2db91774d17b681be750e74a1539c745ae03301bb7"
+    },
+    {
+      "path": "src-tauri/src/desktop/mod.rs",
+      "source_git_blob": "abac7a3d16ca05e395aa2e1a9a60149384146448",
+      "sha256": "08606f6a089d100f45ea1316a75f1891aaa84f76620d3e2161adbd241a28445e"
+    },
+    {
+      "path": "src-tauri/src/domain/library.rs",
+      "source_git_blob": "451fec84ce86f0db7fdc31562fd3ba0c5c3a26f1",
+      "sha256": "73fce119e4f83aedf7d418b52ca8d8a279b898764b61ebb22ec8a5eb1f99cde8"
+    },
+    {
+      "path": "src-tauri/src/domain/mod.rs",
+      "source_git_blob": "d2f2ac893dbaf92f444296a2cb8decc697391190",
+      "sha256": "0432b1fb721913c38414297baa5641a71b8558b6d58185a95c613375ab307b11"
+    },
+    {
+      "path": "src-tauri/src/domain/workflow.rs",
+      "source_git_blob": "73bbce00ddf2baac152e72fe5f62bb3170798b96",
+      "sha256": "48b65ac774d7e368059fde73afdd04a685a985805e217e1e0d56fd4234aeeccd"
+    },
+    {
+      "path": "src-tauri/src/lib.rs",
+      "source_git_blob": "08c6d01417a57658f3ceda2c4253a00fda504c12",
+      "sha256": "88bf1393fb79f2a59cd60bee40b5c8aa86e09996b5d40b235a1a693fcdcbe0e2"
+    },
+    {
+      "path": "src-tauri/src/main.rs",
+      "source_git_blob": "3f7697f1a612f06a7126ac924193f3f62dabc76b",
+      "sha256": "923c7819ffe60d2098fffb891d75806b19b783fa5108ac042f578323117a2e1d"
+    },
+    {
+      "path": "src-tauri/src/modules/library/mod.rs",
+      "source_git_blob": "6c960817d7ec817a23b563b5b637a8d896559543",
+      "sha256": "784e509dc8f6f0367c9f3b1395e9421053e91468c6e0ebba84a01640657ab4ea"
+    },
+    {
+      "path": "src-tauri/src/modules/library/recovery.rs",
+      "source_git_blob": "1d8d6d22fb74d2c351e9a80fabed1b302ccd19bc",
+      "sha256": "2f735b7cd13396c87199a2279ae280fbbb01ab3b93bfaae9fccb121504b8cba4"
+    },
+    {
+      "path": "src-tauri/src/modules/library/service.rs",
+      "source_git_blob": "74a221465c9daa79ce40befa1f7c9a07c49934ba",
+      "sha256": "d8fe750cac9f58daa0acd99a725a0897b17d0cad18c047db2e07038aaf1b6a59"
+    },
+    {
+      "path": "src-tauri/src/modules/mod.rs",
+      "source_git_blob": "6eeb3dc78196297513bd7386d5a5084c1a324528",
+      "sha256": "2c8028c94da61238ca494538d08c714176e5cc137a8b6a0a1c37f55967a24008"
+    },
+    {
+      "path": "src-tauri/src/modules/reader/mod.rs",
+      "source_git_blob": "76eeade8656c9f6eea8c578634284321ff212e40",
+      "sha256": "ed15dc6d52ebb5552086cc15fa2c0161a51040f7e8e90b1a36aec127809e3102"
+    },
+    {
+      "path": "src-tauri/src/modules/reader/protocol.rs",
+      "source_git_blob": "408d48c3ef463b08d462c72b0cfa8193ad81965d",
+      "sha256": "ca1a132027a74c4c487c41fc2d09737befdeea5ceef97e0e74bfa20242856dcd"
+    },
+    {
+      "path": "src-tauri/src/modules/reader/service.rs",
+      "source_git_blob": "1aa8559fd22227ff8027b23620eb0886eb02f7e8",
+      "sha256": "c948770036a1cf94d8d880e79681f409573ad729d8984ddcb9c53cc010359881"
+    },
+    {
+      "path": "src-tauri/src/modules/settings.rs",
+      "source_git_blob": "fa286f445a6a4ea33bed46e564664a4bb79343b0",
+      "sha256": "6873d0f09dc7caed66c85b37dad10fecfe325424d5cf37ef3b31aae41f5b160d"
+    },
+    {
+      "path": "src-tauri/src/modules/workflow/definitions.rs",
+      "source_git_blob": "45db99dac4f2ec0de9cb00cb828f30aa1fa45079",
+      "sha256": "fbb726e55b1ecab616357ee8f5d2cda61aa704f4bf7b86186a26eba51650ea2e"
+    },
+    {
+      "path": "src-tauri/src/modules/workflow/mod.rs",
+      "source_git_blob": "28dd6c646bc3698651ec3dbf100fbef909e24722",
+      "sha256": "56144d8a6e54edb6a80547518e2587a1ddd92634b8fa02b8db6d367cb3ddd011"
+    },
+    {
+      "path": "src-tauri/src/modules/workflow/service.rs",
+      "source_git_blob": "d0434d4e19f683e1249727a7ba55eb67644d5ca1",
+      "sha256": "05fe50f53205dd626b3ca6abeffeff321199a932430cc52c950c0876cf5ad1b5"
+    },
+    {
+      "path": "src-tauri/src/transport/commands/library.rs",
+      "source_git_blob": "c271ad7291a93d6fb99e516044116dac8945e938",
+      "sha256": "78a8d8ec6ca55611b71a576ee45745434b385eade5db89a7182562e15bd6ab4f"
+    },
+    {
+      "path": "src-tauri/src/transport/commands/mod.rs",
+      "source_git_blob": "262d88701fe9d68e0511eb4565073f75cd74f568",
+      "sha256": "42b225c41d45e0bf4a6a11fc79ff2d771850d855a7225aae340b1b9029ae245c"
+    },
+    {
+      "path": "src-tauri/src/transport/commands/reader.rs",
+      "source_git_blob": "149e88d58395d6ca50f1a7b907b69668309012a8",
+      "sha256": "45ef206476596886dc89cef1411923666e367598430b4d6b80a50d9dbc99db76"
+    },
+    {
+      "path": "src-tauri/src/transport/commands/settings.rs",
+      "source_git_blob": "c296be6e8fc4721a4992489c38d4017666f938e9",
+      "sha256": "2fdd3ff9948b88d70b7b7c4f8c82fb132b18108434c37940d932433d86cc7c56"
+    },
+    {
+      "path": "src-tauri/src/transport/commands/workflow.rs",
+      "source_git_blob": "91806aeec638fc970a88853722d80b0c600ab4bf",
+      "sha256": "82bdbfdd79779e2c9bd0b9f5f33ad55dcfc739ec302a7f1c13ccaf1fb41845f4"
+    },
+    {
+      "path": "src-tauri/src/transport/dto.rs",
+      "source_git_blob": "5cb6759c1d5e3705b4ac449facca5d7b3b9d9cf4",
+      "sha256": "35b73ba21238b7343df4ea3ee83e5453effd2271417d9ad0eff3556d57216d52"
+    },
+    {
+      "path": "src-tauri/src/transport/error.rs",
+      "source_git_blob": "7acac9f5b69f107fc3a77cf53819d8d3df63320d",
+      "sha256": "fe05dd6d11171e7e6053706f8d48df283cf196729acec1990f6f5d254d01c6a4"
+    },
+    {
+      "path": "src-tauri/src/transport/mod.rs",
+      "source_git_blob": "15820b6c1bf088544286e0acb91b4b8f431ae7ca",
+      "sha256": "441ec03d01042470fc2defa0ec2e416633bb65116d44817d94ae440c2bf18df2"
+    },
+    {
+      "path": "src-tauri/tauri.conf.json",
+      "source_git_blob": "b23d24a61b3e960f28d5fa98e5d716036f11218d",
+      "sha256": "2039babbe2206f73e56c0026100d30c61cb2fb69e9f82e6a81e6d950e13ab2d8"
+    },
+    {
+      "path": "src-tauri/tests/db_actor.rs",
+      "source_git_blob": "bc1dd187cc725cecf897ce8394d5884b5a5b38cd",
+      "sha256": "223462b4407fc551114aa7ee3760310485575cfa41eb515da17acf3a3de9914c"
+    },
+    {
+      "path": "src-tauri/tests/desktop_bootstrap.rs",
+      "source_git_blob": "15e5c93fcfe7694ee75b3ae92e44942406679176",
+      "sha256": "2eb9ea7e1ec15385a794827cce8b19787e7ad3d70d24a3e3e6d036d5d012edcd"
+    },
+    {
+      "path": "src-tauri/tests/document_protocol.rs",
+      "source_git_blob": "0612531ca71911542369390f14a5fdffadb0dfdc",
+      "sha256": "3a114d3bddfee49023c9a8205ff0b290ac5923491fc5277bbc29b48f7022b852"
+    },
+    {
+      "path": "src-tauri/tests/fixtures/task02/encrypted-empty-user.pdf",
+      "source_git_blob": "73efbc6ccc411fb25a87be5027d670c1f999c486",
+      "sha256": "c7993b9b2f70a2294a0889d09820ebc87a9529ad4cdbf8eed71a13888cee6ff8"
+    },
+    {
+      "path": "src-tauri/tests/fixtures/task02/encrypted-user.pdf",
+      "source_git_blob": "dc9ab7ec4a4b9cdbd3318795c371313baa865e0b",
+      "sha256": "a1a43803c58b84620f519c73de7da56765b03ddcb2bce7e87a45e79287a82da4"
+    },
+    {
+      "path": "src-tauri/tests/library_integration.rs",
+      "source_git_blob": "4f58c28bc96a74cb4c320008483968f3ff7136d7",
+      "sha256": "ee8829813a5a3b11ffb2f785337383bef017fe2bf44a9d3e941cbdd816780923"
+    },
+    {
+      "path": "src-tauri/tests/lifecycle_close.rs",
+      "source_git_blob": "7fe597a82103fb451bcfb756bb53aa853e986c1d",
+      "sha256": "affc26400354ced9535e125e60e7ab644f483f0e99b70b5ba9f10c168aef426c"
+    },
+    {
+      "path": "src-tauri/tests/reader_integration.rs",
+      "source_git_blob": "05192e3590513686420d32e114fc3b4f66de3cd4",
+      "sha256": "d14b654e57d9264c5684142b398139ab692e8be2288538676020ed9bb604aa67"
+    },
+    {
+      "path": "src-tauri/tests/scaffold_contracts.rs",
+      "source_git_blob": "9a57f46fd20accdff1bde52eb893a17c8d0e5e04",
+      "sha256": "0db5b78bfe83cc994e5daa495995fd22f64b2d4404d5802b47f68cea610c084f"
+    },
+    {
+      "path": "src-tauri/tests/schema_diagnostic.rs",
+      "source_git_blob": "2f204d5129e5c72304da9077fdb5eb1c181d70ba",
+      "sha256": "5e657e081506d3fac879a1733bbf966cbd62c2248a71fc1beebdce0642317999"
+    },
+    {
+      "path": "src-tauri/tests/settings_service.rs",
+      "source_git_blob": "a38a071a684dcb597de037e6dc0debf13f780059",
+      "sha256": "8e8205b17b28865821766f05129821ee6df8b8add4992e3d3ad3c41398fcaeb7"
+    },
+    {
+      "path": "src-tauri/tests/workflow_acceptance.rs",
+      "source_git_blob": "cf19b67bc464f69e57e0bd4d8c6a485be96aca25",
+      "sha256": "7d981af6cdeec95c7a258383c65454ad112902bd0ab5bbd0c53e1f45dc6234ab"
+    },
+    {
+      "path": "src-tauri/tests/workflow_concurrency.rs",
+      "source_git_blob": "4849070a962441bd1cd0e5e1aed1392ed3babc50",
+      "sha256": "9cefc7f17e666ac708da1a4f6cf8ea7ae357719aedbfa38fcf2fcf41cd93ab12"
+    },
+    {
+      "path": "src-tauri/tests/workflow_gates.rs",
+      "source_git_blob": "e4571b6bc6e711648ef17ea5546e5c701928cf1c",
+      "sha256": "3c8fc88ddb4f4a4c768c9fdd9a71418103e4a22650cf1be16c4ec17ce3e83b63"
+    },
+    {
+      "path": "src-tauri/tests/workflow_ipc.rs",
+      "source_git_blob": "0db20275a9ea3fdb62a08cf0cfab724bd9b5afdd",
+      "sha256": "084ca553ef2d271d82b31203f74e9c6ef79dd22b44f9d13ca88eb48b4f9064ab"
+    },
+    {
+      "path": "src-tauri/tests/workflow_migration.rs",
+      "source_git_blob": "c6fb590ebfa4a8de80d4640a84a8ef9776408fbc",
+      "sha256": "4c8332a818ad3a53a468129d47daafb64cb9ef0f8fb8fcc6cbdb993e7b5abd2b"
+    },
+    {
+      "path": "src/app/App.test.tsx",
+      "source_git_blob": "2d6f971afa9f9341d7673433f90f5c8c09b321e6",
+      "sha256": "d2f233633f55d7e000aa4d1ba32ec523bdc7b7243a77afa75731bbef6ad2355d"
+    },
+    {
+      "path": "src/app/App.tsx",
+      "source_git_blob": "a8e86d6a43e953f9756c3f5056e752eec9536655",
+      "sha256": "66214d6bb94b6f070fccd7c63f193c881baf4b2f245487aeb4a78808a47ff791"
+    },
+    {
+      "path": "src/app/ShellView.ts",
+      "source_git_blob": "4d854b20b58823c64a42532d3b0dcde4b35f66af",
+      "sha256": "c9540e1c36726157c83930ddc02bfed0717484d95b5145c94fae6937c30e0bb3"
+    },
+    {
+      "path": "src/app/tokens.css",
+      "source_git_blob": "0a54bb9db9e64492a4e1eb4f2cbbe72c89e107bb",
+      "sha256": "f747c672735c079db80fd70f4203ce0c8785446ed6173e8a986436c1a7e8d40d"
+    },
+    {
+      "path": "src/features/library/ImportPaperDialog.tsx",
+      "source_git_blob": "48f05fd85205b0606d912c7aad9ce6d2ef2aaccf",
+      "sha256": "e909585fe6dee437a9a3116042edfa0edab7ebab504f47b3fb01ca6ab08904cd"
+    },
+    {
+      "path": "src/features/library/LibraryHome.tsx",
+      "source_git_blob": "f1c86cf4b886b5c710262884b3ffe2e6d99b2552",
+      "sha256": "5e2e262f6615681c52226e9674e3a6ab97a32698e7a335d154c0dd53f20a83ce"
+    },
+    {
+      "path": "src/features/library/LibraryPage.tsx",
+      "source_git_blob": "dd871ff2468213b30283a05f926cafae58a7c8a8",
+      "sha256": "35daaf0b82d28a9549e5fe483db3366d8e10c21b5663a24e8536b5797035f2fa"
+    },
+    {
+      "path": "src/features/library/PaperDetails.tsx",
+      "source_git_blob": "24f8d75436e9741045324d5a74bd422bfb1e6c79",
+      "sha256": "da448a242048d79b8ebf86f1edd3c062b10ac426e07acdc1c536ae498bba4dcc"
+    },
+    {
+      "path": "src/features/library/library.test.tsx",
+      "source_git_blob": "96637464e91b0384507e542987b0b07da4626dd8",
+      "sha256": "d69febc6a17b2a7d907b145e99951b0cf81a8c2cfb2d2fd1bc8ddf5b95d23687"
+    },
+    {
+      "path": "src/features/library/useLibrary.ts",
+      "source_git_blob": "fdbdf982cac4359d6f834a5237a3cf471211d4d5",
+      "sha256": "c5cd2684139c594ac9386b6762273c5ceb1c48b69b14bd95d692897b2b55dfcf"
+    },
+    {
+      "path": "src/features/reader/PaperReader.tsx",
+      "source_git_blob": "2038e54090188daa47bc84846b0d03424d09ee23",
+      "sha256": "b53d55ba770ea63721ca8c0f390527ee6e63c26716df8e8e27c2a4b501c44283"
+    },
+    {
+      "path": "src/features/reader/pdfLoader.test.ts",
+      "source_git_blob": "be746ad9e189ae299600d9ec61ab76f2d5f39580",
+      "sha256": "fd764a7194e8c5ef5a24b5f611ba099aa2c5cd36b88794401e75d439d1fa36b6"
+    },
+    {
+      "path": "src/features/reader/pdfLoader.ts",
+      "source_git_blob": "c78ffc8e9d49764fd967bfd22accea106ee63849",
+      "sha256": "65e78ad8c0c2e4e2196a2d01d3b96eacd7b6ea23eb0d5691792d40c81798216a"
+    },
+    {
+      "path": "src/features/reader/reader.test.tsx",
+      "source_git_blob": "f10466973b4164b562470b6365122d1f9d218955",
+      "sha256": "660f34954bc84011ba2c4dd0a12049318027c6de8d18ca27021a3bf61740ef42"
+    },
+    {
+      "path": "src/features/reader/useReadingPosition.test.tsx",
+      "source_git_blob": "91b41d1436d23837a23069feb99073b8ce5771b5",
+      "sha256": "d48e6e409b50339b20cd1a32fd77054dc67ca2da4dcdbe2546314c7bbd69f261"
+    },
+    {
+      "path": "src/features/reader/useReadingPosition.ts",
+      "source_git_blob": "cfb53a0e65231feee5c19b5faff24a61236a68e6",
+      "sha256": "642f5c3cc2b8e6be60707b6724b07c9a41537f016478fe6a6eaff7ce19cb8c7e"
+    },
+    {
+      "path": "src/main.tsx",
+      "source_git_blob": "02e4d3188f5226af2eb7e293a3bf8fc3f6442b58",
+      "sha256": "8e0ac9b27bee31721068e6b22d7c56f6d93fcb2d3124070a2d3770a4c9923de4"
+    },
+    {
+      "path": "src/shared/adapters/tauri/client.test.ts",
+      "source_git_blob": "36c0906d657ce64560d46f2dd6fc14995867a1d1",
+      "sha256": "0c793b14ec5b5648f062d7ccaeefbf327fe23802c908981a05816580b1d8692b"
+    },
+    {
+      "path": "src/shared/adapters/tauri/client.ts",
+      "source_git_blob": "3dc3f14bc4e4a895cddf42e45fe194745546709b",
+      "sha256": "fbfa08a7984fdda9abe368d032ac112452c90c0ccf59663ef53075edccff328e"
+    },
+    {
+      "path": "src/shared/adapters/tauri/index.ts",
+      "source_git_blob": "f195d6dcb5546affc9a124a82325abf0ae04ed07",
+      "sha256": "974883dd491cb2966587799fbf82fa436a63f14927af69f7185da7f25136a7eb"
+    },
+    {
+      "path": "src/shared/adapters/tauri/pdf-assets.test.ts",
+      "source_git_blob": "9c8d4271038534fbb6133829898fc43e752711ad",
+      "sha256": "a85da7c6cc29b9dfa082baa95c454883cba5bce2e91b1cf2735204432bd3e914"
+    },
+    {
+      "path": "src/shared/adapters/tauri/pdf-assets.ts",
+      "source_git_blob": "a033b244193040bd68d47964d008ad51493f39f2",
+      "sha256": "1f0ce44d1ee1cd0848887f9286d921c014f8d85ef5eb505a23e05e13f8dc6cf2"
+    },
+    {
+      "path": "src/shared/contracts/fixtures.test.ts",
+      "source_git_blob": "4c402095b810579f66ca458661365388efea595e",
+      "sha256": "166224af9b638133dd2031ae88e34683ecbe2dcaa6735e23666d3d09cbfca98d"
+    },
+    {
+      "path": "src/shared/contracts/generated/contracts.ts",
+      "source_git_blob": "1dea8f26418310073a30f3d22ac5b8099503ff3e",
+      "sha256": "8fb1b3682b6065d2c65cd9c0fee1235b2b55b4cc5e78ec34eba7d6dda4832596"
+    },
+    {
+      "path": "src/shared/contracts/optional-types.test.ts",
+      "source_git_blob": "8231a3938935a353865dec55041d3b208461e32a",
+      "sha256": "8898ccdb35835b7fa63ebb000424c0f338769b516ec82dc4678ebf79dae71594"
+    },
+    {
+      "path": "src/shared/contracts/ports.ts",
+      "source_git_blob": "e4d072fc86e570a07079f3ec8611d2937928e22c",
+      "sha256": "c6b8d6dff782acfc666e67481d4d8b8339510b042986ca92ee40b84a0569985b"
+    },
+    {
+      "path": "src/shared/contracts/wire.test.ts",
+      "source_git_blob": "77d23575a9fc8e8e21c2c8a2cd38e3e85b5190eb",
+      "sha256": "c86a8110efb65063e512ff45485840a3d6021379670faaa67a4b21915270f307"
+    },
+    {
+      "path": "src/shared/contracts/wire.ts",
+      "source_git_blob": "3cc1fca89cc1dbdf2ac7b195bc585d411aa79684",
+      "sha256": "03c795f4b240d38fc179f457a5315911173c6256ca646d7c9cfaf24848595baa"
+    },
+    {
+      "path": "src/shared/ui/dialog.tsx",
+      "source_git_blob": "3c401afbe78e76e515cdcbf8362b0f741a7fc20f",
+      "sha256": "0aa9c09e27071d60c235658de00f7d7d6bbabdb6851d69e44673723f1044594f"
+    },
+    {
+      "path": "src/vite-env.d.ts",
+      "source_git_blob": "11f02fe2a0061d6e6e1f271b21da95423b448b32",
+      "sha256": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5"
+    },
+    {
+      "path": "tests/fixtures/invalid.pdf",
+      "source_git_blob": "2f134a7e400b8ffed8e87d0d986ab53d20b5ec8c",
+      "sha256": "5c4ed2cc21fd6acefdb72b2488905d492ac68c813ee071614dcc89798ca21bd2"
+    },
+    {
+      "path": "tests/fixtures/sample.pdf",
+      "source_git_blob": "285f43b79cc94c7a90694b19d914bf7be7fbdd43",
+      "sha256": "e6719dc8e277acb28c57a5d64d2b273a1544206c8d003c729aa1f8b090f54394"
+    },
+    {
+      "path": "tests/fixtures/scanned.pdf",
+      "source_git_blob": "9a46b539e43a5f284aacea03ed14754ae900e2a3",
+      "sha256": "39d4888daa79d46a73ebf70e355f0b6befcc6e44a549d940003877a376f5e34b"
+    },
+    {
+      "path": "tsconfig.app.json",
+      "source_git_blob": "ffb88c41cb590decd8ab3a47a04babb2c209b953",
+      "sha256": "48b70e761932c3f869bd49298ee39ceb165e2bd3172ead886156840427c8b8fd"
+    },
+    {
+      "path": "tsconfig.json",
+      "source_git_blob": "65f670c8f0aa5f2b919670ae58c7e58861c53620",
+      "sha256": "b55a1830fd9d60d0117d0fedbe85c9042da56815aa18d72fab39001a6841a3e7"
+    },
+    {
+      "path": "tsconfig.node.json",
+      "source_git_blob": "8bd18cded606931ee7d63b8ed294393aee963a38",
+      "sha256": "73e9a6fed2cc2d6b4aa8dbed01ccf9aba9ea7be9f82201927eae37fea29f2130"
+    },
+    {
+      "path": "vite.config.ts",
+      "source_git_blob": "1cecfd3bc31f639435f4913a3903de5b50f440a2",
+      "sha256": "05c1c58455118948fd5c30178a98bf4d5a67bd457413cc55d0e16084292f806a"
+    },
+    {
+      "path": "vitest.config.ts",
+      "source_git_blob": "83b0b871de10dd968746cb929b8c180a0645b95c",
+      "sha256": "2907d8d8ed8a8147bc4c360cf0f8848eda0ae38df3435e34951b2a8a207fbb2d"
+    }
+  ]
+}

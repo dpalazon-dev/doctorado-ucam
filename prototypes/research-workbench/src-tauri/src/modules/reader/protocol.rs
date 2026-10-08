@@ -282,7 +282,7 @@ mod tests {
         let hash_for_db = hash.clone();
         tauri::async_runtime::block_on(actor.submit(move |connection| {
             let tx = connection.transaction()?;
-            tx.execute("INSERT INTO papers(id,title,year,review_type,lifecycle,revision,processing_initialized,active_document_id,created_at,updated_at) VALUES(?1,'Protocolo sintético',2026,'unknown','NEW',0,0,?2,'2026-10-03T00:00:00Z','2026-10-03T00:00:00Z')", rusqlite::params![paper_for_db, document_for_db])?;
+            tx.execute("INSERT INTO papers(id,title,year,review_type,lifecycle,revision,processing_initialized,active_document_id,created_at,updated_at) VALUES(?1,'Synthetic protocol',2026,'unknown','NEW',0,0,?2,'2026-10-03T00:00:00Z','2026-10-03T00:00:00Z')", rusqlite::params![paper_for_db, document_for_db])?;
             tx.execute("INSERT INTO documents(id,paper_id,original_filename,relative_path,sha256,media_type,size_bytes,imported_at,status) VALUES(?1,?2,'synthetic.pdf',?3,?4,'application/pdf',?5,'2026-10-03T00:00:00Z','ACTIVE')", rusqlite::params![document_for_db, paper_for_db, relative_for_db, hash_for_db, bytes.len() as i64])?;
             tx.commit()?;
             Ok(())

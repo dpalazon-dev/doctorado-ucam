@@ -61,7 +61,7 @@ export function PaperReader({
       .catch(() => {
         if (active && !controller.signal.aborted)
           setLoadError(
-            "No se pudo mostrar este PDF. Puede estar dañado, protegido o no estar disponible. Tu ficha sigue en la biblioteca.",
+            "Could not display this PDF. It may be damaged, protected, or unavailable. Its record remains in the library.",
           );
       })
       .finally(() => {
@@ -93,7 +93,7 @@ export function PaperReader({
       .catch(() => {
         if (!controller.signal.aborted && current === renderId.current)
           setRenderError(
-            "No se pudo dibujar esta página. Puedes cambiar de página o cerrar el lector.",
+            "Could not render this page. You can change pages or close the reader.",
           );
       });
     return () => controller.abort();
@@ -133,20 +133,20 @@ export function PaperReader({
     void save(pageIndex, bounded);
   }
   return (
-    <section className="reader-shell" aria-label="Lector PDF">
+    <section className="reader-shell" aria-label="PDF reader">
       <div className="reader-toolbar">
-        <button type="button" aria-label="Cerrar lector" onClick={close}>
-          Cerrar
+        <button type="button" aria-label="Close reader" onClick={close}>
+          Close
         </button>
         <div className="reader-title">
-          <span className="eyebrow">Lector PDF</span>
+          <span className="eyebrow">PDF reader</span>
           <h1>{opened.paper.title}</h1>
           <span>{opened.document.originalFilename}</span>
         </div>
         <div className="reader-controls">
           <button
             type="button"
-            aria-label="Reducir zoom"
+            aria-label="Zoom out"
             disabled={zoom <= 0.25}
             onClick={() => changeZoom(zoom - 0.1)}
           >
@@ -155,7 +155,7 @@ export function PaperReader({
           <span>{Math.round(zoom * 100)}%</span>
           <button
             type="button"
-            aria-label="Aumentar zoom"
+            aria-label="Zoom in"
             disabled={zoom >= 5}
             onClick={() => changeZoom(zoom + 0.1)}
           >
@@ -166,16 +166,16 @@ export function PaperReader({
       <div className="reader-pagination">
         <button
           type="button"
-          aria-label="Página anterior"
+          aria-label="Previous page"
           disabled={pageIndex <= 1}
           onClick={() => changePage(pageIndex - 1)}
         >
           ‹
         </button>
         <label>
-          Página{" "}
+          Page{" "}
           <input
-            aria-label="Ir a página"
+            aria-label="Go to page"
             type="number"
             step={1}
             min={1}
@@ -187,11 +187,11 @@ export function PaperReader({
               else e.currentTarget.value = String(pageIndex);
             }}
           />
-          {pageCount === null ? "" : ` de ${pageCount}`}
+          {pageCount === null ? "" : ` of ${pageCount}`}
         </label>
         <button
           type="button"
-          aria-label="Página siguiente"
+          aria-label="Next page"
           disabled={pageCount === null || pageIndex >= pageCount}
           onClick={() => changePage(pageIndex + 1)}
         >
@@ -199,13 +199,13 @@ export function PaperReader({
         </button>
         <span aria-live="polite">
           {loading
-            ? "Cargando PDF…"
+            ? "Loading PDF…"
             : status === "saving"
-              ? "Guardando posición…"
+              ? "Saving position…"
               : status === "saved"
-                ? "Guardado"
+                ? "Saved"
                 : status === "error"
-                  ? "Cambios pendientes"
+                  ? "Changes pending"
                   : ""}
         </span>
       </div>
@@ -213,12 +213,12 @@ export function PaperReader({
         <section
           className="reader-recovery"
           role="group"
-          aria-label="Resolver guardado de posición"
+          aria-label="Resolve position save"
         >
           <h2>
             {recovery.kind === "conflict"
-              ? "La posición cambió en otra operación"
-              : "No se pudo confirmar el guardado"}
+              ? "The position changed in another operation"
+              : "Could not confirm the save"}
           </h2>
           <p>{recovery.message}</p>
           {recovery.kind === "uncertain" ? (
@@ -227,14 +227,14 @@ export function PaperReader({
               disabled={status === "saving"}
               onClick={() => void retryUncertain().catch(() => {})}
             >
-              Reintentar guardado de posición
+              Retry saving position
             </button>
           ) : (
             <>
               <p>
                 {recovery.durable
-                  ? `Posición guardada: página ${recovery.durable.pageIndex}, ${Math.round(recovery.durable.zoom * 100)}%.`
-                  : "No se pudo consultar la posición guardada."}
+                  ? `Position saved: page ${recovery.durable.pageIndex}, ${Math.round(recovery.durable.zoom * 100)}%.`
+                  : "Could not retrieve the saved position."}
               </p>
               {recovery.durable ? (
                 <>
@@ -243,7 +243,7 @@ export function PaperReader({
                     disabled={status === "saving"}
                     onClick={keepSavedPosition}
                   >
-                    Conservar posición guardada
+                    Keep saved position
                   </button>
                   <button
                     type="button"
@@ -252,7 +252,7 @@ export function PaperReader({
                       void resolveConflict("save-local").catch(() => {})
                     }
                   >
-                    Guardar mi posición
+                    Save my position
                   </button>
                 </>
               ) : (
@@ -261,7 +261,7 @@ export function PaperReader({
                   disabled={status === "saving"}
                   onClick={() => void refreshConflict()}
                 >
-                  Consultar posición guardada
+                  Check saved position
                 </button>
               )}
             </>
@@ -271,13 +271,13 @@ export function PaperReader({
       {(loadError || renderError || error) && (
         <p role="alert">{loadError ?? renderError ?? error}</p>
       )}
-      {loading && <p role="status">Preparando el documento…</p>}
+      {loading && <p role="status">Preparing document…</p>}
       <div className="pdf-page-wrap">
         {!loadError && (
           <canvas
             ref={canvas}
             role="img"
-            aria-label={`Página ${pageIndex} del documento`}
+            aria-label={`Page ${pageIndex} of the document`}
           />
         )}
       </div>

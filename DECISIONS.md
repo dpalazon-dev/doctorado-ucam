@@ -793,3 +793,29 @@ The snapshot is partial and paused without active maintenance. Public availabili
 - The prototype's historical contracts and status remain available in their original namespace.
 - The import does not claim v0.1 completion, clean-machine installation validation, or production behavior beyond recorded evidence.
 - Third-party dependencies continue under their own licenses and notices.
+
+---
+
+# ADR-0014 · English Repository and Prototype Presentation
+
+**Status:** Accepted
+**Date:** 2026-10-08
+
+## Context
+
+ResearchOS documents already use English. Importing the independent Workbench prototype introduced Spanish documentation and interface text. The author explicitly requested English throughout the repository, including the prototype interface.
+
+## Decision
+
+Use English for maintained documentation, help, interface messages, source comments and synthetic example labels. Translate maintained normative, development and design documents without changing their requirements or provenance. Preserve historical execution plans, reviews, reports and pending work verbatim at their original Git revision, with English indexes and pinned links to each source. Replace the superseded product book and status chronology with current English overviews that link to their complete originals. This presentation decision supersedes the former Spanish-interface preference within the Workbench namespace; it introduces no ResearchOS implementation or new prototype feature.
+
+Keep technical identifiers, paths, bibliographic names, third-party license notices and exact historical source observations intact. In particular, preserve the immutable v1 workflow JSON snapshots and migration 0002 byte for byte: their canonical hashes identify definitions embedded in stored answer snapshots. Translating those serialized payloads in place would invalidate their identity. Future workflow presentation must use an English display projection while retaining the original stored definitions.
+
+Preserve Git history and original import provenance. Remove obsolete Spanish raster previews from the current tree while keeping their authentic historical revisions accessible. Do not alter historical QA screenshots to manufacture evidence of an English native test run. Keep the pending T04c work separate from the active prototype.
+
+## Consequences
+
+- Readers and contributors share one language for current documentation and interface copy.
+- English copy verification is distinct from the historical import's byte-equality checks.
+- Existing libraries retain their definition hashes and data compatibility.
+- The language change does not establish clean-machine installation, complete v0.1 or active maintenance.

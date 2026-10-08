@@ -1,20 +1,20 @@
-# Publicación y procedencia
+# Publication and provenance
 
-## Alcance
+## Scope
 
-Este repositorio reúne dos alcances relacionados pero independientes: la arquitectura futura de ResearchOS, documentada en la raíz, y una instantánea del prototipo local Research Workbench en [`../../prototypes/research-workbench/`](../../prototypes/research-workbench/). La instantánea no implementa las Specs de ResearchOS, no comparte su modelo canónico y no incorpora su sidecar cognitivo. La presencia de ambos en un repositorio no cambia contratos de producto ni convierte el prototipo en autoridad arquitectónica.
+This repository brings together two related but independent scopes: the future ResearchOS architecture at the root, and a snapshot of the local Research Workbench prototype under [`../../prototypes/research-workbench/`](../../prototypes/research-workbench/). The snapshot does not implement ResearchOS specifications, share its canonical model, or include its cognitive sidecar. Repository consolidation does not change product contracts or make the prototype an architectural authority for ResearchOS.
 
-## Procedencia de Workbench
+## Workbench provenance
 
-El código del prototipo procede del hito integrado `702d08b02f2d2655584a932455ac394fb026f8d2` de `integration/v0.1`, que incluye el lector y el backend PRE/P1. La UI PRE/P1 de workflow de T04c no forma parte del ejecutable publicado; su patch se conserva aparte en `pending-work/T04c-workflow-ui.patch` y no está integrado. Los documentos añadidos o modificados en `main` proceden de `6e20428fe8267dddac3f4a8adca41a158314fd05`; propuestas documentales proceden de `1f598cbe0bb36d5b0fd8f65c530337a7b36378e6`.
+The original product snapshot was imported from integrated milestone `702d08b02f2d2655584a932455ac394fb026f8d2` on `integration/v0.1`, including the reader and PRE/P1 backend. The pending PRE/P1 workflow UI is not part of the active product; its exact original patch remains available through the pinned historical link in [`pending-work/`](pending-work/README.md) and remains unapplied. Added or modified documents came from `6e20428fe8267dddac3f4a8adca41a158314fd05`; design proposals came from `1f598cbe0bb36d5b0fd8f65c530337a7b36378e6`.
 
-La carpeta es un snapshot reproducible del árbol de archivos, no una importación del historial Git remoto de Workbench. El historial local del origen se conserva en el bundle archivado fuera de esta publicación. Esta unificación conserva el historial de ResearchOS. Los documentos originales locales y el repositorio fuente permanecen intactos.
+The directory was imported as a file snapshot rather than as Workbench Git history. The complete local source history remains in a verified local bundle outside this publication. This repository preserves ResearchOS history. The original local source repository and its pending work remain intact.
 
-La importación excluye `.codex`, `docs/session`, binarios, releases, bibliotecas, cachés, `node_modules`, `target` y `work`. [`import-manifest.json`](import-manifest.json) registra la composición del snapshot; esta página describe sus fuentes y límites.
+The import excluded `.codex`, `docs/session`, installers, releases, personal libraries, caches, `node_modules`, `target` and `work`. [import-manifest.json](import-manifest.json) records the exact original import; it is historical provenance, not a checksum inventory of later English copy changes. [VERIFICATION.md](VERIFICATION.md) records the original consolidation checks.
 
-## Desarrollo del prototipo
+## Development
 
-Desde [`../../prototypes/research-workbench/`](../../prototypes/research-workbench/) en Windows 11 x64:
+From [`../../prototypes/research-workbench/`](../../prototypes/research-workbench/) on Windows 11 x64:
 
 ```powershell
 npm.cmd ci
@@ -23,8 +23,14 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/check.ps1
 npm.cmd run tauri:dev
 ```
 
-El prototipo requiere Windows x64, Node.js/npm, Rust MSVC, Visual Studio C++ Build Tools con SDK de Windows y WebView2 Runtime. Los datos usados en las pruebas son sintéticos. Estos comandos describen el flujo de desarrollo; no acreditan instalación limpia ni finalización de v0.1. Consulta [`README del prototipo`](../../prototypes/research-workbench/README.md), [`estado del prototipo`](../../prototypes/research-workbench/docs/STATUS.md) y [`entorno de desarrollo`](../../prototypes/research-workbench/docs/development/ENVIRONMENT.md).
+Development requires Node.js/npm, Rust MSVC, Visual Studio C++ Build Tools with the Windows SDK, and the WebView2 Runtime. Tests use synthetic data. These development commands do not establish clean-machine installation or completion of v0.1. See the [prototype README](../../prototypes/research-workbench/README.md), [prototype status](../../prototypes/research-workbench/docs/STATUS.md) and [environment guide](../../prototypes/research-workbench/docs/development/ENVIRONMENT.md).
 
-## Licencias
+## Repository language and historical data
 
-La licencia MIT de la raíz cubre el material propio de este repositorio. Las dependencias y otros componentes de terceros conservan sus licencias y avisos; consulta [`../../prototypes/research-workbench/THIRD_PARTY_NOTICES.md`](../../prototypes/research-workbench/THIRD_PARTY_NOTICES.md).
+Current authored documentation, help text, source comments and interface copy use English. Immutable v1 workflow definition snapshots, original bibliographic names, technical identifiers and exact historical observations retain their original data values. Their preservation protects definition hashes, saved answer snapshots and provenance; they are not a second set of current-language documentation. Git history is preserved rather than rewritten.
+
+Historical screenshots of the former Spanish interface are not presented as English UI evidence. Their originals remain recoverable from the previous repository revision and local source backup. The vector design mockup is an English proposal, not evidence of an implemented feature or a native test run.
+
+## Licenses
+
+The root MIT license covers original material. Dependencies and other third-party components retain their own licenses and notices; see [THIRD_PARTY_NOTICES.md](../../prototypes/research-workbench/THIRD_PARTY_NOTICES.md).

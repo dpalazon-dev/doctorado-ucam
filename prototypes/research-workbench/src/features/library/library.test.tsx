@@ -23,7 +23,7 @@ const id = "00000000-0000-4000-8000-000000000001";
 const paper = (patch: Partial<PaperDto> = {}): PaperDto => ({
   id,
   documentId: "00000000-0000-4000-8000-000000000002",
-  title: "Agua industrial y recuperación",
+  title: "Industrial water and recovery",
   authors: ["Ana Ruiz"],
   year: 2024,
   doi: null,
@@ -52,7 +52,7 @@ const failure = (code: string): IpcResult<never> => ({
   ok: false,
   error: {
     code: code as never,
-    message: "No se pudo guardar. Revisa los datos.",
+    message: "Could not save. Check the details.",
     retryable: false,
   },
 });
@@ -109,10 +109,10 @@ it("empty_library_shows_import", async () => {
     />,
   );
   expect(
-    await screen.findByRole("heading", { name: "Tu biblioteca" }),
+    await screen.findByRole("heading", { name: "Your library" }),
   ).toBeTruthy();
   expect(
-    (await screen.findAllByRole("button", { name: "Importar PDF" })).length,
+    (await screen.findAllByRole("button", { name: "Import PDF" })).length,
   ).toBeGreaterThan(0);
 });
 it("picker_cancel_no_form", async () => {
@@ -126,9 +126,9 @@ it("picker_cancel_no_form", async () => {
       onOpenPaper={vi.fn()}
     />,
   );
-  fireEvent.click(screen.getByRole("button", { name: "Seleccionar PDF" }));
+  fireEvent.click(screen.getByRole("button", { name: "Select PDF" }));
   await waitFor(() => expect(api.selectPdf).toHaveBeenCalled());
-  expect(screen.queryByLabelText("Título")).toBeNull();
+  expect(screen.queryByLabelText("Title")).toBeNull();
 });
 it("metadata_error_accessible", async () => {
   const api = makeApi({
@@ -152,16 +152,16 @@ it("metadata_error_accessible", async () => {
       onOpenPaper={vi.fn()}
     />,
   );
-  fireEvent.click(screen.getByRole("button", { name: "Seleccionar PDF" }));
+  fireEvent.click(screen.getByRole("button", { name: "Select PDF" }));
   fireEvent.click(
-    await screen.findByRole("button", { name: "Guardar en biblioteca" }),
+    await screen.findByRole("button", { name: "Save to library" }),
   );
   expect(
-    await screen.findByText("Escribe un título para identificar el documento."),
+    await screen.findByText("Enter a title to identify the document."),
   ).toBeTruthy();
 });
 it("duplicate_opens_existing", async () => {
-  const candidate = paper({ title: "Documento existente" });
+  const candidate = paper({ title: "Existing document" });
   const api = makeApi({
     selectPdf: vi.fn().mockResolvedValue(
       ok({
@@ -193,9 +193,9 @@ it("duplicate_opens_existing", async () => {
       onOpenPaper={onOpenPaper}
     />,
   );
-  fireEvent.click(screen.getByRole("button", { name: "Seleccionar PDF" }));
+  fireEvent.click(screen.getByRole("button", { name: "Select PDF" }));
   fireEvent.click(
-    await screen.findByRole("button", { name: "Abrir existente" }),
+    await screen.findByRole("button", { name: "Open existing" }),
   );
   await waitFor(() => expect(api.cancelImport).toHaveBeenCalled());
   await waitFor(() =>
@@ -221,7 +221,7 @@ it("archive_filter_and_restore", async () => {
       onOpenPaper={vi.fn()}
     />,
   );
-  fireEvent.change(await screen.findByLabelText("Estado"), {
+  fireEvent.change(await screen.findByLabelText("Status"), {
     target: { value: "ARCHIVED" },
   });
   await waitFor(() =>
@@ -231,7 +231,7 @@ it("archive_filter_and_restore", async () => {
       }),
     ),
   );
-  fireEvent.click(await screen.findByRole("button", { name: "Restaurar" }));
+  fireEvent.click(await screen.findByRole("button", { name: "Restore" }));
   await waitFor(() => expect(api.restorePaper).toHaveBeenCalled());
 });
 it("conflict_preserves_draft", async () => {
@@ -248,12 +248,12 @@ it("conflict_preserves_draft", async () => {
       onOpenPaper={vi.fn()}
     />,
   );
-  fireEvent.click(await screen.findByRole("button", { name: "Editar" }));
-  const input = await screen.findByLabelText("Título");
+  fireEvent.click(await screen.findByRole("button", { name: "Edit" }));
+  const input = await screen.findByLabelText("Title");
   fireEvent.change(input, { target: { value: "Mi borrador pendiente" } });
-  fireEvent.click(screen.getByRole("button", { name: "Guardar cambios" }));
+  fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
   expect(await screen.findByRole("alert")).toBeTruthy();
-  expect(screen.getByLabelText("Título")).toHaveProperty(
+  expect(screen.getByLabelText("Title")).toHaveProperty(
     "value",
     "Mi borrador pendiente",
   );
@@ -280,14 +280,14 @@ it("metadata_draft_never_moves_to_another_paper", async () => {
     />,
   );
   fireEvent.click(
-    (await screen.findAllByRole("button", { name: "Editar" }))[0],
+    (await screen.findAllByRole("button", { name: "Edit" }))[0],
   );
-  fireEvent.change(await screen.findByLabelText("Título"), {
-    target: { value: "Borrador de A" },
+  fireEvent.change(await screen.findByLabelText("Title"), {
+    target: { value: "Draft A" },
   });
-  fireEvent.click(screen.getAllByRole("button", { name: "Editar" })[1]);
+  fireEvent.click(screen.getAllByRole("button", { name: "Edit" })[1]);
   fireEvent.click(
-    await screen.findByRole("button", { name: "Guardar cambios" }),
+    await screen.findByRole("button", { name: "Save changes" }),
   );
   await waitFor(() => expect(api.updateMetadata).toHaveBeenCalled());
   expect(api.updateMetadata).toHaveBeenLastCalledWith(
@@ -301,7 +301,7 @@ it("metadata_draft_never_moves_to_another_paper", async () => {
 it("library_pages_forward_cursor_and_reset_after_filter_change", async () => {
   const next = paper({
     id: "00000000-0000-4000-8000-000000000004",
-    title: "Página dos",
+    title: "Page dos",
   });
   const list = vi
     .fn()
@@ -323,15 +323,15 @@ it("library_pages_forward_cursor_and_reset_after_filter_change", async () => {
     />,
   );
   fireEvent.click(
-    await screen.findByRole("button", { name: "Siguiente página" }),
+    await screen.findByRole("button", { name: "Next page" }),
   );
-  await waitFor(() => expect(screen.getByText("Página dos")).toBeTruthy());
+  await waitFor(() => expect(screen.getByText("Page dos")).toBeTruthy());
   expect(list).toHaveBeenLastCalledWith(
     expect.objectContaining({
       filter: expect.objectContaining({ cursor: "cursor-2" }),
     }),
   );
-  fireEvent.change(screen.getByLabelText("Estado"), {
+  fireEvent.change(screen.getByLabelText("Status"), {
     target: { value: "ARCHIVED" },
   });
   await waitFor(() =>
@@ -347,7 +347,7 @@ it("library_pages_forward_cursor_and_reset_after_filter_change", async () => {
 });
 
 it("duplicate_open_failure_remains_visible_and_retries_reader_only", async () => {
-  const candidate = paper({ title: "Paper ya existente" });
+  const candidate = paper({ title: "Existing paper" });
   const api = makeApi({
     selectPdf: vi.fn().mockResolvedValue(
       ok({
@@ -381,12 +381,12 @@ it("duplicate_open_failure_remains_visible_and_retries_reader_only", async () =>
       onOpenPaper={vi.fn()}
     />,
   );
-  fireEvent.click(screen.getByRole("button", { name: "Seleccionar PDF" }));
+  fireEvent.click(screen.getByRole("button", { name: "Select PDF" }));
   fireEvent.click(
-    await screen.findByRole("button", { name: "Abrir existente" }),
+    await screen.findByRole("button", { name: "Open existing" }),
   );
   fireEvent.click(
-    await screen.findByRole("button", { name: "Reintentar abrir existente" }),
+    await screen.findByRole("button", { name: "Try opening the existing paper again" }),
   );
   await waitFor(() => expect(readerApi.openPaper).toHaveBeenCalledTimes(2));
   expect(api.cancelImport).toHaveBeenCalledTimes(1);
@@ -394,7 +394,7 @@ it("duplicate_open_failure_remains_visible_and_retries_reader_only", async () =>
 });
 
 it("failed_duplicate_cancel_is_visible_and_never_opens_reader", async () => {
-  const candidate = paper({ title: "Paper ya existente" });
+  const candidate = paper({ title: "Existing paper" });
   const api = makeApi({
     selectPdf: vi.fn().mockResolvedValue(
       ok({
@@ -424,9 +424,9 @@ it("failed_duplicate_cancel_is_visible_and_never_opens_reader", async () => {
       onOpenPaper={vi.fn()}
     />,
   );
-  fireEvent.click(screen.getByRole("button", { name: "Seleccionar PDF" }));
+  fireEvent.click(screen.getByRole("button", { name: "Select PDF" }));
   fireEvent.click(
-    await screen.findByRole("button", { name: "Abrir existente" }),
+    await screen.findByRole("button", { name: "Open existing" }),
   );
   expect(await screen.findByRole("alert")).toBeTruthy();
   expect(readerApi.openPaper).not.toHaveBeenCalled();
@@ -460,7 +460,7 @@ it("out_of_order_open_responses_follow_the_latest_library_intent", async () => {
   render(
     <LibraryPage api={api} readerApi={readerApi} onOpenPaper={onOpenPaper} />,
   );
-  const buttons = await screen.findAllByRole("button", { name: "Leer" });
+  const buttons = await screen.findAllByRole("button", { name: "Read" });
   fireEvent.click(buttons[0]);
   fireEvent.click(buttons[1]);
   await act(async () => {
@@ -500,12 +500,12 @@ it("dialog_close_uses_confirmed_cancel_and_preserves_preview_when_cancel_fails",
       onOpenPaper={vi.fn()}
     />,
   );
-  fireEvent.click(screen.getByRole("button", { name: "Seleccionar PDF" }));
-  await screen.findByLabelText("Título");
-  fireEvent.click(screen.getByRole("button", { name: "Cerrar" }));
+  fireEvent.click(screen.getByRole("button", { name: "Select PDF" }));
+  await screen.findByLabelText("Title");
+  fireEvent.click(screen.getByRole("button", { name: "Close" }));
   expect(await screen.findByRole("alert")).toBeTruthy();
   expect(onClose).not.toHaveBeenCalled();
-  expect(screen.getByLabelText("Título")).toBeTruthy();
+  expect(screen.getByLabelText("Title")).toBeTruthy();
   expect(api.cancelImport).toHaveBeenCalledTimes(1);
 });
 
@@ -536,18 +536,18 @@ it("late_metadata_save_does_not_reselect_a_paper_the_user_left", async () => {
       onOpenPaper={vi.fn()}
     />,
   );
-  const editButtons = await screen.findAllByRole("button", { name: "Editar" });
+  const editButtons = await screen.findAllByRole("button", { name: "Edit" });
   fireEvent.click(editButtons[0]);
-  fireEvent.change(await screen.findByLabelText("Título"), {
+  fireEvent.change(await screen.findByLabelText("Title"), {
     target: { value: "Cambio A" },
   });
-  fireEvent.click(screen.getByRole("button", { name: "Guardar cambios" }));
-  fireEvent.click(screen.getAllByRole("button", { name: "Editar" })[1]);
-  expect(screen.getByLabelText("Título")).toHaveProperty("value", "Paper B");
+  fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+  fireEvent.click(screen.getAllByRole("button", { name: "Edit" })[1]);
+  expect(screen.getByLabelText("Title")).toHaveProperty("value", "Paper B");
   await act(async () => {
     resolveSave(ok(first));
   });
-  expect(screen.getByLabelText("Título")).toHaveProperty("value", "Paper B");
+  expect(screen.getByLabelText("Title")).toHaveProperty("value", "Paper B");
   expect(screen.getAllByRole("heading", { name: "Paper B" })).toHaveLength(2);
 });
 
@@ -573,7 +573,7 @@ it("home_discards_open_response_after_leaving_home", async () => {
     />,
   );
   fireEvent.click(
-    await screen.findByRole("button", { name: "Reanudar lectura" }),
+    await screen.findByRole("button", { name: "Resume reading" }),
   );
   view.unmount();
   await act(async () => {
@@ -624,33 +624,33 @@ it.each(["selection pending", "preview visible"])(
       <LibraryPage api={api} readerApi={readerApi} onOpenPaper={onOpenPaper} />,
     );
     fireEvent.click(
-      (await screen.findAllByRole("button", { name: "Leer" }))[0],
+      (await screen.findAllByRole("button", { name: "Read" }))[0],
     );
     fireEvent.click(
-      (await screen.findAllByRole("button", { name: "Importar PDF" }))[0],
+      (await screen.findAllByRole("button", { name: "Import PDF" }))[0],
     );
     fireEvent.click(
-      await screen.findByRole("button", { name: "Seleccionar PDF" }),
+      await screen.findByRole("button", { name: "Select PDF" }),
     );
     if (importState === "preview visible")
-      await screen.findByLabelText("Título");
+      await screen.findByLabelText("Title");
     await act(async () => {
       resolveOpen(ok(opened));
     });
     expect(onOpenPaper).not.toHaveBeenCalled();
     expect(api.cancelImport).not.toHaveBeenCalled();
     if (importState === "preview visible")
-      expect(screen.getByLabelText("Título")).toBeTruthy();
+      expect(screen.getByLabelText("Title")).toBeTruthy();
     resolveSelection?.(ok(preview));
   },
 );
 
 it("late_duplicate_decision_after_doi_shows_all_validated_candidates", async () => {
-  const first = paper({ title: "Candidato A" });
+  const first = paper({ title: "Candidate A" });
   const second = paper({
     id: "00000000-0000-4000-8000-000000000004",
     documentId: "00000000-0000-4000-8000-000000000005",
-    title: "Candidato B",
+    title: "Candidate B",
   });
   const api = makeApi({
     selectPdf: vi.fn().mockResolvedValue(
@@ -689,20 +689,20 @@ it("late_duplicate_decision_after_doi_shows_all_validated_candidates", async () 
       onOpenPaper={vi.fn()}
     />,
   );
-  fireEvent.click(screen.getByRole("button", { name: "Seleccionar PDF" }));
-  fireEvent.change(await screen.findByLabelText("Título"), {
+  fireEvent.click(screen.getByRole("button", { name: "Select PDF" }));
+  fireEvent.change(await screen.findByLabelText("Title"), {
     target: { value: "Paper con DOI" },
   });
   fireEvent.change(screen.getByLabelText("DOI"), {
     target: { value: "10.1234/paper" },
   });
   fireEvent.click(
-    screen.getByRole("button", { name: "Guardar en biblioteca" }),
+    screen.getByRole("button", { name: "Save to library" }),
   );
   expect(
-    await screen.findAllByRole("button", { name: "Abrir existente" }),
+    await screen.findAllByRole("button", { name: "Open existing" }),
   ).toHaveLength(2);
-  expect(screen.getByRole("heading", { name: "Candidato B" })).toBeTruthy();
+  expect(screen.getByRole("heading", { name: "Candidate B" })).toBeTruthy();
   expect(api.confirmImport).toHaveBeenCalledWith(
     expect.objectContaining({
       metadata: expect.objectContaining({ doi: "10.1234/paper" }),
@@ -711,11 +711,11 @@ it("late_duplicate_decision_after_doi_shows_all_validated_candidates", async () 
 });
 
 it("candidate_choice_waits_for_confirmed_cancel_and_escape_cannot_change_candidate", async () => {
-  const first = paper({ title: "Candidato A" });
+  const first = paper({ title: "Candidate A" });
   const second = paper({
     id: "00000000-0000-4000-8000-000000000004",
     documentId: "00000000-0000-4000-8000-000000000005",
-    title: "Candidato B",
+    title: "Candidate B",
   });
   let resolveCancel!: (value: IpcResult<null>) => void;
   const api = makeApi({
@@ -750,14 +750,14 @@ it("candidate_choice_waits_for_confirmed_cancel_and_escape_cannot_change_candida
       onOpenPaper={vi.fn()}
     />,
   );
-  fireEvent.click(screen.getByRole("button", { name: "Seleccionar PDF" }));
+  fireEvent.click(screen.getByRole("button", { name: "Select PDF" }));
   const choices = await screen.findAllByRole("button", {
-    name: "Abrir existente",
+    name: "Open existing",
   });
   fireEvent.click(choices[1]);
   await waitFor(() => expect(api.cancelImport).toHaveBeenCalledTimes(1));
   expect(readerApi.openPaper).not.toHaveBeenCalled();
-  expect(screen.queryByRole("button", { name: "Cerrar" })).toBeNull();
+  expect(screen.queryByRole("button", { name: "Close" })).toBeNull();
   fireEvent.keyDown(document, { key: "Escape" });
   expect(onClose).not.toHaveBeenCalled();
   await act(async () => resolveCancel(ok(null)));
@@ -791,22 +791,22 @@ it("invalid_import_details_keep_the_draft_and_do_not_confirm", async () => {
       onOpenPaper={vi.fn()}
     />,
   );
-  fireEvent.click(screen.getByRole("button", { name: "Seleccionar PDF" }));
-  fireEvent.change(await screen.findByLabelText("Título"), {
-    target: { value: "Borrador válido" },
+  fireEvent.click(screen.getByRole("button", { name: "Select PDF" }));
+  fireEvent.change(await screen.findByLabelText("Title"), {
+    target: { value: "Valid draft" },
   });
-  fireEvent.change(screen.getByLabelText("Año"), {
+  fireEvent.change(screen.getByLabelText("Year"), {
     target: { value: "20x4" },
   });
   fireEvent.click(
-    screen.getByRole("button", { name: "Guardar en biblioteca" }),
+    screen.getByRole("button", { name: "Save to library" }),
   );
   expect(await screen.findByRole("alert")).toBeTruthy();
-  expect(screen.getByLabelText("Título")).toHaveProperty(
+  expect(screen.getByLabelText("Title")).toHaveProperty(
     "value",
-    "Borrador válido",
+    "Valid draft",
   );
-  expect(screen.getByLabelText("Año")).toHaveProperty("value", "20x4");
+  expect(screen.getByLabelText("Year")).toHaveProperty("value", "20x4");
   expect(api.confirmImport).not.toHaveBeenCalled();
 });
 
@@ -828,11 +828,11 @@ it("malformed_duplicate_candidate_keeps_draft_and_allows_cancel_without_opening"
       ok: false,
       error: {
         code: "DuplicateDecisionRequired",
-        message: "Hay una ficha duplicada.",
+        message: "A duplicate paper exists.",
         retryable: false,
         details: {
           candidates: [
-            { paperId: "not-a-uuid", title: "Candidato inválido", reasons: ["doi"] },
+            { paperId: "not-a-uuid", title: "Invalid candidate", reasons: ["doi"] },
           ],
         },
       },
@@ -849,27 +849,27 @@ it("malformed_duplicate_candidate_keeps_draft_and_allows_cancel_without_opening"
       onOpenPaper={onOpenPaper}
     />,
   );
-  fireEvent.click(screen.getByRole("button", { name: "Seleccionar PDF" }));
-  fireEvent.change(await screen.findByLabelText("Título"), {
-    target: { value: "Borrador conservado" },
+  fireEvent.click(screen.getByRole("button", { name: "Select PDF" }));
+  fireEvent.change(await screen.findByLabelText("Title"), {
+    target: { value: "Preserved draft" },
   });
-  fireEvent.change(screen.getByLabelText("Año"), {
+  fireEvent.change(screen.getByLabelText("Year"), {
     target: { value: "2024" },
   });
   fireEvent.click(
-    screen.getByRole("button", { name: "Guardar en biblioteca" }),
+    screen.getByRole("button", { name: "Save to library" }),
   );
   expect(
     await screen.findByText(
-      "Se detectó un duplicado, pero no se pudo validar su ficha. Puedes cancelar la importación.",
+      "A duplicate was detected, but its record could not be validated. You can cancel the import.",
     ),
   ).toBeTruthy();
-  expect(screen.getByLabelText("Título")).toHaveProperty(
+  expect(screen.getByLabelText("Title")).toHaveProperty(
     "value",
-    "Borrador conservado",
+    "Preserved draft",
   );
-  expect(screen.getByLabelText("Año")).toHaveProperty("value", "2024");
-  expect(screen.getByRole("button", { name: "Cancelar" })).toHaveProperty(
+  expect(screen.getByLabelText("Year")).toHaveProperty("value", "2024");
+  expect(screen.getByRole("button", { name: "Cancel" })).toHaveProperty(
     "disabled",
     false,
   );
@@ -918,13 +918,13 @@ it.each(["selection", "confirmation"])(
         onOpenPaper={vi.fn()}
       />,
     );
-    fireEvent.click(screen.getByRole("button", { name: "Seleccionar PDF" }));
+    fireEvent.click(screen.getByRole("button", { name: "Select PDF" }));
     if (stage === "confirmation") {
-      fireEvent.change(await screen.findByLabelText("Título"), {
+      fireEvent.change(await screen.findByLabelText("Title"), {
         target: { value: "Paper pendiente" },
       });
       fireEvent.click(
-        screen.getByRole("button", { name: "Guardar en biblioteca" }),
+        screen.getByRole("button", { name: "Save to library" }),
       );
     }
     fireEvent.keyDown(document, { key: "Escape" });
@@ -932,10 +932,10 @@ it.each(["selection", "confirmation"])(
     expect(screen.getByRole("dialog")).toBeTruthy();
     if (stage === "selection") {
       await act(async () => resolveSelection(ok(preview)));
-      expect(await screen.findByLabelText("Título")).toBeTruthy();
+      expect(await screen.findByLabelText("Title")).toBeTruthy();
     } else {
       await act(async () => resolveConfirmation(failure("StorageUnavailable")));
-      expect(screen.getByLabelText("Título")).toHaveProperty(
+      expect(screen.getByLabelText("Title")).toHaveProperty(
         "value",
         "Paper pendiente",
       );

@@ -1,23 +1,23 @@
-# Intención del producto
+# Intent of the product
 
-> **Nota de publicación (8 de octubre de 2026):** este documento conserva la intención histórica de Research Workbench. El prototipo publicado es parcial, está pausado y no tiene mantenimiento activo por falta de tiempo de su autor. La intención de completar v0.1 que sigue no describe un resultado alcanzado ni un compromiso vigente. Workbench es una aplicación Windows local independiente, sin IA; no implementa ResearchOS ni comparte su modelo canónico. Para procedencia y límites, consulta [la guía de publicación](../../docs/publication/README.md).
+> **Publication note (8 October 2026):** this document retains the historical intention of Research Workbench. The published prototype is partial, paused and has no active maintenance due to lack of time of its author. The intention to complete v0.1 that follows does not describe an achieved result or an existing commitment. Workbench is an independent local Windows application, without AI; it does not implement ResearchOS or share its canonical model. For provenance and limits, see [the publication guide](../../docs/publication/README.md).
 
-Research Workbench es una aplicación Windows local para David, un investigador que transforma la lectura manual de papers en conocimiento estructurado, recuperable y trazable. Se instala y abre como una aplicación de escritorio; el equipo de uso no necesita herramientas de desarrollo.
+Research Workbench is a local Windows application for David, a researcher who transforms manual reading of papers into structured, recoverable and traceable knowledge. It is installed and opened as a desktop application; the end-user computer does not need development tools.
 
-Paper es la unidad de trabajo; Concept organiza conocimiento; KnowledgeItem captura una unidad semántica; Evidence y Provenance conservan trazabilidad; Relation expresa relaciones explícitas; Workflow guía el trabajo intelectual. La aplicación conserva decisiones humanas, incertidumbre y límites, sin inventar evidencias ni convertir hipótesis en resultados.
+Paper is the unit of work; Concept organizes knowledge; KnowledgeItem captures a semantic unit; Evidence and Provenance maintain traceability; Relation expresses explicit relationships; Workflow guides intellectual work. The application retains human decisions, uncertainty and limits, without inventing evidence or converting hypotheses into results.
 
-## Resultado autorizado
-Implementar v0.1 por fases hasta poder importar PDFs, leerlos, completar PRE/P1/P2, capturar elementos tipados y conceptos globales, registrar localizadores y relaciones, buscar, exportar y recuperar una biblioteca desde backups. Entregar instalador NSIS Windows x64 con WebView2 offline, datos fuera del directorio del programa y pruebas de las capacidades realizadas.
+## Authorized result
+Implement v0.1 in phases until you can import PDFs, read them, complete PRE / P1 / P2, capture typed elements and global concepts, record locators and relationships, search, export and recover a library from backups. Deliver NSIS Windows x64 installer with WebView2 offline, data outside the program directory and tests of the capabilities performed.
 
-El primer piloto 0.0.1 incluye instalación, biblioteca y lector. v0.1.0 añade workflow y conocimiento, búsqueda, exportación, backup y restauración segura. Cada fase se integra después de revisión y validación; no se posterga la integridad de datos para ganar funcionalidades.
+The first 0.0.1 pilot includes installation, library and reader. v0.1.0 adds workflow and knowledge, search, export, backup and safe restoration. Each phase is integrated after revision and validation; data integrity is not postponed to gain functionalities.
 
-## Límites
-Un usuario, una biblioteca activa y un escritor; uso offline; sin login, servidor HTTP, cloud obligatoria, sincronización, OCR o integración LLM. P3/P4, fusión y borrado definitivo se diseñarán después. Archivar/restaurar es reversible. El programa no ejecuta los agentes que lo desarrollan.
+## Limits
+A user, an active library and a writer; offline use; no login, HTTP server, mandatory cloud, synchronization, OCR or LLM integration. P3 / P4, fusion and final deletion will be designed later. File / restore is reversible. The program does not run the agents that develop it.
 
-## Principios
-Persistencia fiable; procedencia explícita; control del investigador; contratos comprobables; interfaz en español clara; mínima complejidad suficiente; portabilidad sin dependencia del programa; recuperación antes de cambios de esquema. No afirmar una capacidad sin demostrarla.
+## Principles
+Reliable persistence; explicit provenance; researcher control; verifiable contracts; clear English interface; minimum sufficient complexity; portability without programme dependence; recovery before scheme changes. Not to claim a capacity without proving it.
 
-## Fuente y aceptación
-El usuario pidió arquitectura antes de implementar y, el 1 de octubre de 2026, autorizó crear el entorno, traer todos los archivos e implementar completamente por fases con este chat como orquestador. Se adopta la arquitectura v0.2 de `docs/architecture/` como baseline de ejecución. El DOCX y los planes originales se conservan íntegros en `docs/session/`; sus formulaciones anteriores no reemplazan contratos normativos posteriores.
+## Source and acceptance
+The user requested architecture before implementing and, on October 1, 2026, authorized creating the environment, bringing all the files and fully implementing in phases with this chat as an orchestrator. The v0.2 architecture of `docs/architecture/` is adopted as a baseline of execution. The DOCX and the original plans are kept in full in `docs/session/`; its earlier formulations do not replace subsequent normative contracts.
 
-Cambiar alcance o decisiones exige actualizar documentos afectados y registrar razón, impacto, migración y verificación en un ADR. La aceptación del diseño no demuestra aún la implementación ni sus prestaciones.
+Changing scope or decisions requires updating affected documents and recording reason, impact, migration and verification in an ADR. The acceptance of the design does not yet demonstrate the implementation and its performance.

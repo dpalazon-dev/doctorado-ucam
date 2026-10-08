@@ -1,26 +1,26 @@
-# Instalación del piloto 0.0.1
+# Installing pilot 0.0.1
 
-Esta guía corresponde al instalador local NSIS por usuario de Windows x64. El piloto no tiene actualizador integrado ni firma Authenticode. La disponibilidad de instalación sin conexión y el contenido WebView2 solo quedan confirmados cuando se inspecciona y prueba el instalador congelado.
+This guide describes the local per-user Windows x64 NSIS installer. The pilot has no integrated updater or Authenticode signature. Offline installation and WebView2 contents are confirmed only by inspecting and testing the frozen installer. This public repository distributes source, not a verified installer.
 
-## Instalar
+## Install
 
-1. Descarga o copia `Research-Workbench_0.0.1_x64-setup.exe` junto con su `manifest.json`.
-2. Comprueba que el SHA-256 del instalador coincide con `artifact.sha256` en el manifiesto.
-3. Ejecuta el instalador y sigue el asistente de Windows. La configuración del producto instala para el usuario actual y crea la entrada del menú Inicio `Research Workbench`.
-4. Inicia la aplicación desde Inicio. No hace falta Node.js, Rust, Cargo, Git ni un checkout del código fuente para el uso instalado.
+1. Download or copy `Research-Workbench_0.0.1_x64-setup.exe` with its `manifest.json` when a candidate is available.
+2. Verify that its SHA-256 matches `artifact.sha256` in the manifest.
+3. Run the installer and follow the Windows wizard. Product configuration installs for the current user and creates the `Research Workbench` Start entry.
+4. Launch from Start. Installed use requires no Node.js, Rust, Cargo, Git or source checkout.
 
-El payload de WebView2 se configura para instalarse desde el paquete. Hasta completar la prueba limpia sin red, mantén disponible el instalador y trata esa capacidad como pendiente.
+The WebView2 payload is configured to install from the package. Until clean offline testing is complete, retain the installer and treat that capability as pending.
 
-## Datos locales
+## Local data
 
-La biblioteca release se guarda en `%LOCALAPPDATA%\ResearchWorkbench\library`. Las copias de seguridad y logs quedan en las carpetas hermanas `backups` y `logs`. Conserva esas carpetas al actualizar o desinstalar. El override `RESEARCH_WORKBENCH_TEST_ROOT` solo afecta a builds de depuración y no redirige los datos de una versión release.
+The release library lives in `%LOCALAPPDATA%\ResearchWorkbench\library`. Backups and logs live in sibling `backups` and `logs` folders. Preserve them when updating or uninstalling. `RESEARCH_WORKBENCH_TEST_ROOT` affects debug builds only and does not redirect release data.
 
-## Actualizar y desinstalar
+## Update and uninstall
 
-Antes de instalar una versión posterior, cierra la aplicación y conserva una copia de la biblioteca y de `backups`. El piloto 0.0.1 no acredita migración desde una versión anterior. Instala una versión posterior compatible solo cuando sus notas indiquen la versión de origen y su prueba de migración.
+Before installing a later version, close the app and keep a copy of the library and `backups`. Pilot 0.0.1 establishes no migration from an earlier version. Install a compatible later version only when its notes identify the source version and migration test.
 
-Para desinstalar, usa **Configuración de Windows → Aplicaciones → Aplicaciones instaladas** y selecciona Research Workbench. La política esperada es retirar binarios y accesos conservando biblioteca, copias de seguridad y logs. La conservación debe confirmarse mediante la prueba instalada antes de confiar en ella.
+To uninstall, use **Windows Settings → Apps → Installed apps** and select Research Workbench. Expected policy removes binaries and shortcuts while retaining the library, backups and logs. Confirm retention through installed testing before relying on it.
 
-## Verificación
+## Verification
 
-El estado observado del instalador y de las pruebas está en [`docs/verification/installed-pilot.md`](verification/installed-pilot.md). No se debe interpretar la generación de un setup como verificación de instalación limpia, funcionamiento offline, actualización ni conservación de datos.
+Recorded installer/test status is in [installed-pilot.md](verification/installed-pilot.md). Generating a setup does not prove clean installation, offline operation, upgrade or data preservation.

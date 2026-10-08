@@ -1,51 +1,51 @@
-# Dominio de Research Workbench
+# Research Workbench Domain
 
-**Estado: baseline de ejecución v0.2, adoptada el 1 de octubre de 2026.** Este documento fija el lenguaje ubicuo de la baseline, límites e invariantes para contrastar con `ARCHITECTURE.md`, `DATA.md`, `CONTRACTS.md` y los SPECs antes de implementar. Las reglas marcadas como propuesta concretan decisiones que la especificación deja abiertas.
+**Status: v0.2 execution baseline, adopted on 1 October 2026.** This document defines the baseline's ubiquitous language, boundaries, and invariants for comparison with `ARCHITECTURE.md`, `DATA.md`, `CONTRACTS.md`, and the SPECs. Rules marked as proposals resolve decisions left open by the specification.
 
-## Alcance y versiones
+## Scope and Versions
 
-- **Piloto 0.0.1:** biblioteca local, importación y lectura de PDF, metadatos, reanudación, archive/restore y ciclo de vida del desktop. No demuestra PRE–P2 ni equivale a v0.1.
-- **v0.1:** flujo manual PRE–P2 completo, captura tipada, conceptos globales, relaciones y procedencia, gates, búsqueda, export y backup/restore verificados.
-- **Posterior:** P3, P4, reglas automatizadas y ayuda de IA; no alteran retrospectivamente el significado de datos guardados.
+- **Pilot 0.0.1:** local library, PDF import and reading, metadata, resume, archive/restore, and desktop lifecycle. It does not demonstrate PRE–P2 and is not equivalent to v0.1.
+- **v0.1:** complete manual PRE–P2 workflow, typed capture, global concepts, relations and provenance, gates, search, export, and verified backup/restore.
+- **Later:** P3, P4, automated rules, and AI assistance; these do not retroactively change the meaning of saved data.
 
-Los nombres de entidades y estados en inglés son claves estables de dominio/wire. La UI presenta etiquetas en español. SQLite es autoridad; PDF y otros binarios viven en biblioteca; índices y exports son derivados.
+Entity and state names in English are stable domain/wire keys. The UI currently presents Spanish labels; the user's 8 October 2026 decision changes the presentation language to English without changing these keys. SQLite is authoritative; PDFs and other binaries live in the library; indexes and exports are derived.
 
-## Lenguaje ubicuo
+## Ubiquitous Language
 
-| Término | Significado |
+| Term | Meaning |
 |---|---|
-| Paper | Fuente bibliográfica y unidad de lectura; conserva metadatos, documentos y lifecycle. |
-| Document | Versión concreta de un archivo fuente administrado, identificada por UUID y SHA-256. Los anclajes apuntan al Document, nunca solo al Paper. |
-| Phase | Contrato versionado de trabajo (PRE, P1, P2, P3, P4) asociado a un Paper. No es el lifecycle editorial del Paper. |
-| PhaseAnswer | Respuesta tipada a una pregunta/required output de una Phase. UNKNOWN y NOT_APPLICABLE son decisiones explícitas, no valores vacíos. |
-| KnowledgeItem | Unidad semántica con UUID, type, contenido, origin, lifecycle y confidence. |
-| Concept | KnowledgeItem global reutilizable entre Papers; no se duplica automáticamente por fuente. |
-| Relation | Enlace dirigido y tipado entre KnowledgeItems, con origen/contexto propios. |
-| Provenance | Rastro hacia un Document y localizador concreto o explícitamente pendiente. No implica que una afirmación sea verdadera. |
-| Gate | Evaluación reproducible de salidas de una fase. Mide completitud declarada, no verdad científica. |
-| Revision | Contador optimista del agregado afectado; se incrementa en cada mutación confirmada. |
-| Archive | Retirada reversible de vistas activas, preservando identidad, contenido y enlaces. |
-| Trash | Estado recuperable de retirada antes de una eventual eliminación; la eliminación física no está en el piloto ni en el contrato de v0.1. |
+| Paper | Bibliographic source and unit of reading; owns metadata, documents, and lifecycle. |
+| Document | A specific version of a managed source file, identified by UUID and SHA-256. Anchors point to the Document, never only to the Paper. |
+| Phase | A versioned work contract (PRE, P1, P2, P3, P4) associated with a Paper. It is not the Paper's editorial lifecycle. |
+| PhaseAnswer | Typed answer to a question or required output of a Phase. UNKNOWN and NOT_APPLICABLE are explicit decisions, not empty values. |
+| KnowledgeItem | Semantic unit with UUID, type, content, origin, lifecycle, and confidence. |
+| Concept | A KnowledgeItem shared across Papers and reusable globally; it is not automatically duplicated per source. |
+| Relation | Directed, typed link between KnowledgeItems, with its own origin and context. |
+| Provenance | Trail to a Document and a concrete or explicitly pending locator. It does not imply that a claim is true. |
+| Gate | Reproducible evaluation of a phase's outputs. It measures declared completeness, not scientific truth. |
+| Revision | Optimistic counter for the affected aggregate, incremented on every committed mutation. |
+| Archive | Reversible removal from active views while preserving identity, content, and links. |
+| Trash | Recoverable removal state before possible future deletion. Physical deletion is not part of the pilot or v0.1 contract. |
 
-## Límites de agregado y consistencia
+## Aggregate Boundaries and Consistency
 
-No son microservicios: estos límites organizan validación dentro del monolito. Propuesta operativa: un actor dedicado serializa comandos sobre una única conexión SQLite de escritura. Commands y queries son operaciones lógicas separadas, pero todos los cambios cruzados entre módulos usan el mismo `UnitOfWork` y una sola transacción/conexión; no abrir una transacción por módulo.
+These are not microservices; the boundaries organize validation inside the monolith. Operational proposal: a dedicated actor serializes commands over one SQLite write connection. Commands and queries are logically separate, but cross-module changes use the same `UnitOfWork` and a single transaction/connection; do not open a transaction per module.
 
-| Agregado | Raíz y propiedad | Invariantes y transacción |
+| Aggregate | Root and ownership | Invariants and transaction |
 |---|---|---|
-| Paper | Paper | Metadatos, autores ordenados, venue, lifecycle y referencias a documentos/procesamiento; PhaseRecord posee sus respuestas y reglas propias. Crear/importar paper y autores/documento es una operación coordinada; no hay éxito visible hasta commit. Archive/restore preserva IDs y dependencias. |
-| Document | Document | Hash inmutable por versión. La ruta relativa queda dentro de la raíz administrada. Sustituir archivo crea otra versión; no cambia silenciosamente anclajes existentes. |
-| PhaseRecord | (paper_id, phase_code) | Versión de definición fijada al inicializar processing; respuestas e historial tienen revision. Gate de avance se recalcula bajo la misma transacción que avanza. Editar fase anterior conserva lo posterior y lo marca NEEDS_REVIEW si cambió una salida que afecta el gate. |
-| KnowledgeItem | KnowledgeItem | UUID global. Subtipo/extensión coherente con `type_code`. Captura multi tabla e hipervínculos se confirman juntos. Archivar un item compartido no lo borra ni destruye procedencia. |
-| Concept | KnowledgeItem de tipo `concept` | Nombre preferido y alias normalizados para sugerir búsqueda, no para probar equivalencia. Reutilización siempre seleccionada por la persona; cambiar nombre preserva UUID. |
-| Relation | Relation | Extremos existentes, tipos compatibles, sin autoenlace; unicidad semántica conserva contextos distintos. Procedencia de la relación se guarda junto con ella. |
-| Provenance | Provenance | Pertenece a un Document y guarda el hash visto al capturar. Cita literal y texto interpretativo permanecen separados. Un hash distinto hace locator `STALE`, no lo reescribe. |
+| Paper | Paper | Metadata, ordered authors, venue, lifecycle, and references to documents/processing; `PhaseRecord` owns its answers and rules. Creating/importing a Paper together with authors/document is coordinated; success is not visible until commit. Archive/restore preserves IDs and dependencies. |
+| Document | Document | Hash is immutable per version. The relative path stays within the managed root. Replacing a file creates a new version; existing anchors are not silently changed. |
+| PhaseRecord | (`paper_id`, `phase_code`) | Definition version is pinned when processing is initialized; answers and history have a revision. The advance gate is recalculated in the same transaction as the advance. Editing an earlier phase preserves later phases and marks them NEEDS_REVIEW if a changed output affects their gate. |
+| KnowledgeItem | KnowledgeItem | Globally unique UUID. Subtype/extension agrees with `type_code`. Multi-table capture and hyperlinks are committed together. Archiving a shared item does not delete it or destroy provenance. |
+| Concept | KnowledgeItem of type `concept` | Preferred name and normalized aliases help suggest searches; they do not prove equivalence. A person always chooses reuse; renaming preserves the UUID. |
+| Relation | Relation | Endpoints exist and types are compatible; no self-link. Semantic uniqueness preserves distinct contexts. Relation provenance is stored with the relation. |
+| Provenance | Provenance | Belongs to a Document and stores the hash observed at capture. Literal quotation and interpretive text remain separate. A different hash makes the locator `STALE`; it is not rewritten. |
 
-Las operaciones que atraviesan SQLite y filesystem usan una saga local recuperable, no una falsa transacción atómica: intención durable, staging en el mismo volumen, hash verificado, promoción, commit, y reconciliación idempotente al arrancar. Un archivo ambiguo no se borra automáticamente.
+Operations spanning SQLite and the filesystem use a recoverable local saga, not a pretend atomic transaction: durable intent, staging on the same volume, verified hash, promotion, commit, and idempotent reconciliation at startup. An ambiguous file is not automatically deleted.
 
-## Enumeraciones canónicas
+## Canonical Enums
 
-Se persisten los siguientes valores exactos; presentación y traducción no modifican las claves:
+The following exact values are persisted; presentation and translation do not change these keys:
 
 ```text
 PaperLifecycle = NEW | ACTIVE | COMPLETED | ARCHIVED | TRASHED
@@ -61,90 +61,88 @@ Relevance = sufficient | use_with_caution | weak_for_my_purpose
 ReadingDecision = continue | light_read | archive
 ```
 
-**Estado editorial:** `COMPLETED` solo se asigna cuando el workflow completo hasta P4 esté implementado y satisfecho. En v0.1, completar P2 no cambia el paper a COMPLETED; la UI expresa “P2 completada” o “revisión inicial completa”. No representa certeza científica. Si el paper se archiva desde NEW/ACTIVE/COMPLETED, guardar `archived_from_lifecycle`; restore vuelve a ese estado. `TRASHED` es estado reservado para el futuro; no exponerlo en el piloto ni v0.1.
+**Editorial status:** `COMPLETED` is assigned only when the complete workflow through P4 is implemented and satisfied. In v0.1, completing P2 does not change the Paper to COMPLETED; the UI describes completed P2 or the complete initial review. This does not represent scientific certainty. When a Paper is archived from NEW/ACTIVE/COMPLETED, save `archived_from_lifecycle`; restore returns it to that state. `TRASHED` is reserved for the future and must not be exposed in the pilot or v0.1.
 
-## Fases operativas y gates
+## Operational Phases and Gates
 
-Las definiciones incluyen `code`, `version`, `objective`, `key_questions`, `do_items`, `dont_items`, `considerations`, `required_outputs` y `completion_rules`. Los payloads canónicos v1 están en [phase-definitions/](phase-definitions/); cada Paper fija PRE/P1/P2 al inicializar processing. Son inmutables y pueden embeberse al compilar. [WORKFLOW_GATES.md](WORKFLOW_GATES.md), ADR-017, fija resoluciones, reglas por salida, habilitación, proyecciones, snapshots y revisiones sin alterar el wire.
+Definitions include `code`, `version`, `objective`, `key_questions`, `do_items`, `dont_items`, `considerations`, `required_outputs`, and `completion_rules`. The canonical v1 payloads are in [phase-definitions/](phase-definitions/); each Paper pins PRE/P1/P2 when processing is initialized. They are immutable and may be embedded at compile time. [WORKFLOW_GATES.md](WORKFLOW_GATES.md), ADR-017, specifies resolutions, per-output rules, scoring, projections, snapshots, and review without changing the wire contract.
 
-Regla común: salida requerida procesada según allowedResolutions. ANSWERED textual exige contenido; UNKNOWN/NOT_APPLICABLE exige explicación no vacía sin duplicarla en answerText. PRE.review_type, P1.relevance_decision y P2.p3_candidates_or_justification se procesan por estructura válida sin prosa redundante; PENDING/null puede guardar una respuesta pendiente y nunca cierra gate. No hay puntuación epistemológica ni cuotas. Formas exactas, ausencia justificada y alternativa cerrada P2 por key en WORKFLOW_GATES.
+General rule: a required output is processed according to `allowedResolutions`. ANSWERED text requires content; UNKNOWN/NOT_APPLICABLE requires a non-empty explanation and must not duplicate it in `answerText`. PRE `review_type`, P1 `relevance_decision`, and P2 `p3_candidates_or_justification` are processed through valid structure without redundant prose. PENDING/null may be saved as an outstanding response but never closes a gate. There is no epistemic score or quota. Exact form behavior, justified absence, and the closed P2 alternative for each key are defined in WORKFLOW_GATES.
 
-**Invalidación determinista:** un cambio real en `answerText`, `structuredValue`, `resolution` o `explanation` de una fase `COMPLETED` la cambia a `NEEDS_REVIEW`, aunque siga pasando el gate; requiere `advancePhase` para volver a completarla. Fases posteriores instanciadas que no estén `NOT_STARTED` también pasan a `NEEDS_REVIEW`, preservando datos. Captura/edición de item, asociación de concepto, cambio de relación, procedencia o candidatura P3 que modifique el snapshot de P2 completada cambia P2 a `NEEDS_REVIEW`. Un no-op con mismo valor canónico no invalida. El snapshot aceptado al completar contiene definición versionada, respuestas normalizadas y proyección estable de salidas/entidades requeridas; el hash usa serialización canónica ordenada.
+**Deterministic invalidation:** a real change to `answerText`, `structuredValue`, `resolution`, or `explanation` in a COMPLETED phase changes it to NEEDS_REVIEW, even if its gate still passes; `advancePhase` completes it again. A change to a NOT_STARTED phase also moves it to NEEDS_REVIEW while preserving its data. An edit to an item, concept association, relation, provenance, or P3 candidacy that changes the completed P2 snapshot moves P2 to NEEDS_REVIEW. A no-op with the same canonical value does not invalidate. The accepted completion snapshot contains the versioned definition, normalized answers, and stable projection of required outputs/entities; its hash uses ordered canonical serialization.
 
-### PRE — contexto previo
+### PRE — Prior Context
 
-Salidas requeridas PRE visibles: `purpose`, `uncertainty_target`, `baseline`, `expected_outcome`, `desired_depth`, `review_type`. Esta sexta respuesta confirma el metadato Paper.reviewType con `{reviewType: ReviewType}`: tipos conocidos ANSWERED; unknown UNKNOWN+explanation. El gate compara captura y metadato actual; import default no equivale a procesado ni la respuesta edita bibliografía. También requiere título no vacío y Document vigente ACTIVE disponible. Las cinco preguntas previas conservan su significado; no inferir conclusiones del título.
+PRE's required visible outputs are `purpose`, `uncertainty_target`, `baseline`, `expected_outcome`, `desired_depth`, and `review_type`. The sixth response confirms the Paper's `reviewType` metadata using `{reviewType: ReviewType}`: known types resolve to ANSWERED; unknown resolves to UNKNOWN plus an explanation. The gate compares the current capture with metadata; an import default is not processing, and the answer does not edit the bibliography. The gate also requires a non-empty title and an existing ACTIVE Document. The five preceding questions retain their meaning; do not infer conclusions from the title.
 
-Sólo advance PRE exitoso acepta su snapshot y cambia NEW→ACTIVE en la misma UoW. Habilitar P1 hacia delante requiere PRE COMPLETED, snapshot aceptado y gate vigente satisfecho; habilitar P2 requiere cadena aceptada vigente y P1 readingDecision=continue. Touch no acepta prerequisitos. Consulta de fases ya iniciadas conserva datos sin aceptar/completar implícitamente. Todas las fases observan disponibilidad documental viva según WORKFLOW_GATES.
+Only a successful PRE advance accepts its snapshot and changes NEW→ACTIVE in the same `UnitOfWork`. Enabling P1 requires PRE COMPLETED, an accepted snapshot, and a passing gate. Enabling P2 requires an accepted chain and P1 `readingDecision = continue`. Touching or saving does not implicitly accept or complete a phase. All phases observe live document availability as defined in WORKFLOW_GATES.
 
-### P1 — orientación
+### P1 — Orientation
 
-Salidas requeridas P1: `scope`, `out_of_scope`, `review_type`, `literature_cutoff`, `core_message`, `relevance_decision`; `field_organization` opcional. P1.review_type caracteriza textualmente el enfoque/metodología según la fuente; no es segundo editor del metadato confirmado en PRE. Literatura/metodología no declaradas se registran UNKNOWN explicado donde lo permite la definición, sin inventarlas.
+P1 required outputs: `scope`, `out_of_scope`, `review_type`, `literature_cutoff`, `core_message`, and `relevance_decision`; `field_organization` is optional. P1 `review_type` characterizes the approach/methodology according to the source; it is not a second editor for the metadata confirmed in PRE. Unstated literature/methodology is recorded as explained UNKNOWN where the definition allows; do not invent it.
 
-`relevance_decision` combina valoración (`sufficient`, `use_with_caution`, `weak_for_my_purpose`) y decisión (`continue`, `light_read`, `archive`). ANSWERED requiere ambos enums; UNKNOWN/NA no inventa una rama. Sólo continue aceptado habilita P2. Light_read completa P1, active P1, Paper ACTIVE, nextPhase=null. Archive sólo en advance completa P1 y archiva Paper atómicamente, conserva lifecycle anterior/respuestas y active P1, nextPhase=null. P2 nunca iniciada queda NOT_STARTED; P2 previa conserva datos/NEEDS_REVIEW. Ninguna decisión completa todo el workflow.
+`relevance_decision` combines an assessment (`sufficient`, `use_with_caution`, `weak_for_my_purpose`) and a decision (`continue`, `light_read`, `archive`). ANSWERED requires both enums; UNKNOWN/NOT_APPLICABLE do not invent a branch. Only `continue` enables P2. `light_read` completes P1, leaves P1 active, keeps the Paper ACTIVE, and sets `nextPhase = null`. `archive` is applied only by the full P1 advance and archives the Paper atomically, preserving its previous lifecycle, answers, and active P1; `nextPhase = null`. P2, if never started, remains NOT_STARTED; if previously started, its data is preserved and it becomes NEEDS_REVIEW. None of these decisions completes the entire workflow.
 
-### P2 — modelo conceptual
+### P2 — Conceptual Model
 
-Salidas P2 canónicas: `main_questions_processed`, `field_synthesis`, `relevant_concepts_reviewed`, `meaningful_relations_reviewed`, `contradictions_reviewed`, `references_classified`, `p3_candidates_or_justification`. Preguntas se relacionan con PRE. Cada salida enlaza entidades/relaciones consultables; síntesis se conserva como Insight. Arrays vacíos requieren justificación explícita de ausencia, sin mínimos arbitrarios. UNKNOWN/NA sólo donde la definición lo permite. Mapping por key y proyección persistida exactos en WORKFLOW_GATES; un checkbox narrativo no sustituye artefactos.
+Canonical P2 outputs: `main_questions_processed`, `field_synthesis`, `relevant_concepts_reviewed`, `meaningful_relations_reviewed`, `contradictions_reviewed`, `references_classified`, and `p3_candidates_or_justification`. Questions are related to PRE. Each output links to queryable entities/relations; synthesis is retained as an Insight. Empty arrays require an explicit justification of absence, without arbitrary minimum counts. UNKNOWN/NOT_APPLICABLE are allowed only where the definition permits. The exact key mapping and persistent projection are defined in WORKFLOW_GATES; a narrative checkbox does not replace artifacts.
 
-Completar P2 procesa el mapa manual y cola P3 sin validar afirmaciones. Asociaciones paper_items gobiernan selección/priority/rationale de Claims/Questions. La única justificación de cero candidatos reside en PhaseAnswer(P2,p3_candidates_or_justification).structuredValue.noCandidatesJustification; candidates/count es proyección comprobada. setP3Candidate y savePhaseAnswer de ausencia operan sobre esa fuente en la misma UoW; un cambio de proyección renueva answer.revision y clock P2. P3 workspace puede estar deshabilitado. Gate P2 real/aceptación final espera todas las capacidades T06/T07; ausencia de resolutor es UnsupportedCapability.
+Completing P2 processes the manual map and P3 queue; it does not validate claims or the priority/rationale of Claims/Questions. The only justification for zero candidates is `PhaseAnswer(P2, p3_candidates_or_justification).structuredValue.noCandidatesJustification`; candidates/count are a proven projection. `setP3Candidate` and saving an absence answer operate on that source in the same `UnitOfWork`; a changed projection renews the answer revision and P2 clock. The P3 workspace may be disabled. Final acceptance requires all T06/T07 capabilities; without a resolver, return UnsupportedCapability.
 
-P3 y P4 tienen código reservado, pero no gate ejecutable en v0.1. No marcar Paper COMPLETED por alcanzar P2 si la definición de producto aún exige otras fases operativas; en el alcance v0.1 la UI debe nombrar “P2 completada / revisión inicial completa”.
+P3 and P4 have reserved codes but are not executable in v0.1. Do not mark a Paper COMPLETED after P2 while the product definition still requires other operational phases; within v0.1 the UI should describe completed P2 / complete initial review.
 
-## KnowledgeItem, origen, confianza y procedencia
+## Knowledge
 
-Tipos core del catálogo: `concept`, `claim`, `evidence`, `question`, `gap`, `assumption`, `condition`, `limitation`, `method`, `example`, `insight`, `reference`. El catálogo admite los tipos, pero los formularios pueden desplegarse gradualmente. Dataset/Metric/Task/System y domain packs quedan posteriores.
+Core type catalog: `concept`, `claim`, `evidence`, `question`, `gap`, `assumption`, `condition`, `limitation`, `method`, `example`, `insight`, `reference`. The catalog supports these types, but forms may be deployed gradually. Metric/Task/System and domain packs are deferred.
 
-- `literature`: el contenido describe lo que la fuente expresa. Para presentarlo como trazable, exigir Provenance `LOCATED`; capturas en borrador pueden persistir sin fuente (`NONE`, pendiente de atribuir) o con fuente sin anclaje (`PENDING`), visibles como pendientes.
-- `researcher_interpretation`: interpretación del investigador; no presentarla como cita textual. Puede enlazar a la fuente que la motivó.
-- `researcher_hypothesis`: hipótesis propia, explícita y atribuida al investigador; puede carecer de cita, pero el contexto/razón se registra.
-- Quote/snippet es literal y separado de body/interpretation. `page_index` es página física desde 1; `page_label` puede diferir. Hash capturado igual al documento actual puede marcar LOCATED; cambiar archivo/hash marca STALE.
-- Confidence inicial es `requires_validation`. Solo una decisión humana explícita puede cambiarla. La app no la calcula contando citas, relaciones, coincidencias de texto o estados de fase.
-- Evidencia describe fragmento o resultado inspeccionado; su estado no se confunde con confianza de Claim. DOI y cita secundaria por sí solos no son evidencia evaluada.
+- `literature`: content describes what the source states. To present it as traceable, require Provenance `LOCATED`; draft captures may be saved without a source (`NONE`, to be attributed) or with a source but no anchor (`PENDING`), visibly marked as pending.
+- `researcher_interpretation`: the researcher's interpretation; do not present it as a verbatim quotation. It may link to the source that motivated it.
+- `researcher_hypothesis`: an explicit hypothesis attributed to the researcher; it may lack a citation, but its context/reason is recorded.
+- Quote/snippet is literal and separate from body/interpretation. `page_index` is the physical page number starting at 1; `page_label` may differ. A matching captured/current document hash may mark a locator LOCATED; changing the file/hash marks it STALE.
+- Initial Confidence is `requires_validation`. Only an explicit human decision may change it. The app does not calculate confidence by counting quotations, relations, text matches, or phase states.
+- Evidence describes an inspected passage or result; its state is not confused with a Claim's confidence. A DOI or secondary citation alone is not evaluated evidence.
 
-## Relaciones permitidas en v0.1
+## Relations Allowed in v0.1
 
-La relación siempre guarda `source`, `target`, `type`, `context`, `origin`, `confidence`, fechas y procedencia separada. Propuesta de allowlist inicial para formularios/validación:
+Every relation stores `source`, `target`, `type`, `context`, `origin`, `confidence`, dates, and separate provenance. Proposed initial allowlist for forms/validation:
 
-| type | source → target permitido | Simétrica |
+| type | permitted source → target | Symmetric |
 |---|---|---|
 | supports | evidence → claim | no |
-| contradicts | claim ↔ claim | sí, normalizar extremos |
+| contradicts | claim ↔ claim | yes, normalize endpoints |
 | extends | method → method; claim → claim | no |
-| causes | claim → claim o concept | no |
+| causes | claim → claim or concept | no |
 | requires | method → condition | no |
-| depends_on | method → concept o method | no |
+| depends_on | method → concept or method | no |
 | works_when | method → condition | no |
 | fails_when | method → condition | no |
-| compares_with | method ↔ method | sí |
+| compares_with | method ↔ method | yes |
 | part_of | concept → concept | no |
-| similar_to | concept ↔ concept | sí |
-| limits | limitation → claim o method | no |
+| similar_to | concept ↔ concept | yes |
+| limits | limitation → claim or method | no |
 | improves | method → method | no |
 
-La allowlist v0.1 habilita exactamente estos 13 tipos y combinaciones; el catálogo persistido y `RelationType` usan la misma versión. `causes`/`improves` requieren contexto y origen explícitos; elegirlos no demuestra causalidad o mejora. Toda relación admite contexto; contextos diferentes no se deduplican. No aceptar extremos fuera de la matriz. Relaciones dirigidas conservan orden; las simétricas lo normalizan.
+The v0.1 allowlist enables exactly these 13 types and combinations; the persisted catalog and `RelationType` use the same version. `causes`/`improves` require explicit context and origin; choosing them does not prove causation or improvement. Every relation allows context; different contexts are not deduplicated. Reject endpoints outside the matrix. Directed relations preserve endpoint order; symmetric relations normalize it.
 
-## Archive, restore, delete y merge
+## Archive, Restore, Delete, and Merge
 
-- **Paper archive/restore:** reversible; preserva documentos, metadatos, phases, KnowledgeItems y procedencia. Archivar no archiva contenido global ni borra dependencias compartidas.
-- **Item/Concept archive/restore:** reversible; se excluye de listas activas por defecto, pero enlaces históricos continúan visibles y puede restaurarse.
-- **Delete Paper/KnowledgeItem/Concept:** piloto 0.0.1 y v0.1: no hard delete ni estado TRASHED expuesto. Paper y KnowledgeItem/Concept usan archive/restore reversible; relaciones y procedencia quedan conservadas. `TRASHED` queda reservado a una posible papelera posterior.
-- **Merge Concept:** fuera de piloto 0.0.1 y v0.1; requiere ADR de alcance posterior a v0.1. Si se aprueba más adelante: operación explícita con preview de enlaces/alias/relaciones afectados, destino elegido y confirmación. La transacción reasigna referencias seguras, deduplica solo relaciones equivalentes conservando contexto, marca origen como redirigido al destino y registra auditoría. UUID de origen permanece; rechazar ciclos, autorrelaciones o colisión ambigua. Si no se puede preservar semántica/procedencia, rechazar.
+- **Paper archive/restore:** reversible; preserves documents, metadata, phases, KnowledgeItems, and provenance. Archiving a Paper does not archive global content or delete shared dependencies.
+- **Item/Concept archive/restore:** reversible; excluded from active lists by default, while historical links remain visible and the item can be restored.
+- **Delete Paper/KnowledgeItem/Concept:** in pilot 0.0.1 and v0.1, no hard delete and no exposed TRASHED state. Paper and KnowledgeItem/Concept use reversible archive/restore; relations and provenance are retained. `TRASHED` is reserved for a possible future trash feature.
+- **Merge Concept:** outside pilot 0.0.1 and v0.1; requires an ADR for post-v0.1 scope. If approved later, it is an explicit operation with a preview of affected links/aliases/relations, a chosen destination, and confirmation. The transaction reassigns safe references, deduplicates only equivalent relations while preserving context, marks the source as redirected to the destination, and records an audit. The source UUID remains; reject cycles, self-relations, or ambiguous collisions. Reject if semantics/provenance cannot be preserved.
 
-## Fuera del dominio v0.1
+## Outside the v0.1 Domain
 
-Usuarios/roles, sincronización, API remota, microservicios, OCR, análisis automático, LLM/agentes, RAG/embeddings, P3/P4 operativos, score de confianza automático, editor genérico de ontología y grafo visual complejo. Las reglas futuras solo informan sobre carencias del registro; no convierten falta de cobertura personal en gap de toda la literatura.
+Users/roles, synchronization, remote API, microservices, OCR, automatic analysis, LLMs/agents, RAG/embeddings, operational P3/P4, automatic confidence score, generic ontology editor, and complex visual graph. Future rules report only gaps in the record; they do not turn an individual's lack of coverage into a gap in all literature.
 
-COMPLETED reservado se conserva en upgrade/get/lectura y Library archive/restore, también ARCHIVED desde COMPLETED. Transiciones Workflow incompatibles devuelven UnsupportedCapability sin efectos; no conversión silenciosa ni migración especial. Upgrade no cambia metadatos/lifecycle ni restaura archivados; borradores PRE NEW siguen editables y sólo advance PRE los activa editorialmente.
+Reserved COMPLETED is preserved in upgrade/get/read and Library archive/restore, including ARCHIVED from COMPLETED. Incompatible Workflow transitions return UnsupportedCapability without side effects; there is no silent conversion or special migration. Upgrade does not change metadata/lifecycle or restore archived Papers; PRE NEW drafts remain editable, and only PRE advance activates them editorially.
 
+ADR-020 editing clarification: saving does not start a phase; NOT_STARTED rejects response writes, while an initiated phase may be edited without moving the active context. Replay, CAS, clocks, and invalidation are governed by WORKFLOW_GATES.
 
+## Shared Capture Clarifications (ADR-022)
 
-Precisión de edición ADR-020: guardar no inicia una fase; NOT_STARTED rechaza escrituras de respuesta, mientras una fase iniciada puede editarse sin mover el contexto activo. Replay, CAS, clocks e invalidación se rigen por WORKFLOW_GATES.
+Concept preserves its canonical name/definition and UUID; Knowledge modifies only its confidence, while ConceptApi controls the rest. `Insight.affectedConceptIds` classifies an explicit subset of linked concepts: removing that classification does not remove the link, and `linkConcept` does not add the classification. Homonyms are not merged. Editing/linking from an archived parent requires restore; new associations to an archived Concept are rejected, while historical associations still resolve. Repeating an existing association from an active parent is a no-op even when the destination has been archived.
 
-## Precisiones de captura compartida (ADR-022)
+The P2 projection starts from `paper_items` and follows `item_concepts` transitively, deduplicating by UUID to terminate cycles. It includes only relations whose two endpoints have already been reached; relations do not expand reachability. Archived items remain in history/projection. Reverse invalidation uses the same closure before and after a change. Editing an artifact renews the P2 clock when appropriate; a candidate `PhaseAnswer` changes only when selection/count/justification changes, not when the body is edited without changing that projection.
 
-Concept conserva nombre/definición canónicos y UUID; Knowledge sólo modifica su confidence, ConceptApi controla el resto. Insight.affectedConceptIds clasifica un subset explícito de conceptos vinculados: eliminar esa clasificación no elimina vínculo ni linkConcept la añade. No se fusionan homónimos. Edición/enlace desde padre archivado exige restore; nuevas asociaciones hacia Concept archivado se rechazan, asociaciones históricas resuelven. Repetir asociación existente desde padre activo es no-op aunque destino se haya archivado.
-
-La proyección P2 parte de paper_items y sigue item_concepts transitivamente, con deduplicación por UUID hasta terminar ciclos. Sólo incluye relaciones cuyos dos extremos ya están alcanzados; relaciones no expanden alcance. Archivados permanecen en historia/proyección. La invalidación inversa usa el mismo cierre antes/después. Una edición de artefacto renueva clock P2 cuando corresponde; PhaseAnswer candidata sólo cambia si cambia selección/count/justificación, no por editar body sin cambiar esa proyección.
-
-Procedencia sin source es NONE, no una fila ficticia. LOCATED es ubicación registrada conforme CONTRACTS, no cita verificada ni prueba de página física; T07 valida navegación. Editar locator conserva Document/hash y no elimina STALE; cambiar fuente requiere attach nuevo explícito. Firmas, restricciones completas y criterios en CONTRACTS y TASK05_PORTS.
+Provenance without a source is NONE, not a fabricated row. LOCATED means a locator is registered as specified in CONTRACTS; it is not a verified citation or proof of physical page. T07 validates navigation. Editing a locator preserves its Document/hash and does not clear STALE; changing source requires an explicit new attachment. Full signatures, constraints, and criteria are in CONTRACTS and TASK05_PORTS.

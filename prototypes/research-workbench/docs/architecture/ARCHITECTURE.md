@@ -1,171 +1,169 @@
-# Arquitectura de software
+# Software architecture
 
-Estado: baseline de ejecución v0.2, adoptada el 1 de octubre de 2026 · Alcance: piloto instalable 0.0.1 y producto v0.1.0.
+Status: implementation baseline v0.2, adopted on 1 October 2026 · Scope: installable pilot 0.0.1 and product v0.1.0.
 
-## 1. Forma del sistema
+## 1. System form
 
-Research Workbench es un **monolito modular local con arquitectura hexagonal pragmática**. Tauri aloja la ventana y el núcleo Rust. React presenta información y recoge intenciones; los servicios de aplicación coordinan casos de uso; el dominio decide reglas; adaptadores concretos acceden a SQLite, documentos y sistema operativo.
+Research Workbench is a **local modular monolith with pragmatic hexagonal architecture**. Tauri hosts the window and Rust core. React presents information and captures user intent; application services coordinate use cases; the domain enforces rules; concrete adapters access SQLite, documents, and the operating system.
 
-Los servicios son módulos internos del mismo programa. No son procesos desplegables, endpoints REST ni microservicios. Se permite una transacción común cuando un caso de uso modifica varios módulos, por ejemplo capturar una afirmación con procedencia o invalidar fases posteriores.
+Services are internal modules within the same program. They are not separately deployed processes, REST endpoints, or microservices. A use case may use one transaction when it changes several modules, for example when capturing a claim with provenance or invalidating later phases.
 
 ```mermaid
 flowchart TB
-  U[Investigador] --> UI[Ventana Tauri / React]
-  UI --> F[Features y hooks de aplicación]
-  F --> API[Puertos TypeScript / DTOs de contrato]
-  API --> IPC[Adaptador IPC y comandos Tauri]
-  IPC --> A[Casos de uso Rust]
-  A --> D[Dominio: invariantes y políticas]
-  A --> P[Puertos: repositorios / documentos / reloj / identidad]
-  P --> DB[Adaptador rusqlite / hilo DB]
-  P --> FS[Adaptador biblioteca / trabajos de archivos]
-  P --> OS[Diálogos y ciclo de vida Windows]
-  DB --> S[(SQLite canónico)]
-  FS --> PDF[PDF administrados]
-  IPC --> R[Protocolo research por documentId]
+  U[Researcher] --> UI[Tauri window / React]
+  UI --> F[Features and application hooks]
+  F --> API[TypeScript ports / contract DTOs]
+  API --> IPC[IPC adapter and Tauri commands]
+  IPC --> A[Rust use cases]
+  A --> D[Domain: invariants and policies]
+  A --> P[Ports: repositories / documents / clock / identity]
+  P --> DB[rusqlite adapter / DB thread]
+  P --> FS[Library adapter / file jobs]
+  P --> OS[Dialogs and Windows lifecycle]
+  DB --> S[(Canonical SQLite)]
+  FS --> PDF[Managed PDFs]
+  IPC --> R[research protocol by documentId]
   R --> PDF
 ```
 
-## 2. Frameworks y bibliotecas seleccionadas
+## 2. Selected frameworks and libraries
 
-| Área | Selección | Responsabilidad y frontera |
+| Area | Selection | Responsibility and boundary |
 |---|---|---|
-| Aplicación e instalador | Tauri 2, WebView2, NSIS | Ventana, IPC, diálogo nativo y bundle Windows x64 offline |
-| Presentación | React + TypeScript strict | Componentes, estado transitorio y modelos de vista tipados |
-| Construcción UI | Vite | Desarrollo y producción; assets locales en el bundle |
-| Sistema visual | Tailwind CSS y componentes shadcn/ui basados en Radix | Tokens comunes y controles accesibles; componentes incorporados al proyecto |
-| Formularios | React Hook Form + Zod | Validación de interacción y preservación de borradores; backend vuelve a validar |
-| Lectura | PDF.js | Render y selección; worker, fuentes y recursos necesarios empaquetados |
-| Dominio y aplicación | Rust stable MSVC | Entidades, políticas, casos de uso y gestión de operaciones |
-| Persistencia | SQLite + rusqlite con SQLite bundled y backup | SQL explícito, transacciones, backup consistente y FTS5 verificado |
-| Serialización | Serde + ts-rs | DTOs Rust canónicos y TypeScript generado; sin exponer entidades DB ni rutas arbitrarias |
-| Pruebas UI | Vitest + Testing Library | Interacciones, accesibilidad semántica y adaptadores de contrato |
-| Pruebas núcleo | cargo test, fmt y clippy | Reglas, repositorios reales, fallos y recuperación |
+| Application and installer | Tauri 2, WebView2, NSIS | Window, IPC, native dialog, and offline Windows x64 bundle |
+| Presentation | React + strict TypeScript | Components, transient state, and typed view models |
+| UI build | Vite | Development and production builds; local assets in the bundle |
+| Visual system | Tailwind CSS and shadcn/ui components based on Radix | Shared tokens and accessible controls; components are included in the project |
+| Forms | React Hook Form + Zod | Interaction validation and draft preservation; the backend validates again |
+| Reading | PDF.js | Rendering and selection; the worker, fonts, and required resources are packaged |
+| Domain and application | Stable Rust with MSVC | Entities, policies, use cases, and operation management |
+| Persistence | SQLite + rusqlite with bundled SQLite and backup support | Explicit SQL, transactions, consistent backups, and verified FTS5 |
+| Serialization | Serde + ts-rs | Canonical Rust DTOs and generated TypeScript; database entities and arbitrary paths are not exposed |
+| UI tests | Vitest + Testing Library | Interactions, semantic accessibility, and contract adapters |
+| Core tests | cargo test, fmt, and clippy | Rules, real repositories, failures, and recovery |
 
-Los detalles y fuentes actuales de los frameworks se recogen en ADRS. No se presupone que estén instalados o integrados. La disponibilidad de FTS5 se comprueba en la build de SQLite usada por el producto, no en la SQLite de otro programa.
+The current framework details and sources are collected in ADRS. The project does not assume that these frameworks are installed or integrated. FTS5 availability is checked in the SQLite build used by the product, not in another program's SQLite build.
 
-El cuerpo de conocimiento es texto plano UTF-8, formato plain_text versión 1; las citas literales son campos distintos. No se añade TipTap inicialmente. La navegación usa un estado ShellView tipado que distingue Home, Library, PaperWorkspace, Knowledge y Settings; sin routing de servidor. React useState/useReducer mantiene selecciones, diálogos y borradores. No se añade Zustand, Redux, TanStack Query ni un contenedor DI en la primera versión. Si la complejidad medida lo exige, se documentará la decisión antes de añadirlos.
+The knowledge body is UTF-8 plain text in plain_text version 1 format; literal citations are separate fields. TipTap is not included initially. Navigation uses a typed ShellView state with Home, Library, PaperWorkspace, Knowledge, and Settings; it does not use server-side routing. React useState/useReducer manages selections, dialogs, and drafts. Zustand, Redux, TanStack Query, and a DI container are not included in the first version. If measured complexity requires them, the decision will be documented before they are added.
 
-El caché inicial existe solo dentro del modelo de vista de cada feature. Una respuesta de mutación confirmada actualiza la vista y recarga consultas dependientes; no se duplica el almacén canónico en localStorage o IndexedDB. Los tests usan una implementación del mismo puerto que el adaptador Tauri. Las respuestas wire se validan en el adaptador con esquemas Zod tipados contra los DTO generados y fixtures de serialización; la validación de formularios no reemplaza esa frontera.
+The initial cache exists only in each feature's view model. A confirmed mutation response updates the view and reloads dependent queries; the canonical store is not duplicated in localStorage or IndexedDB. Tests use an implementation of the same port as the Tauri adapter. Wire responses are validated in the adapter with Zod schemas typed against the generated DTOs and serialization fixtures; form validation does not replace that boundary.
 
-## 3. Módulos y límites
+## 3. Modules and boundaries
 
-| Módulo | Posee | Depende de | No debe hacer |
+| Module | Owns | Depends on | Must not |
 |---|---|---|---|
-| desktop | Inicio/cierre, bloqueo de biblioteca, ventana y rutas | Puertos OS y servicios de recuperación | Aplicar gates o editar notas |
-| library | Paper, metadatos, asociación de documentos, importación | Repositorios, DocumentStore | Declarar evidencia validada por importar un PDF |
-| reader | Posición y acceso controlado al documento | Documento registrado y protocolo local | Leer rutas elegidas por JavaScript |
-| workflow | Definiciones versionadas, respuestas y evaluación de gates | Lecturas de biblioteca y conocimiento | Borrar contenido al volver atrás |
-| knowledge | Items, Concept y asociaciones | Procedencia y repositorios | Fusionar significados automáticamente |
-| relations | Extremos, contexto y semántica tipada | Catálogo y existencia/tipo de items | Interpretar una relación como prueba científica |
-| provenance | Localizadores y vínculo a versión documental | Documentos y hashes | Mezclar cita literal con interpretación |
-| search | Proyecciones FTS y consultas paginadas | SQLite y DTOs de resultados | Tener datos canónicos propios |
-| portability | Exportación, verificación de backups y restore | Snapshot, DocumentStore y coordinador de mantenimiento | Restaurar sobrescribiendo sin validación previa |
-| settings | Preferencias y biblioteca activa | Rutas OS y desktop | Cambiar biblioteca mientras hay escrituras activas |
+| desktop | Startup/shutdown, library lock, window, and routes | OS ports and recovery services | Apply gates or edit notes |
+| library | Paper, metadata, document association, and import | Repositories, DocumentStore | Declare evidence validated merely because a PDF was imported |
+| reader | Position and controlled document access | Registered document and local protocol | Read paths selected by JavaScript |
+| workflow | Versioned definitions, answers, and gate evaluation | Library readings and knowledge | Delete content when moving back |
+| knowledge | Items, Concept, and associations | Provenance and repositories | Merge meanings automatically |
+| relations | Endpoints, context, and typed semantics | Catalogue and item existence/type | Treat a relation as scientific proof |
+| provenance | Locators and links to document versions | Documents and hashes | Mix literal quotations with interpretation |
+| search | FTS projections and paginated queries | SQLite and result DTOs | Own canonical data |
+| portability | Export, backup verification, and restore | Snapshot, DocumentStore, and maintenance coordinator | Restore by overwriting without prior validation |
+| settings | Preferences and active library | OS paths and desktop | Change the library while writes are active |
 
-ValidationService y el workspace P3 no se implementan todavía. La selección de candidatos P3 pertenece al contexto de trabajo de P2; no habilita una evaluación crítica ficticia.
+ValidationService and the P3 workspace are not implemented yet. Selecting P3 candidates belongs to the P2 work context; it does not enable a fictitious critical assessment.
 
-Los módulos llaman a interfaces de aplicación declaradas. No importan adaptadores privados de otros módulos. Las consultas de infraestructura pueden hacer joins entre tablas para producir una vista; las escrituras siguen pasando por el caso de uso propietario de las invariantes.
+Modules call declared application interfaces. They do not import private adapters from other modules. Infrastructure queries may join tables to produce a view; writes still go through the use case that owns the invariants.
 
-## 4. Regla de dependencias y estructura futura
+## 4. Dependency rule and future structure
 
 ```text
 src/
-  app/                       # composición, ShellView, tokens y layout
-  shared/contracts/          # tipos generados y validación wire
-  shared/adapters/tauri/      # invoke y traducción de errores
-  features/library/          # vista, hook, formulario y tests de biblioteca
+  app/                       # composition, ShellView, tokens, and layout
+  shared/contracts/          # generated types and wire validation
+  shared/adapters/tauri/     # invoke and error translation
+  features/library/          # library view, hook, form, and tests
   features/reader/
   features/workflow/
   features/knowledge/
   features/settings/
 src-tauri/src/
-  lib.rs                     # composición; registro IPC y protocolo
-  domain/                    # tipos e invariantes sin Tauri ni rusqlite
-  application/               # casos de uso, puertos y unidad de trabajo
-  modules/                   # agrupación funcional de servicios
-  adapters/sqlite/            # repositorios y migraciones
-  adapters/documents/         # archivos, hash, staging, backup
-  adapters/windows/           # rutas, bloqueo y diálogos
-  transport/                 # DTOs, comandos y errores IPC
-  desktop/                   # arranque/cierre y coordinación de mantenimiento
-contracts/                   # fixtures wire y esquema generado verificable
-docs/architecture/           # esta base de diseño
+  lib.rs                     # composition; IPC and protocol registration
+  domain/                    # types and invariants without Tauri or rusqlite
+  application/               # use cases, ports, and unit of work
+  modules/                   # functional grouping of services
+  adapters/sqlite/           # repositories and migrations
+  adapters/documents/        # files, hashes, staging, backups
+  adapters/windows/          # paths, locking, and dialogs
+  transport/                 # DTOs, commands, and IPC errors
+  desktop/                   # startup/shutdown and maintenance coordination
+contracts/                   # wire fixtures and verifiable generated schema
+docs/architecture/           # this design baseline
 ```
 
-Este mapa sustituye la agrupación de archivos abreviada del plan anterior. Al redactar las tareas finales se concretan los nombres de archivos dentro de cada grupo sin alterar el contrato. No se crea todavía esta estructura en el proyecto.
+This map replaces the abbreviated file grouping in the previous plan. Final task definitions will specify filenames within each group without changing the contract. This structure has not yet been created in the project.
 
-Dominio depende solo de tipos de valor y bibliotecas puras necesarias. La capa de aplicación depende de dominio y puertos. Infraestructura implementa puertos. Transporte traduce DTOs a peticiones de aplicación. lib.rs compone las implementaciones concretas. No se permite importar invoke dentro de componentes ni exponer Connection, SQL, PathBuf o AppHandle a React.
+The domain depends only on required value types and pure libraries. The application layer depends on the domain and ports. Infrastructure implements the ports. Transport maps DTOs to application requests. lib.rs composes concrete implementations. Components must not import invoke, and Connection, SQL, PathBuf, or AppHandle must not be exposed to React.
 
-## 5. Patrones escogidos y uso concreto
+## 5. Selected patterns and concrete use
 
-| Patrón | Aplicación | Límite |
+| Pattern | Application | Boundary |
 |---|---|---|
-| DDD táctico | Paper, procesamiento, KnowledgeItem y Concept con invariantes explícitas | Lenguaje y aggregates; no framework DDD ni burocracia por entidad |
-| Puertos y adaptadores | Persistencia, archivos, reloj e identidad aislados para pruebas | Interfaces para fronteras reales; evitar traits genéricos sin consumidor |
-| Application Service / Use Case | Importar, capturar con procedencia, avanzar y restaurar | Comandos delgados; reglas de dominio reutilizables |
-| Repository | Consultar y persistir aggregates con control de revisión | SQL parametrizado; no repositorio CRUD genérico que salte invariantes |
-| Unit of Work | Una transacción por operación estructurada | Compartida por módulos afectados; no commit oculto por repositorio |
-| State Machine | Fases y operaciones de archivos con transiciones permitidas | Estados persistidos y tablas de transición, sin motor de workflow externo |
-| Specification / Policy | Gate puro sobre snapshot + definición versionada | Reglas conocidas y auditables; no scripts ejecutables en plantillas |
-| Optimistic concurrency | expectedRevision y actualización condicional | Rechazar edición obsoleta; no resolver conflictos con último escritor |
-| Adapter / Anti-corruption layer | DTOs IPC separados de tablas y presentación | Cambio de almacenamiento no cambia automáticamente contrato |
-| Command/query separation | Comandos mutan, queries devuelven DTOs | Mismo SQLite; no CQRS distribuido ni event sourcing |
-| Operación recuperable | Intento durable para import, backup/restore y cambios de raíz | Compensación verificable; no transacción ficticia SQLite+filesystem |
+| Tactical DDD | Paper, processing, KnowledgeItem, and Concept with explicit invariants | Domain language and aggregates; no DDD framework or entity-by-entity bureaucracy |
+| Ports and adapters | Persistence, files, clock, and identity isolated for tests | Interfaces at real boundaries; avoid generic traits with no consumers |
+| Application Service / Use Case | Import, capture with provenance, advance, and restore | Thin commands; reusable domain rules |
+| Repository | Query and persist aggregates with revision control | Parameterized SQL; no generic CRUD repository that bypasses invariants |
+| Unit of Work | One transaction per structured operation | Shared by affected modules; repositories do not hide commits |
+| State Machine | Phases and file operations with permitted transitions | Persisted states and transition tables; no external workflow engine |
+| Specification / Policy | Pure gate over a snapshot and versioned definition | Known, auditable rules; no executable scripts in templates |
+| Optimistic concurrency | expectedRevision and conditional update | Reject stale edits; do not resolve conflicts with last-writer-wins |
+| Adapter / Anti-corruption layer | IPC DTOs separate from tables and presentation | Storage changes do not automatically change the contract |
+| Command/query separation | Commands mutate; queries return DTOs | Same SQLite database; no distributed CQRS or event sourcing |
+| Recoverable operation | Durable intent for import, backup/restore, and root changes | Verifiable compensation; no fictitious SQLite-plus-filesystem transaction |
 
-Los eventos de auditoría se insertan en la misma transacción que el cambio. No se incorpora event bus; invalidación de vistas y marcas NEEDS_REVIEW se coordinan explícitamente. El historial es auditoría de estado, no la fuente desde la que reconstruir todo el sistema.
+Audit events are inserted in the same transaction as the change. No event bus is added; view invalidation and NEEDS_REVIEW flags are coordinated explicitly. History is an audit of state, not a source from which to rebuild the entire system.
 
-## 6. Ejecución, concurrencia y operaciones largas
+## 6. Execution, concurrency, and long-running operations
 
-Una conexión rusqlite pertenece a un hilo dedicado DB. Los comandos Tauri esperan respuestas de forma asíncrona; el hilo de ventana no hace SQL, hashing, render de PDF ni copias. La decisión evita compartir una Connection a través de llamadas concurrentes; las propiedades de Connection se documentan en la [referencia de rusqlite](https://docs.rs/rusqlite/latest/rusqlite/struct.Connection.html).
+A dedicated DB thread owns the rusqlite connection. Tauri commands await responses asynchronously; the window thread does not perform SQL, hashing, PDF rendering, or file copies. This avoids sharing a Connection across concurrent calls; Connection properties are documented in the [rusqlite reference](https://docs.rs/rusqlite/latest/rusqlite/struct.Connection.html).
 
-La cola DB tiene capacidad inicial 64 trabajos. Si no admite un trabajo, devuelve error recuperable de ocupación definido en CONTRACTS; no crece sin límite. Cada trabajo contiene una operación tipada y respuesta propia. Una transacción corta agrupa las escrituras del caso de uso. No se mantiene una transacción durante copia o hash de PDFs.
+The DB queue initially holds 64 jobs. If it cannot accept a job, it returns the recoverable busy error defined in CONTRACTS; the queue does not grow without limit. Each job carries a typed operation and its own response. A short transaction groups a use case's writes. A transaction is never held open while copying or hashing PDFs.
 
-Los trabajos de archivos usan ejecución bloqueante en background y tokens de operación. Tauri ofrece [spawn_blocking](https://docs.rs/tauri/latest/tauri/async_runtime/fn.spawn_blocking.html); el uso de un hilo DB y las políticas de cancelación son decisiones de este diseño. Cancelar solicita detenerse en un punto seguro; nunca se supone que abandonar una Promise revierta un commit.
+File jobs use blocking background execution and operation tokens. Tauri provides [spawn_blocking](https://docs.rs/tauri/latest/tauri/async_runtime/fn.spawn_blocking.html); using a DB thread and defining cancellation policies are decisions in this design. Cancellation requests a stop at a safe point; abandoning a Promise is never assumed to roll back a commit.
 
-Un coordinador de mantenimiento impide nuevas mutaciones mientras obtiene una instantánea, migra, restaura o cambia biblioteca. Antes drena operaciones aceptadas o las deja en un estado recuperable. Al salir, publica la nueva raíz y revisiones de forma coherente. Una segunda instancia no adquiere la biblioteca activa para escribir.
+A maintenance coordinator prevents new mutations while taking a snapshot, migrating, restoring, or changing the library. It first drains accepted operations or leaves them in a recoverable state. On exit, it publishes the new root and revisions consistently. A second instance cannot acquire the active library for writing.
 
-## 7. Recorridos entre módulos
+## 7. Cross-module flows
 
 ```mermaid
 sequenceDiagram
-  participant UI as Formulario
-  participant IPC as Transporte IPC
-  participant UC as Caso de uso
-  participant D as Dominio
-  participant DB as Hilo DB / Unit of Work
-  UI->>IPC: Captura tipada + localizador + revisión
-  IPC->>UC: Validar DTO y autorización de comando
-  UC->>DB: Cargar snapshot consistente
-  DB->>D: Comprobar tipos, origen y dependencias
-  D-->>DB: Cambios permitidos
-  DB->>DB: Item + procedencia + asociaciones + auditoría
+  participant UI as Form
+  participant IPC as IPC transport
+  participant UC as Use case
+  participant D as Domain
+  participant DB as DB thread / Unit of Work
+  UI->>IPC: Typed capture + locator + revision
+  IPC->>UC: Validate DTO and command authorization
+  UC->>DB: Load consistent snapshot
+  DB->>D: Check types, source, and dependencies
+  D-->>DB: Permitted changes
+  DB->>DB: Item + provenance + associations + audit
   DB->>DB: COMMIT
-  DB-->>IPC: DTO persistido y revisiones
-  IPC-->>UI: Confirmación
-  UI->>UI: Mostrar Guardado y recargar vistas dependientes
+  DB-->>IPC: Persisted DTO and revisions
+  IPC-->>UI: Confirmation
+  UI->>UI: Show Saved and reload dependent views
 ```
 
-Avanzar fase sigue la misma regla: cargar definición fijada y estado actual, reevaluar gate dentro de la operación, confirmar transición e historial juntos. Un evaluateGate anterior sirve para orientación, no como token de autorización permanente.
+Phase advancement follows the same rule: load the pinned definition and current state, reevaluate the gate within the operation, and commit the transition and history together. A prior evaluateGate result is guidance, not a permanent authorization token.
 
-Importar usa intención durable, staging, hash, promoción y commit final; el detalle está en DATA. Exportar y respaldar trabajan desde snapshots para que relaciones, respuestas y archivos correspondan a la misma generación. Restaurar usa una raíz preparada y validada y un cambio recuperable, no copiar sobre una biblioteca abierta.
+Import uses durable intent, staging, hashing, promotion, and final commit; details are in DATA. Export and backup work from snapshots so relations, answers, and files belong to the same generation. Restore uses a prepared and validated root plus a recoverable switch; it does not copy over an open library.
 
-## 8. Seguridad, distribución y evolución
+## 8. Security, distribution, and evolution
 
-El frontend no se considera una frontera de validación suficiente. Comandos aceptan IDs y DTOs limitados. Los diálogos nativos otorgan tokens específicos a archivos elegidos; ninguna cadena de ruta recibida permite lectura general. El protocolo research sirve únicamente documentId registrados dentro de la raíz canónica, con comprobación de escapes y reparse points.
+The frontend is not a sufficient validation boundary. Commands accept IDs and bounded DTOs. Native dialogs grant specific tokens for selected files; no path string received from the frontend permits general file access. The research protocol serves only registered documentIds inside the canonical root, with checks against path escapes and reparse points.
 
-La ventana autorizada se etiqueta main. Una capability main-local permite exclusivamente los grupos de comandos propios research-read, research-write y research-maintenance, extraídos del registry cerrado de CONTRACTS. research-read contiene consultas sin efectos; research-write contiene mutaciones bibliográficas, de lectura, workflow y conocimiento; research-maintenance contiene importación, comprobación de hashes, export/backup/restore y cambio de raíz. Seleccionar un archivo no concede lectura genérica: pertenece al comando de aplicación que devuelve un token. No se conceden permisos JavaScript genéricos de fs, shell, SQL, HTTP, creación de ventanas o acceso remoto. Los diálogos se utilizan desde Rust, no mediante una API libre de frontend.
+The authorized window is labelled main. A main-local capability allows only the research-read, research-write, and research-maintenance command groups defined by the closed registry in CONTRACTS. research-read contains queries without side effects; research-write contains bibliographic, reading, workflow, and knowledge mutations; research-maintenance contains import, hash checks, export/backup/restore, and root changes. Selecting a file does not grant generic read access; it is handled by the application command that returns a token. Generic JavaScript permissions for fs, shell, SQL, HTTP, window creation, or remote access are not granted. Dialogs are used from Rust, not through an unrestricted frontend API.
 
-El manifest de tauri-build declara todos los comandos de aplicación para que sus permisos sean explícitos; los archivos TOML de permisos utilizan commands.allow y la capability aplica solo a main, sin remote.urls. La build debe verificar que un comando fuera de los grupos o desde otra ventana se rechaza. Son mecanismos documentados en [Permissions](https://v2.tauri.app/security/permissions/), [Capabilities](https://v2.tauri.app/security/capabilities/) y [AppManifest](https://docs.rs/tauri-build/latest/tauri_build/struct.AppManifest.html); las listas concretas se derivan del registry, no de wildcards.
+The tauri-build manifest declares all application commands so their permissions are explicit; TOML permission files use commands.allow, and the capability applies only to main, with no remote.urls. The build must verify that a command outside these groups, or a command from another window, is rejected. These mechanisms are documented in [Permissions](https://v2.tauri.app/security/permissions/), [Capabilities](https://v2.tauri.app/security/capabilities/), and [AppManifest](https://docs.rs/tauri-build/latest/tauri_build/struct.AppManifest.html); concrete lists derive from the registry, not wildcards.
 
-La CSP de release admite scripts y workers empaquetados del propio origen, estilos locales —con inline únicamente donde los componentes lo necesiten—, imágenes data/blob utilizadas por el lector, fuentes locales y las conexiones IPC/custom protocol necesarias. Deniega scripts remotos, unsafe-eval JavaScript, objetos y frames. ADR-015 permite únicamente wasm-unsafe-eval para los decodificadores WASM empaquetados de PDF.js y connect-src self para sus recursos locales; no autoriza scripting del PDF. El adaptador no incorpora servidores localhost de desarrollo a la CSP de release. Se registra la CSP resuelta de la build para comprobar los orígenes exactos que Tauri utiliza en Windows, sin abrir connect-src a todos los hosts. El texto científico siempre se presenta escapado; no se activa JavaScript embebido del PDF y los enlaces externos solo se abren por una acción explícita del usuario.
+The release CSP allows scripts and workers bundled from the application origin, local styles—with inline styles only where components require them—data/blob images used by the reader, local fonts, and the IPC/custom-protocol connections required by the app. It denies remote scripts, JavaScript unsafe-eval, objects, and frames. ADR-015 allows wasm-unsafe-eval only for bundled PDF.js WASM decoders and connect-src self for its local resources; it does not authorize PDF scripting. The release CSP does not include localhost development servers. The resolved build CSP is recorded to check the exact origins Tauri uses on Windows, without opening connect-src to every host. Scientific text is always rendered as escaped text; embedded PDF JavaScript is not enabled, and external links open only after an explicit user action.
 
-La protección debe activarse en la configuración; Tauri añade elementos necesarios a la CSP al empaquetar. La [guía oficial CSP](https://v2.tauri.app/security/csp/) fundamenta esa configuración y el test inspecciona el resultado de release.
+Protection must be enabled in configuration; Tauri adds required entries to the CSP when bundling. The [official CSP guide](https://v2.tauri.app/security/csp/) informs this configuration, and the test inspects the release result.
 
-Las bibliotecas están en disco local; no se soporta SQLite activo en carpetas de red o sincronización como OneDrive. Un backup exportado sí puede copiarse allí. La propia aplicación no envía investigación ni telemetría. La integridad local no garantiza confidencialidad frente a otra cuenta/proceso con permisos de lectura del sistema operativo.
+Libraries reside on local disks; active SQLite libraries in network or synced folders such as OneDrive are unsupported. An exported backup may be copied there. The application does not send research data or telemetry. Local integrity does not guarantee confidentiality from another account or process with operating-system read permissions.
 
-La entrega Windows está regida por ADR-011 y SPEC-001. Los binarios, datos, backups y código tienen rutas independientes. No hay servidor residente ni autoinicio predeterminado. Mantener recursos locales y CSP limitada forma parte del gate de instalación.
+The Windows delivery follows ADR-011 and SPEC-001. Binaries, data, backups, and source code use separate paths. There is no resident server or default auto-start. Keeping resources local and the CSP restricted are part of the installation gate.
 
-Una futura integración LLM tendrá un puerto independiente, consentimiento para envío de datos y propuestas separadas del conocimiento confirmado. No se introduce ahora ese runtime. P3/P4, editor enriquecido, caché avanzada o multiplataforma requieren ADR/SPEC y contrato nuevo o compatible antes de implementación.
-
-
+A future LLM integration will use an independent port, require consent to send data, and keep suggestions separate from confirmed knowledge. No such runtime is introduced now. P3/P4, a rich-text editor, advanced caching, or cross-platform support require a new or compatible ADR/SPEC and contract before implementation.

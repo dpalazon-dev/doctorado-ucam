@@ -1,166 +1,165 @@
-# Diseño de datos, persistencia y recuperación
+# Data design, persistence, and recovery
 
-Estado: baseline de ejecución v0.2, adoptada el 1 de octubre de 2026. Modelo lógico v0.1; no es una migración ejecutada.
+Status: v0.2 implementation baseline, adopted on 1 October 2026. Logical model v0.1; this is not an executed migration.
 
-## 1. Autoridad y representación
+## 1. Authority and representation
 
-SQLite conserva entidades, relaciones, procedencia, respuestas, preferencias e historial. Los PDF son archivos administrados identificados desde SQLite; sus rutas se guardan relativas a la raíz. Export, FTS, vistas por concepto y un eventual grafo son derivados.
+SQLite stores entities, relations, provenance, answers, preferences, and history. PDFs are managed files identified through SQLite; their paths are stored relative to the root. Exports, FTS, concept views, and a possible graph are derived data.
 
-UUID en texto con forma canónica, fechas UTC RFC3339 y contadores de revisión enteros desde cero. Los escritores emiten milisegundos y sufijo Z; el decoder admite también +00:00 preservando strings y receipts previos, conforme ADR-019, sin aceptar otros offsets ni fechas locales. DTOs camelCase; columnas snake_case. Un cambio de etiqueta traducida no cambia enums persistidos. Ausencias bibliográficas son NULL o colecciones vacías, sin cadenas como "desconocido" que parezcan valores reales. El cuerpo inicial es body_text, plain_text versión 1; body_json queda NULL.
+UUIDs use canonical text form, dates use UTC RFC3339, and revision counters are integers starting at zero. Writers emit milliseconds and the `Z` suffix; the decoder also accepts `+00:00`, preserving existing strings and receipts, in accordance with ADR-019. Other offsets and local dates are rejected. DTOs use `camelCase`; columns use `snake_case`. Translating a display label does not change persisted enums. Missing bibliographic values are `NULL` or empty collections, never strings such as "unknown" that could look like real values. The initial body is `body_text`, with `plain_text` version 1; `body_json` remains `NULL`.
 
-No se almacenan blobs PDF en SQLite. No se incluye una URL de descarga remota como sustituto de un documento administrado. Documento y paper tienen identidades distintas para conservar versiones documentales y anclajes.
+PDF blobs are not stored in SQLite. A remote download URL is not used as a substitute for a managed document. A document and a paper have separate identities so document versions and locators can be preserved.
 
-## 2. Modelo lógico y restricciones
+## 2. Logical model and constraints
 
-El DDL del DOCX original es el antecedente de este modelo; las migraciones que se implementen deben incorporar los ajustes explícitos siguientes, no copiarlo sin revisar.
+The original DOCX DDL is an antecedent to this model. Implemented migrations must incorporate the explicit adjustments below rather than copying it without review.
 
-| Grupo | Tablas y claves | Restricciones y responsabilidades |
+| Group | Tables and keys | Constraints and responsibilities |
 |---|---|---|
-| Identidad bibliográfica | papers(id), authors(id), venues(id), paper_authors(paper_id, author_order) | DOI normalizado único no NULL; título no vacío; autores ordenados; mismo nombre no prueba misma persona |
-| Documentos | documents(id, paper_id) | Ruta relativa única; SHA-256; media type; tamaño; documento vigente seleccionado explícitamente; versiones previas preservadas si tienen anclajes |
-| Imports | import_operations(id) | Token opaco; estados STAGING/PROMOTED/COMMITTED/FAILED; metadatos e IDs reservados antes de promoción; resultado de commit conservado |
-| Lectura | reading_positions(document_id), app_session(singleton) | Página física >=1; zoom finito positivo; revisión; último paper abierto nullable con FK |
-| Definición de fase | phase_definitions(code, version) | Documento JSON validado e inmutable por versión; hash de contenido y reglas declarativas conocidas |
-| Procesamiento | paper_phases(paper_id, phase_code), phase_answers(paper_id, phase_code, question_key) | FK a versión exacta; revisión de fase y respuesta; resolución, explicación y valor estructurado validado cuando lo exige la pregunta; snapshot/hash del último gate aceptado |
-| Objetos | knowledge_items(id) | Tipo válido, origen y confianza explícitos; revisión; lifecycle; cuerpo de texto independiente de cita |
-| Conceptos | concepts(item_id), concept_aliases(concept_id, normalized_alias) | Subtipo de item; nombre normalizado para búsqueda, sin uniqueness global que fuerce fusionar homónimos |
-| Especialización | evidence_details(item_id), question_details(item_id) | FK a item con tipo comprobado también por dominio; estados específicos separados de lifecycle |
-| Asociaciones | paper_items(paper_id,item_id), item_concepts(item_id,concept_id) | Compartir un item/concepto no es procedencia; selected_for_p3, prioridad y motivo se conservan por paper/item, protegidos por revisión del procesamiento |
-| Relaciones | relations(id) | Extremos distintos y existentes; tipo/contexto/origen; revisión y archive; simetría normalizada; unicidad del vínculo semántico activo según DOMAIN |
-| Procedencia | provenance(id), item_provenance(item_id,provenance_id), relation_provenance(relation_id,provenance_id) | Versión documental, hash capturado, página/sección/cita, estado PENDING/LOCATED/STALE; revisión para editar un localizador |
-| Evaluación futura | validations(id) | Reservada para P3; sin comandos de validación humana completa en v0.1 |
-| Catálogo | ontology_types(code), relation_types(code) | Catálogo core versionado; allowlist de extremos, dirección y reglas; ningún código ejecutable |
-| Operación | schema_migrations(version), audit_events(id), app_settings(key), operation_receipts(request_id), maintenance_operations(id) | Migraciones con checksum; eventos en misma transacción; preferencias validadas; idempotencia; trabajos largos con estado/resultado/error durable |
-| Índices derivados | papers_fts, items_fts | FTS5 reconstruible; alimentado desde tablas canónicas y filtros de lifecycle posteriores al match |
+| Bibliographic identity | papers(id), authors(id), venues(id), paper_authors(paper_id, author_order) | Normalized non-NULL DOI is unique; title is non-empty; authors are ordered; matching names do not prove that two records represent the same person |
+| Documents | documents(id, paper_id) | Unique relative path; SHA-256; media type; size; current document selected explicitly; prior versions preserved when they have locators |
+| Imports | import_operations(id) | Opaque token; STAGING/PROMOTED/COMMITTED/FAILED states; metadata and IDs reserved before promotion; commit result retained |
+| Reading | reading_positions(document_id), app_session(singleton) | Physical page >=1; finite positive zoom; revision; nullable last-opened paper with FK |
+| Phase definition | phase_definitions(code, version) | Validated JSON document, immutable per version; content hash and known declarative rules |
+| Processing | paper_phases(paper_id, phase_code), phase_answers(paper_id, phase_code, question_key) | FK to exact version; phase and answer revisions; resolution, explanation, and validated structured value when required by the question; snapshot/hash of the last accepted gate |
+| Objects | knowledge_items(id) | Valid type, explicit origin and confidence; revision; lifecycle; body text separate from citations |
+| Concepts | concepts(item_id), concept_aliases(concept_id, normalized_alias) | Item subtype; normalized name for search, without global uniqueness that would force homonyms to merge |
+| Specialization | evidence_details(item_id), question_details(item_id) | FK to item with type also checked by domain logic; specific states separate from lifecycle |
+| Associations | paper_items(paper_id,item_id), item_concepts(item_id,concept_id) | Sharing an item/concept is not provenance; selected_for_p3, priority, and rationale are retained per paper/item and protected by a processing revision |
+| Relations | relations(id) | Distinct, existing endpoints; type/context/origin; revision and archive; normalized symmetry; uniqueness of active semantic link according to DOMAIN |
+| Provenance | provenance(id), item_provenance(item_id,provenance_id), relation_provenance(relation_id,provenance_id) | Document version, captured hash, page/section/quote, PENDING/LOCATED/STALE state; revision for editing a locator |
+| Future evaluation | validations(id) | Reserved for P3; no complete human-validation commands in v0.1 |
+| Catalog | ontology_types(code), relation_types(code) | Versioned core catalog; endpoint allowlist, direction, and rules; no executable code |
+| Operations | schema_migrations(version), audit_events(id), app_settings(key), operation_receipts(request_id), maintenance_operations(id) | Migrations with checksums; events in the same transaction; validated preferences; idempotency; long-running jobs with durable state/result/error |
+| Derived indexes | papers_fts, items_fts | Rebuildable FTS5; populated from canonical tables with lifecycle filtering after matching |
 
-papers incorpora revision y archived_from_lifecycle. Items y relaciones sólo alternan ACTIVE/ARCHIVED: restore siempre devuelve ACTIVE y no requieren columna de estado previo. Los campos de progreso derivados no se actualizan desde la UI.
+`papers` includes `revision` and `archived_from_lifecycle`. Items and relations only switch between ACTIVE/ARCHIVED: restore always returns them to ACTIVE, so no prior-state column is needed. Derived progress fields are not updated by the UI.
 
-papers incluye current_phase y last_opened_at; app_session referencia el último paper abierto. paper_phases conserva state, definition_version, revision y completed_at; phase_answers incluye revision, answer_text, resolution, explanation y structured_value_json validado por tipo de pregunta. Los valores estructurados, como la decisión P1, no se deducen mediante búsqueda de palabras en prosa. Provenance incorpora revision y updated_at si su localizador puede editarse. Todos los campos que un contrato somete a expectedRevision tienen una revisión persistida.
+`papers` includes `current_phase` and `last_opened_at`; `app_session` references the last-opened paper. `paper_phases` retains `state`, `definition_version`, `revision`, and `completed_at`; `phase_answers` includes `revision`, `answer_text`, `resolution`, `explanation`, and `structured_value_json`, validated against the question type. Structured values such as the P1 decision are not inferred by searching prose for keywords. Provenance includes `revision` and `updated_at` when its locator can be edited. Every field whose contract uses `expectedRevision` has a persisted revision.
 
-paper_phases guarda accepted_gate_snapshot_json/hash al completar y conserva snapshot/completed_at históricos al invalidar; state decide vigencia. Snapshot canónico y proyecciones exactas en [WORKFLOW_GATES.md](WORKFLOW_GATES.md), ADR-017: definitionHash, respuestas normalizadas/revisiones, dependencias aceptadas y Document vivo en PRE/P1/P2, artefactos/edges ordenados. No incluir phaseRevision/contexto/lifecycle/timestamps en el hash. No reconstruir historia desde estado actual.
+When a phase is completed, `paper_phases` stores `accepted_gate_snapshot_json/hash` and retains the historical snapshot and `completed_at` when invalidated; `state` determines whether it remains current. The canonical snapshot and exact projections are defined in [WORKFLOW_GATES.md](WORKFLOW_GATES.md), ADR-017: `definitionHash`, normalized answers/revisions, accepted dependencies, and the live Document in PRE/P1/P2, plus ordered artifacts/edges. Do not include `phaseRevision`, context, lifecycle, or timestamps in the hash. Do not reconstruct history from current state.
 
-Una modificación efectiva de una respuesta invalida conservadoramente la completitud de esa fase y marca NEEDS_REVIEW las posteriores ya iniciadas, sin tocar NOT_STARTED ni borrar datos. Cambios efectivos en artefactos usados por P2 —items, relaciones, procedencia, enlaces y selección P3— invalidan P2 si estaba completada. Una petición idempotente o que conserva los mismos valores no invalida. La regla y las revisiones afectadas se aplican en el mismo Unit of Work; no dependen de inferir la relevancia del cambio mediante texto libre.
+An effective answer change conservatively invalidates completion for that phase and marks later phases already started as NEEDS_REVIEW, without changing NOT_STARTED phases or deleting data. Effective changes to artifacts used by P2—items, relations, provenance, links, and P3 selection—invalidate P2 if it was complete. An idempotent request or one that preserves the same values does not invalidate anything. The rule and affected revisions are applied in the same Unit of Work; relevance is never inferred from free text.
 
-Los índices mínimos incluyen DOI, documentos por paper, papers por lifecycle/updated_at, items por type/lifecycle, relaciones por ambos extremos, provenance por documento y asociaciones por ambos lados. Las constraints de catálogo que exigen joins se comprueban dentro del caso de uso, además de FKs y CHECK básicos.
+Minimum indexes include DOI, documents by paper, papers by lifecycle/updated_at, items by type/lifecycle, relations by both endpoints, provenance by document, and associations by both sides. Catalog constraints that require joins are checked inside the use case, in addition to basic FKs and CHECK constraints.
 
-Todos los enlaces persistentes usan FKs verificables. No hay cascadas que borren conocimiento global al archivar una fuente. Una consulta excluye archivados por defecto y puede solicitarlos explícitamente; el filtro de biblioteca ACTIVE significa no archivado, incluyendo NEW.
+All persistent links use verifiable FKs. Archiving a source does not cascade into deletion of global knowledge. Queries exclude archived records by default and may request them explicitly; an ACTIVE library filter means not archived, including NEW.
 
-FTS5 inicial: papers_fts contiene entity_id UNINDEXED, title, authors_text, venue y domain; items_fts contiene entity_id UNINDEXED, type_code UNINDEXED, title y body_text. Se utiliza tokenizer unicode61 con remove_diacritics=2. Los UUID son la identidad pública, nunca el rowid interno de FTS. El caso de uso actualiza la proyección en la misma transacción de la mutación canónica; una reconstrucción completa se hace bajo mantenimiento y se confirma antes de declarar el índice utilizable. La búsqueda interpreta entrada como texto literal tokenizado, con todos los términos requeridos; no ofrece sintaxis SQL ni operadores FTS avanzados en v0.1. Un empate de relevancia se resuelve por UUID para paginación estable. La [documentación FTS5](https://www.sqlite.org/fts5.html) es la referencia del adaptador; pesos y orden son decisiones del producto, no medida de calidad científica.
+Initial FTS5 projections: `papers_fts` contains `entity_id UNINDEXED`, title, authors_text, venue, and domain; `items_fts` contains `entity_id UNINDEXED`, `type_code UNINDEXED`, title, and body_text. The tokenizer is `unicode61` with `remove_diacritics=2`. UUIDs are the public identity, never FTS's internal rowid. The use case updates the projection in the same transaction as the canonical mutation; a full rebuild runs under maintenance and must complete before the index is declared usable. Search treats input as literal tokenized text and requires every term; v0.1 offers neither SQL syntax nor advanced FTS operators. Relevance ties are resolved by UUID for stable pagination. The [FTS5 documentation](https://www.sqlite.org/fts5.html) is the adapter reference; weights and ordering are product decisions, not measures of scientific quality.
 
-Respuestas: expectedRevision=0 sólo para fila ausente, primera revision=1; CAS precede no-op y replay receipt precede CAS. Clock de fases fresco por Paper: max(revision)+1 bajo UoW, valores distintos por fase afectada y renovación destino por contexto; sin tabla nueva. No-op conserva revisiones/timestamps/snapshot; rollback no consume clock. Proyección de candidatos cambiada incrementa PhaseAnswer.revision además de clock P2. Única justificación cero candidatos: structured_value_json de PhaseAnswer(P2,p3_candidates_or_justification); selección/priority/rationale conserva autoridad paper_items. Detalle WORKFLOW_GATES.
+Answers: `expectedRevision=0` only for an absent row, first revision is 1; compare-and-swap precedes no-op detection, and receipt replay precedes compare-and-swap. Phase clocks are fresh per Paper: `max(revision)+1` under the UoW, distinct values for each affected phase, and destination renewal on context change; no new table. No-op preserves revisions/timestamps/snapshot; rollback does not consume a clock. A changed candidate projection increments `PhaseAnswer.revision` as well as the P2 clock. The only zero-candidate justification is `structured_value_json` of `PhaseAnswer(P2,p3_candidates_or_justification)`; selection/priority/rationale remain authoritative in `paper_items`. See WORKFLOW_GATES.
 
-## 3. Configuración SQLite y unidad de trabajo
+## 3. SQLite configuration and unit of work
 
-Cada conexión configura foreign_keys=ON. Para la biblioteca local se seleccionan journal_mode=WAL, synchronous=FULL y busy_timeout inicial de 5000 ms. Son decisiones de durabilidad que se medirán en las pruebas; no significan garantía absoluta frente a hardware o disco defectuoso.
+Each connection sets `foreign_keys=ON`. The local library uses `journal_mode=WAL`, `synchronous=FULL`, and an initial `busy_timeout` of 5000 ms. These durability choices will be measured in tests; they do not guarantee protection against defective hardware or disks.
 
-El mismo hilo posee la conexión y ejecuta transacciones cortas. Mutaciones usan transacción IMMEDIATE cuando cargan y modifican invariantes compartidas; los repositorios reciben la transacción y no hacen commits propios. Una actualización con expectedRevision comprueba y aumenta revision en la misma transacción; cero filas actualizadas produce conflicto, no éxito.
+The same thread owns the connection and runs short transactions. Mutations use an IMMEDIATE transaction when they read and modify shared invariants; repositories receive the transaction and do not commit independently. An update with `expectedRevision` checks and increments the revision in the same transaction; updating zero rows is a conflict, not success.
 
-La documentación de [SQLite WAL](https://www.sqlite.org/wal.html) describe sus archivos asociados y límites de funcionamiento. Este diseño restringe la biblioteca activa a disco local. No se comparte una conexión concurrentemente entre tareas.
+The [SQLite WAL documentation](https://www.sqlite.org/wal.html) describes its associated files and operating limits. This design restricts the active library to a local disk. A connection is not shared concurrently among tasks.
 
-| Operación | Escrituras que se confirman juntas |
+| Operation | Writes committed together |
 |---|---|
-| confirmImport | Paper, autores ordenados, documento, intención COMMITTED, recibo y auditoría |
-| Captura tipada | Item y detalle especializado, pertenencia al paper, conceptos, localizador y enlace inicial, auditoría y revisiones afectadas |
-| Guardar respuesta | Respuesta, revisión de procesamiento, reevaluación de invalidaciones relevantes y evento |
-| Avanzar fase | Snapshot de gate actual, estado de fase, fase activa, historial y revisión; decisión P1 archive incluye archive de Paper en ese mismo commit |
-| Relación | Extremos y tipos comprobados, relación/procedencia inicial y auditoría |
-| Archive/restore | Estado previo y nuevo, revisión, invalidaciones dependientes y auditoría |
+| confirmImport | Paper, ordered authors, document, COMMITTED intent, receipt, and audit |
+| Typed capture | Item and specialized detail, paper membership, concepts, locator and initial link, audit, and affected revisions |
+| Save answer | Answer, processing revision, reevaluation of relevant invalidations, and event |
+| Advance phase | Current gate snapshot, phase state, active phase, history, and revision; a P1 archive decision includes archiving the Paper in that same commit |
+| Relation | Checked endpoints and types, relation/initial provenance, and audit |
+| Archive/restore | Previous and new state, revision, dependent invalidations, and audit |
 
-No existe una transacción común real entre filesystem y SQLite. Las operaciones que afectan ambos conservan una intención verificable y recuperación explícita.
+There is no real shared transaction between the filesystem and SQLite. Operations affecting both retain a verifiable intent and support explicit recovery.
 
-Prueba de acceso documental/handle y guardas fuera de la TX; dentro se revalida referencia Paper/Document y concordancia con prueba. No leer/hashear PDFs de hasta 500 MiB bajo DbActor/TX. Inaccesibilidad externa cambia snapshot disponible pero no fabrica revisión; cambios DB Document sí invalidan/renuevan en UoW. En habilitación/completitud revalidar cadena COMPLETED+snapshot aceptado+gate vigente. ABI tras T03, ver WORKFLOW_GATES.
+Check document access/handle and guards outside the transaction; inside it, revalidate the Paper/Document reference and its agreement with the check. Do not read or hash PDFs up to 500 MiB under DbActor/transaction. External inaccessibility changes snapshot availability but does not invent a revision; DB Document changes do invalidate/renew revisions in the UoW. When enabling or completing a phase, revalidate the COMPLETED + accepted snapshot + current gate chain. ABI after T03; see WORKFLOW_GATES.
 
-## 4. Idempotencia, historial y límites de mutación
+## 4. Idempotency, history, and mutation limits
 
-confirmImport vuelve a entregar su PaperDto si el mismo token ya se confirmó, sin crear otra entidad; una petición con contenido incompatible devuelve conflicto. operation_receipts guarda request_id UUID, comando, hash canónico de petición, referencias de resultado y fecha para los comandos idempotentes definidos en CONTRACTS. La recepción repetida de mismo ID y hash recupera el resultado; mismo ID con otro contenido se rechaza.
+`confirmImport` returns its PaperDto again if the same token was already confirmed, without creating another entity; a request with incompatible content returns a conflict. `operation_receipts` stores the request_id UUID, command, canonical request hash, result references, and timestamp for the idempotent commands defined in CONTRACTS. Repeating the same ID and hash retrieves the result; reusing the ID with different content is rejected.
 
-Los recibos no se purgan automáticamente en v0.1. Las mutaciones de edición siguen necesitando expectedRevision; requestId no sustituye la protección contra textos obsoletos. Antes de comunicar un éxito se confirma la transacción, incluido el recibo.
+Receipts are not purged automatically in v0.1. Edits still require `expectedRevision`; `requestId` does not replace protection against stale text. The transaction, including the receipt, is committed before success is reported.
 
-audit_events registra acción, identidad afectada y cambios necesarios para explicar el historial. El historial de contenido sensible permanece dentro de la biblioteca y sus backups; no se copia a logs de diagnóstico. No se denomina event sourcing ni se promete undo general. Merge y purga definitiva no se exponen en v0.1.
+`audit_events` records the action, affected identity, and changes needed to explain history. Sensitive content history stays inside the library and its backups; it is not copied into diagnostic logs. This is not called event sourcing and does not promise general undo. Merge and permanent purge are not exposed in v0.1.
 
-maintenance_operations conserva operationId, tipo, estado, progreso si es conocido, resultado/error y manifiesto de recursos propios. Para activar una raíz restaurada o cambiar biblioteca, un journal durable de coordinación fuera de la raíz que se está cerrando permite resolver el cambio incluso si la DB anterior ya no está abierta. No se serializan secretos ni contenidos de papers en ese journal.
+`maintenance_operations` retains `operationId`, type, state, progress when known, result/error, and the manifest of owned resources. Activating a restored root or changing libraries uses a durable coordination journal outside the root being closed, so the change can be resolved even if the previous database is no longer open. The journal does not serialize secrets or paper contents.
 
-## 5. Raíces y archivos administrados
+## 5. Roots and managed files
 
 ```text
 %LOCALAPPDATA%/ResearchWorkbench/
   library/
-    library.json             # libraryId, formato y compatibilidad
+    library.json             # libraryId, format, and compatibility
     research.sqlite
     documents/<documentId>/original.pdf
     staging/<importOperationId>/source.pdf
-    recovery/                # manifiestos de operación cuando correspondan
-  backups/<backupId>/         # protección interna y copias elegidas locales
-  logs/                      # diagnóstico rotado sin contenido de investigación
+    recovery/                # operation manifests where applicable
+  backups/<backupId>/         # internal protection and locally selected copies
+  logs/                      # rotated diagnostics without research content
 ```
 
-La raíz real se resuelve con APIs OS y preferencias; ninguna operación se basa en cwd. Los metadatos SQLite y library.json deben coincidir en libraryId; el manifiesto no es una segunda autoridad para conocimiento. Una biblioteca abierta conserva su identidad al moverla.
+The actual root is resolved through OS APIs and preferences; no operation depends on cwd. SQLite metadata and library.json must agree on libraryId; the manifest is not a second authority for knowledge. An open library retains its identity when moved.
 
-DocumentStore comprueba ruta relativa, raíz canónica y reparse points/junctions antes de abrir. El protocolo del lector consulta documentId; no recibe una ruta. Un archivo cambiado externamente marca sus anclajes STALE y provoca diagnóstico de integridad; no reescribe automáticamente el hash capturado ni finge que la procedencia sigue verificada.
+DocumentStore checks relative paths, the canonical root, and reparse points/junctions before opening. The reader protocol takes a documentId, never a path. A file changed externally marks its locators STALE and triggers an integrity diagnostic; the captured hash is not rewritten automatically, and provenance is not falsely reported as verified.
 
-El primer piloto gestiona un documento vigente por paper. La estructura admite versiones sin que eso prometa una interfaz de reemplazo de PDF. Los recursos binarios se retienen mientras existan anclajes o una operación recuperable que los use.
+The first pilot manages one current document per paper. The structure supports versions without promising a PDF replacement interface. Binary resources are retained while locators exist or a recoverable operation uses them.
 
-## 6. Importación y recuperación
+## 6. Import and recovery
 
-1. Selector nativo concede una operación para un archivo elegido. Se registra intención STAGING y se copia a staging; cancelación retira solo archivos propiedad de ese intento.
-2. Se valida formato mínimo, tamaño y legibilidad, se calcula hash y se ofrece decisión ante DOI/hash duplicado. No se infiere autor o año si faltan.
-3. Antes de promover se persisten documento/paper UUID reservados, metadatos confirmados, destino relativo y hash. Las rutas staging y destino están en el mismo volumen.
-4. Se promueve el archivo y se marca el intento PROMOTED. Después la transacción inserta las entidades y deja COMMITTED.
-5. Si se interrumpe entre pasos, el arranque coteja intención, destino y hash. Coincidencia inequívoca permite terminar; un caso ambiguo queda pendiente, nunca se elimina un archivo de propietario desconocido.
+1. The native picker grants an operation for a chosen file. A STAGING intent is recorded and the file is copied to staging; cancellation removes only files owned by that attempt.
+2. The format, size, and readability are minimally validated, the hash is calculated, and a decision is requested for a duplicate DOI/hash. Missing authors or year are not inferred.
+3. Before promotion, reserved document/paper UUIDs, confirmed metadata, relative destination, and hash are persisted. Staging and destination are on the same volume.
+4. The file is promoted and the attempt is marked PROMOTED. The next transaction inserts the entities and marks the attempt COMMITTED.
+5. If interrupted between steps, startup compares intent, destination, and hash. An unambiguous match may be completed; an ambiguous case remains pending, and a file with an unknown owner is never deleted.
 
-Un COMMITTED sin archivo legible es una incidencia de integridad, no un motivo para eliminar la ficha. Un staging incompleto sin destino puede cancelarse con registro de resultado. Las pruebas inyectan interrupción antes y después de cada frontera durable.
+A COMMITTED record without a readable file is an integrity incident, not a reason to delete the record. Incomplete staging without a destination may be cancelled with a recorded result. Tests inject interruption before and after each durable boundary.
 
-Los archivos internos `.rw-directory-pin` pueden permanecer en raíz/directorios administrados conforme a [WINDOWS_DIRECTORY_GUARDS](../development/WINDOWS_DIRECTORY_GUARDS.md), ADR-016. No son documentos ni conocimiento; cleanup no los elimina y export/backup los omiten de sus manifiestos. Restore de formato soportado los regenera al adquirir la raíz/directorios, sin confiar en pins aportados como autorización. La biblioteca v0.1 usa volumen local NTFS.
+Internal `.rw-directory-pin` files may remain at the root/managed directories under [WINDOWS_DIRECTORY_GUARDS](https://github.com/dpalazon-dev/doctorado-ucam/blob/c985b079d39ee5915c017c38c1f50b7a94526843/prototypes/research-workbench/docs/development/WINDOWS_DIRECTORY_GUARDS.md), ADR-016. They are not documents or knowledge; cleanup does not remove them, and export/backup omit them from manifests. Restore of a supported format regenerates them when acquiring the root/directories and does not trust supplied pins as authorization. v0.1 libraries use a local NTFS volume.
 
-## 7. Migraciones y compatibility
+## 7. Migrations and compatibility
 
-| Secuencia prevista | Contenido |
+| Planned sequence | Contents |
 |---|---|
-| 0001 piloto | Fuentes, documentos, imports, lectura, revisión, settings, recibos, auditoría y ledger |
-| 0002 workflow | Definiciones PRE/P1/P2, respuestas, procesamiento y gates versionados |
-| 0003 conocimiento | Catálogo core, items, conceptos, asociaciones, relaciones y procedencia |
-| 0004 portabilidad | Proyecciones FTS y metadatos necesarios para export/backup/restore de v0.1 |
+| 0001 pilot | Sources, documents, imports, reading, revision, settings, receipts, audit, and ledger |
+| 0002 workflow | PRE/P1/P2 definitions, answers, processing, and versioned gates |
+| 0003 knowledge | Core catalog, items, concepts, associations, relations, and provenance |
+| 0004 portability | FTS projections and metadata needed for v0.1 export/backup/restore |
 
-Esta es una secuencia de diseño, no SQL ya publicado. Una migración liberada es inmutable y conserva checksum. appVersion, dbSchemaVersion, ipcVersion, ontologyVersion, phaseDefinitionVersion y exportSchemaVersion son versiones independientes.
+This is a design sequence, not SQL already released. A released migration is immutable and retains its checksum. appVersion, dbSchemaVersion, ipcVersion, ontologyVersion, phaseDefinitionVersion, and exportSchemaVersion are independent versions.
 
-Antes de migrar: bloquear escritores, terminar o fijar operaciones de archivos, verificar esquema y checksum y crear snapshot consistente con los archivos necesarios. El backup incluye estado recuperable de imports. Se valida foreign_key_check y quick_check; un fallo impide continuar. La migración se ejecuta en transacción; el ledger se escribe en ese mismo commit. Un fallo revierte DB y mantiene el backup, sin restaurarlo automáticamente ni iniciar una UI editable sobre esquema parcial.
+Before migrating: block writers, complete or pin file operations, verify schema and checksum, and create a consistent snapshot with the required files. The backup includes recoverable import state. Validate `foreign_key_check` and `quick_check`; any failure stops migration. Run the migration in a transaction and write the ledger in that same commit. A failure rolls back the DB and retains the backup; it does not restore automatically or start an editable UI on a partial schema.
 
-Si dbSchemaVersion es mayor que la soportada, se abre solo una pantalla de diagnóstico; no se modifica la biblioteca ni se ejecuta una migración descendente. El instalador limita downgrades, pero el backend conserva esta defensa por separado.
+If dbSchemaVersion is newer than the supported version, open only a diagnostic screen; do not modify the library or run a downgrade migration. The installer limits downgrades, while the backend enforces this protection separately.
 
-## 8. Snapshot, exportación y backup
+## 8. Snapshot, export, and backup
 
-SnapshotService detiene nuevas escrituras y obtiene un estado consistente de DB y referencias documentales; copia los recursos inmutables necesarios mientras conserva el permiso de mantenimiento. Para DB se utiliza la [API de backup de SQLite](https://www.sqlite.org/backup.html), no una copia aislada del archivo con WAL activo. El diseño garantiza consistencia del conjunto imponiendo además la exclusión de mutaciones de la aplicación.
+SnapshotService stops new writes and obtains a consistent state of the DB and document references; it copies the required immutable resources while retaining maintenance permission. For the DB, use the [SQLite backup API](https://www.sqlite.org/backup.html), not an isolated copy of the file while WAL is active. The design also guarantees consistency of the set by excluding application mutations.
 
-ExportLibrary crea JSONL documentado y Markdown derivado con IDs, relaciones, procedencia y versiones. ExportPaper calcula cierre de referencias: incluye entidades compartidas y extremos requeridos para no emitir IDs sin definición. La omisión de PDFs en una exportación de texto se declara en el manifiesto; no se confunde con un backup restaurable.
+ExportLibrary creates documented JSONL and derived Markdown with IDs, relations, provenance, and versions. ExportPaper calculates reference closure: it includes shared entities and required endpoints so it never emits IDs without definitions. Omission of PDFs from a text export is declared in the manifest and is not confused with a restorable backup.
 
-Un backup restaurable contiene DB de snapshot, PDFs requeridos, library.json y manifest.json con backupId, libraryId, versiones, fecha, lista de archivos relativos, tamaños y hashes. El manifiesto es el contrato de verificación; los logs no son necesarios para recuperar investigación.
+A restorable backup contains a snapshot DB, required PDFs, library.json, and manifest.json with backupId, libraryId, versions, date, relative file list, sizes, and hashes. The manifest is the verification contract; logs are not needed to recover research.
 
-Política inicial propuesta: protección obligatoria antes de migración y backup manual desde v0.1; recordatorio tras siete días de uso sin backup exitoso, sin tarea residente ni sincronización. Conservar todas las copias por defecto; cualquier eliminación futura debe ser explícita. Un backup junto a la biblioteca no protege frente a pérdida del disco: la UI permite elegir otro destino local.
+Proposed initial policy: protection is mandatory before migration and backups are manual from v0.1; remind after seven days of use without a successful backup, with no resident task or synchronization. Keep all copies by default; any future deletion must be explicit. A backup beside the library does not protect against disk loss, so the UI lets the user choose another local destination.
 
-## 9. Restauración y cambio de biblioteca
+## 9. Restore and library switching
 
-Restore verifica manifiesto, formato soportado, hashes, referencias, esquema y espacio **antes** de activar datos. Extrae o copia a una raíz nueva junto a la biblioteca, rechaza rutas absolutas, traversal y enlaces que escapen. El formato inicial de backup es directorio; empaquetarlo como archivo comprimido requerirá especificar y probar la extracción segura.
+Restore verifies the manifest, supported format, hashes, references, schema, and available space **before** activating data. It extracts or copies to a new root beside the library, and rejects absolute paths, traversal, and links that escape. The initial backup format is a directory; packaging it as a compressed file requires specifying and testing safe extraction.
 
-Se prepara la raíz y se verifica con SQLite; restore devuelve un token de biblioteca preparada, sin cambiar la activa. Tras una elección explícita, switchLibrary registra intención durable de cambio, cierra la conexión, cambia la raíz activa mediante configuración recuperable y vuelve a abrir. La anterior permanece disponible para rollback explícito; nunca se sobrescribe una DB abierta. Un crash en cada paso se resuelve en el siguiente inicio con el manifiesto, identificando cuál de las raíces está completa.
+Prepare the root and verify it with SQLite; restore returns a prepared-library token without changing the active library. After an explicit choice, switchLibrary records a durable intent, closes the connection, changes the active root through recoverable configuration, and reopens it. The previous root remains available for explicit rollback; an open DB is never overwritten. A crash at any step is resolved on next startup using the manifest to identify which roots are complete.
 
-SwitchLibrary utiliza el mismo coordinador: bloquea operaciones, guarda/cancela pendientes y verifica libraryId/compatibilidad/bloqueo de destino. No fusiona bibliotecas, no cambia IDs y no mueve datos por accidente. Elegir otra raíz requiere selector nativo, no una ruta arbitraria enviada por UI.
+SwitchLibrary uses the same coordinator: it blocks operations, preserves or cancels pending work, and verifies libraryId/compatibility/target lock. It does not merge libraries, change IDs, or move data accidentally. Choosing another root requires the native picker, not an arbitrary path from the UI.
 
-## 10. Verificación de persistencia previa a entrega
+## 10. Persistence checks before delivery
 
-- Restricciones y transacciones: FKs, revisiones, duplicados, rollback e historial coherente.
-- Reapertura real: misma identidad, contenido, última página y procedencia después de reiniciar.
-- Filesystem: Unicode, espacios, escapes, disco lleno, PDF corrupto y hash cambiado.
-- Fault injection: cortes en promoción/import, commit, snapshot, migración y activación de raíz restaurada.
-- Portabilidad: export sin referencias rotas; backup verificable; restore completo con PDFs en biblioteca temporal.
-- Ciclo de instalación: upgrade, rechazo incompatible, uninstall y reinstall conservando datos.
+- Constraints and transactions: FKs, revisions, duplicates, rollback, and consistent history.
+- Real reopen: same identity, content, last page, and provenance after restart.
+- Filesystem: Unicode, spaces, escapes, full disk, corrupt PDF, and changed hash.
+- Fault injection: interruptions during promotion/import, commit, snapshot, migration, and activation of a restored root.
+- Portability: export without broken references; verifiable backup; full restore with PDFs in a temporary library.
+- Installation cycle: upgrade, incompatible-version rejection, uninstall, and reinstall while preserving data.
 
-Estas son pruebas previstas; los resultados se registrarán cuando exista implementación. La aceptación se rige por QUALITY y las SPECs, no por la presencia de estas tablas en un documento.
+These are planned tests; results will be recorded when implementation exists. Acceptance is governed by QUALITY and the SPECs, not by the presence of these tables in a document.
 
+## 0003: accepted consumer manifest (ADR-022)
 
-## 0003: manifiesto consumidor aceptado (ADR-022)
+[TASK05_PORTS](https://github.com/dpalazon-dev/doctorado-ucam/blob/c985b079d39ee5915c017c38c1f50b7a94526843/prototypes/research-workbench/docs/plans/TASK05_PORTS.md) fixes columns, attribute authority, keys/indexes, the core1.0.0 catalog, and consumer mapping before implementation. Concept stores its definition only in body_text, with preferred_name/title as an atomic mirror; Concept/Evidence/Question attributes are reconstructed from their specific tables, with attributes_json=NULL. The other nine types use a fully validated discriminated object. There are no duplicate authorities or defaults in the event of corruption.
 
-[TASK05_PORTS](../plans/TASK05_PORTS.md) fija columnas, autoridad de atributos, claves/índices, catálogo core1.0.0 y mapping consumidor antes de implementar. Concept almacena definición sólo en body_text y preferred_name/title como mirror atómico; attrs de Concept/Evidence/Question se reconstruyen de tablas específicas, attributes_json=NULL. Otros nueve tipos usan objeto discriminado completo validado. No autoridades duplicadas ni defaults ante corrupción.
+Initial parent/Provenance revision is 0. New paper_items use phase_code=P2, selected_for_p3=0, and priority/rationale NULL. Concept shares a revision with knowledge_items. Active Relations are UNIQUE by endpoint/type/canonical context; a create/update/restore collision returns Conflict without side effects. validations(id) is an empty reservation, with no rows or simulated services. No ON DELETE CASCADE or destructive triggers. 0001/0002/checksums/runner remain intact; DDL0003 and backup/upgrade/reopen are reviewed in T05a, with FTS0004 later.
 
-Padre/Provenance inicial revision0. paper_items nuevos phase_code=P2, selected_for_p3=0, priority/rationale NULL. Concept comparte revision con knowledge_items. UNIQUE activo de Relations por extremos/tipo/contexto canónico; colisión create/update/restore Conflict sin efectos. validations(id) es reserva vacía, sin filas ni servicios simulados. No ON DELETE CASCADE ni triggers destructivos. 0001/0002/checksums/runner intactos; DDL0003 y backup/upgrade/reopen se revisarán en T05a, FTS0004 posterior.
-
-Auditoría efectiva lleva requestId, entidad, acción cerrada y before/after pertinente, dentro de la TX de datos/receipt/clocks. El evento genérico legacy de receipt no sustituye historial de contenido. Alcance P2 e inversa siguen exactamente el cierre de WORKFLOW_GATES; no-op no inventa modificaciones.
+An effective audit records requestId, entity, closed action, and relevant before/after values within the data/receipt/clocks TX. The generic legacy receipt event does not replace content history. P2 scope and inverse follow exactly the WORKFLOW_GATES closure; a no-op does not invent modifications.

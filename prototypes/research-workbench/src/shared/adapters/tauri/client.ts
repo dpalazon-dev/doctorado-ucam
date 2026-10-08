@@ -5,8 +5,8 @@ import type {IpcResult,IpcErrorCode,UUID} from '../../contracts/generated/contra
 import * as Wire from '../../contracts/wire';
 import manifest from '../../../../contracts/manifest.json';
 export type Invoke = (command:string,args:Record<string,unknown>)=>Promise<unknown>;
-const unsupported=(requestId:UUID):IpcResult<never>=>({contractVersion:1,requestId,ok:false,error:{code:'UnsupportedCapability',message:'Esta función todavía no está disponible.',retryable:false}});
-function safeFailure(requestId:UUID,code:IpcErrorCode):IpcResult<never>{return {contractVersion:1,requestId,ok:false,error:{code,message:code==='InvalidInput'?'La solicitud contiene datos no válidos.':'No se pudo completar la operación. Revisa la biblioteca.',retryable:code==='StorageUnavailable'}};}
+const unsupported=(requestId:UUID):IpcResult<never>=>({contractVersion:1,requestId,ok:false,error:{code:'UnsupportedCapability',message:'This feature is not available yet.',retryable:false}});
+function safeFailure(requestId:UUID,code:IpcErrorCode):IpcResult<never>{return {contractVersion:1,requestId,ok:false,error:{code,message:code==='InvalidInput'?'The request contains invalid data.':'Could not complete the operation. Check the library.',retryable:code==='StorageUnavailable'}};}
 export function createTauriApis(invokeCommand:Invoke=invoke){
  async function call<T>(command:string,args:unknown,input:z.ZodType,payload:z.ZodType<T>):Promise<IpcResult<T>>{
   const parsed=input.safeParse(args);const id=Wire.uuidSchema.safeParse((args as {requestId?:unknown})?.requestId);const requestId=id.success?id.data:'00000000-0000-0000-0000-000000000000';

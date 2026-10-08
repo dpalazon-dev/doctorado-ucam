@@ -1,86 +1,85 @@
-# Research Workbench — calidad y verificación
+# Research Workbench — Quality and Verification
 
-Estado: plan de calidad previo a implementación. Los umbrales de rendimiento de abajo son propuestas por medir, no resultados ni criterios aceptados hasta acordar hardware y obtener evidencia. Las pruebas citadas son planificadas, no ejecutadas.
+Status: pre-implementation quality plan. The performance thresholds below are proposals to measure, not results or accepted criteria; hardware must be agreed and evidence obtained first. The cited tests are planned, not executed.
 
-## Gates de evidencia
+## Evidence Gates
 
-- **Piloto 0.0.1 instalado:** Windows 11 x64, NSIS real, máquina limpia/offline, WebView2 desde el paquete, recorrido de biblioteca/lector, continuidad y actualización/uninstall/reinstall. Un build sin bundle, tests de navegador, componentes mock o abrir desde el checkout no demuestran este gate.
-- **v0.1:** flujo PRE/P1/P2, conocimiento global y procedencia, search, export, backup/restore y switch library verificados; ningún estado P2 implica P3/P4.
-- Registrar cada evidencia como `automated`, `manual`, `simulated` o `pending`, con versión/commit, fixture, entorno, pasos y resultado. Ausencia de evidencia significa pendiente, no aceptado.
+- **Installed 0.0.1 pilot:** Windows 11 x64, actual NSIS installer, clean/offline machine, WebView2 from the package, library/reader journey, continuity, update/uninstall/reinstall. A build without bundling, browser tests, mock components, or opening from the checkout does not prove this gate.
+- **v0.1:** verified PRE/P1/P2 workflow, global knowledge and provenance, search, export, backup/restore, and library switch; no P2 state implies P3/P4.
+- Record every piece of evidence as `automated`, `manual`, `simulated`, or `pending`, with version/commit, fixture, environment, steps, and result. Missing evidence means pending, not accepted.
 
-## NFR propuestos
+## Proposed NFRs
 
-Equipo de referencia propuesto: Windows 11 x64, 4 núcleos, 16 GB RAM y SSD local; registrar modelo y configuración reales. Tras calentamiento, medir al menos 30 repeticiones para latencias, mediana y p95; reportar frío/caliente por separado y usar build instalada/release. Objetivos iniciales de diseño, no medidos:
+Proposed reference equipment: Windows 11 x64, 4 cores, 16 GB RAM, and local SSD; record the actual model and configuration. After warm-up, measure at least 30 repetitions for latency, median, and p95; report cold and warm results separately and use an installed/release build. Initial design objectives, not measured results:
 
-| Métrica | Presupuesto propuesto | Fixture/método | Estado |
+| Metric | Proposed budget | Fixture/method | Status |
 |---|---:|---|---|
-| Inicio caliente a Home | p95 ≤ 3 s | DB fixture 1k papers, app release | No medido |
-| Inicio frío | p95 ≤ 8 s, excluye primera instalación | VM limpia sin red; runtime incluido | No medido |
-| Abrir PDF a primera página | p95 ≤ 2 s | PDF local de 20 páginas/10 MB | No medido |
-| Guardado pequeño confirmado | p95 ≤ 500 ms | metadata y edición con 10k items | No medido |
-| Búsqueda básica | p95 ≤ 500 ms a 20 resultados | 1k papers + 10k items y filtros | No medido |
-| Importación | ≥20 MB/s de copia secuencial | archivo fixture 100 MB en SSD, hash verificado | No medido |
-| Restauración | ≤2x creación del backup mismo corpus | 1k papers, 10k items, 500 MB PDF | No medido |
-| Memoria estable | p95 <700 MB | 30 minutos, PDF de 100 páginas; abrir/cerrar 20 | No medido |
-| Instalador | medir y registrar tamaño | NSIS con runtime WebView2 offline | No medido |
+| Warm start to Home | p95 ≤ 3 s | DB fixture: 1k papers, release app | Not measured |
+| Cold start | p95 ≤ 8 s; excludes first installation | Clean VM without network; includes runtime | Not measured |
+| Open PDF to first page | p95 ≤ 2 s | Local 20-page/10 MB PDF | Not measured |
+| Confirmed small save | p95 ≤ 500 ms | Metadata and edits with 10k items | Not measured |
+| Basic search | p95 ≤ 500 ms for 20 results | 1k papers + 10k items and filters | Not measured |
+| Import | ≥20 MB/s sequential copy | 100 MB fixture file on SSD, hash verified | Not measured |
+| Restore | ≤2× time to create backup of same corpus | 1k papers, 10k items, 500 MB PDF | Not measured |
+| Stable memory | p95 <700 MB | 30 minutes, 100-page PDF; open/close 20 times | Not measured |
+| Installer | Measure and record size | NSIS with offline WebView2 runtime | Not measured |
 
-Medir también durabilidad y crecimiento de memoria; ningún límite justifica debilitar transacciones, trazabilidad o recuperación. Si umbral falla, registrar hardware/corpus y decidir con evidencia antes de optimizar. No afirmar soporte máximo basándose en fixture.
+Also measure durability and memory growth; no threshold justifies weakening transactions, traceability, or recovery. If a threshold fails, record hardware/corpus and make an evidence-based decision before optimizing. Do not claim maximum supported size based on a fixture.
 
-## Seguridad, privacidad e integridad
+## Security, Privacy, and Integrity
 
-1. **Rutas y protocolo PDF:** la UI selecciona con diálogo/token o UUID de documento registrado, nunca lee un path arbitrario. Backend resuelve ruta canónica bajo biblioteca y rechaza traversal, IDs desconocidos, symlink/junction de escape, recursos no registrados y archivos inesperados. Verificar CSP/origen local. Pruebas `protocol_rejects_traversal`, `protocol_rejects_symlink_escape`, `unknown_document_not_found`, `unregistered_path_never_served`.
-2. **IPC y base:** validar DTO en Rust aunque TS valide; enums, tamaños, UUID, revisions, nullability y estados. SQL parametrizado. No exponer consultas, paths arbitrarios ni capacidades de filesystem general. Pruebas de contrato Rust/TS para camelCase, enums, errores, fechas e ids; `query_is_parameterized`, `stale_revision_rejected`.
-3. **Contenido no confiable:** títulos no se convierten en paths; texto se escapa al presentar; PDFs y ontologías son datos. v0.1 `body` plain_text; no añadir editor enriquecido sin diseño/sanitización. Sin CDN/worker remoto. Enlaces externos requieren acción explícita.
-4. **Privacidad local:** sin telemetría de papers/contenido, login, API remota o envío automático. Logs rotados omiten cuerpos, fragmentos, paths originales innecesarios y secretos. Export compartible omite rutas privadas por defecto. No afirmar cifrado de SQLite/backups.
-5. **Concurrencia/recuperación:** un escritor por biblioteca, lock liberado al morir proceso; import staging/reconciliación no borra archivos de dueño desconocido; escritura de objetos y asociaciones es atómica. Bajo WAL, backup usa API snapshot consistente y coordina cambios a archivos.
-6. **Backup y restauración:** staging/nueva raíz, verificar hashes, SQLite/FKs y recursos antes de switch. Fallo mantiene biblioteca activa. Migración con copia previa, checksums, bloqueo y protección contra downgrade/schema futuro.
-7. **Mantenimiento:** archive/restore no cascada sobre conocimiento global; pruebas `archive_paper_no_cascade`, `archive_restore_preserves_links`. Fusión y borrado permanente no son funciones v0.1.
-8. **Instalador:** NSIS por usuario, WebView2 offline, scripts auditados, datos fuera de carpeta instalable, checksum. Sin promesa de firma Authenticode en piloto.
+1. **Paths and PDF protocol:** the UI selects a registered document through a dialog/token or UUID; it never reads an arbitrary path. The backend resolves the canonical path under the library and rejects traversal, unknown IDs, escaping symlinks/junctions, unregistered resources, and unexpected files. Verify CSP/local origin. Tests: `protocol_rejects_traversal`, `protocol_rejects_symlink_escape`, `unknown_document_not_found`, `unregistered_path_never_served`.
+2. **IPC and database:** validate DTOs in Rust even when TypeScript also validates; validate enums, sizes, UUIDs, revisions, nullability, and states. Parameterize SQL. Do not expose queries, arbitrary paths, or general filesystem capabilities. Rust/TS contract tests cover camelCase, enums, errors, dates, and IDs; also `query_is_parameterized`, `stale_revision_rejected`.
+3. **Untrusted content:** titles are never converted into paths; escape text for display; PDFs and ontologies are data. v0.1 `body` is `plain_text`; do not add a rich-text editor without design/sanitization. No remote CDN/worker. Opening external links requires explicit action.
+4. **Local privacy:** no telemetry of papers/content, login, remote API, or automatic sending. Rotated logs omit bodies, excerpts, unnecessary original paths, and secrets. Shareable exports omit private paths by default. Do not claim SQLite/backups are encrypted.
+5. **Concurrency/recovery:** one writer per library; release the lock when the process exits. Import staging/reconciliation must not delete files owned by an unknown process. Object and association writes are atomic. Under WAL, backup uses a consistent snapshot API and coordinates file changes.
+6. **Backup and restore:** stage into a new root; verify hashes, SQLite/FKs, and resources before switching. On failure, keep the active library. Migration uses a prior copy, checksums, locking, and protection against downgrade/future schemas.
+7. **Maintenance:** archive/restore does not cascade over global knowledge; tests `archive_paper_no_cascade`, `archive_restore_preserves_links`. Merge and permanent deletion are not v0.1 features.
+8. **Installer:** per-user NSIS, offline WebView2, audited scripts, data outside the installable folder, and checksum. Do not promise Authenticode signing for the pilot.
 
-Pruebas de regresión adicionales: `import_retry_is_idempotent`, `import_token_changed_payload_is_rejected`, `duplicate_doi_normalized`, `malicious_title_cannot_escape_export_root`, `plain_text_only_v01`, `logs_exclude_body_and_source_path`, `archive_restore_preserves_links`, `archive_paper_no_cascade`, `trash_merge_hard_delete_not_exposed_v01`. Una prueba de red offline cubre recorridos principales y captura solicitudes; su alcance limitado se documenta, no se presenta como prueba universal de ausencia de comunicaciones.
+Additional regression tests: `import_retry_is_idempotent`, `import_token_changed_payload_is_rejected`, `duplicate_doi_normalized`, `malicious_title_cannot_escape_export_root`, `plain_text_only_v01`, `logs_exclude_body_and_source_path`, `archive_restore_preserves_links`, `archive_paper_no_cascade`, `trash_merge_hard_delete_not_exposed_v01`. An offline network test covers main journeys and captures requests; document its limited scope, and do not present it as universal proof that no communications occur.
 
-## Pruebas planificadas
+## Planned Tests
 
-### Dominio, contratos y UI
+### Domain, Contracts, and UI
 
-- Unitarias sin UI: unknown justificado; gate incompleto y gate revalidado; definiciones versionadas; edición posterior y fases marcadas `NEEDS_REVIEW` preservando datos; tipos/origen/procedencia; restricciones de relaciones; archivo/restauración; filtros FTS; versión/manifest export.
-- Contract tests adaptador Tauri contra comandos reales cuando existan; mocks se etiquetan como simulados. Errores conservan código estable y mensaje español sin path privado.
-- UI por versión: biblioteca vacía/import/duplicado/error; posición/reapertura; PRE/P1 con bloqueo, unknown y elección; P2 captura con/sin selección, concepto compartido y procedencia pendiente; búsqueda, export y restauración. Revisar estados carga/vacío/sin resultados/guardando/guardado/error/conflicto.
-- Accesibilidad: teclado completo, foco visible/inicial/retorno, labels, errores asociados, anuncios de estado, contraste y semántica no basada solo en color. DPI 100/150/200%, ventana redimensionada y escalas diferentes.
+- Unit tests without UI: justified unknown; incomplete and revalidated gates; versioned definitions; later edits and phases marked `NEEDS_REVIEW` while preserving data; types/origin/provenance; relation constraints; archive/restore; FTS filters; export version/manifest.
+- Test the Tauri adapter contract against real commands when they exist; label mocks as simulated. Errors retain stable codes and English messages without private paths.
+- UI by version: empty library/import/duplicate/error; position/reopen; PRE/P1 with blocking, unknown, and choices; P2 capture with/without selection, shared concept, and pending provenance; search, export, and restore. Review loading/empty/no-results/saving/saved/error/conflict states.
+- Accessibility: full keyboard support, visible/initial/return focus, labels, associated errors, status announcements, contrast, and semantics that do not rely only on color. DPI at 100/150/200%, resizable window, and different scaling settings.
 
-### SQLite/filesystem y fallos
+### SQLite/Filesystem and Failures
 
-Cada test usa directorio temporal aislado y datos sintéticos; jamás biblioteca personal.
+Every test uses an isolated temporary directory and synthetic data; never use a personal library.
 
-- Import válido, mover original, DOI/hash duplicado, Unicode, inválido, permisos/espacio, interrupción tras staging y promoción; recuperar sin registrar éxito falso.
-- Integridad de FK, rollback de paper-item-relation-provenance; escritura fuera de orden; lock/segunda instancia; optimistic revision.
-- Migración pre/durante/post, checksum errado, disco lleno, WAL, esquema futuro; no escribir en migración parcial.
-- Backup con todos los recursos, SQLite corrupta, FK/hash roto, recurso faltante, espacio insuficiente, restore staging, fallo antes del switch y recuperación a biblioteca previa.
-- FTS interrumpido entre mutación e índice; reconstrucción coincide con una consulta de referencia sobre fuente canónica y excluye archivados/papelera por defecto.
-- Export conteos/referencias, JSONL parseable por línea, hashes, binarios opcionales, path privado omitido y destinos maliciosos/no escribibles.
+- Valid import, moving the original, duplicate DOI/hash, Unicode, invalid input, permissions/space, interruption after staging and promotion; recover without recording false success.
+- FK integrity, rollback of paper-item-relation-provenance; out-of-order writes; lock/second instance; optimistic revision.
+- Migration before/during/after, wrong checksum, full disk, WAL, future schema; do not write during a partial migration.
+- Backup with all resources, corrupt SQLite, broken FK/hash, missing resource, insufficient space, restore staging, failure before switch, and recovery of prior library.
+- FTS interrupted between mutation and index update; rebuilding matches a reference query against the canonical source and excludes archived/trash items by default.
+- Export counts/references, line-parseable JSONL, hashes, optional binaries, omitted private paths, malicious/unwritable destinations.
 
-Usar fault injection en filesystem/DB donde sea posible. `Guardado`, `Exportado`, `Restaurado` y ubicación activa solo tras commit/verificación. Tests de interrupción deben comprobar estado en una conexión/proceso nuevo.
+Use fault injection in filesystem/DB where possible. Show `Saved`, `Exported`, `Restored`, and the active location only after commit/verification. Interruption tests must check state from a new connection/process.
 
-### Corpus de rendimiento moderado
+### Moderate Performance Corpus
 
-Fixture determinista sin contenido privado: **1.000 papers**, 2.000 autores, **10.000 knowledge items**, 15.000 relations, 12.000 provenances, 100.000 asociaciones y **500 MB de PDFs sintéticos**. Registrar seed, tipos/tamaños, filtros y hardware. Medir por separado metadata/FTS y binarios. Corpus evalúa calidad, no limita tamaño soportado.
+Deterministic fixture without private content: **1,000 papers**, 2,000 authors, **10,000 KnowledgeItems**, 15,000 relations, 12,000 provenance records, 100,000 associations, and **500 MB of synthetic PDFs**. Record seed, types/sizes, filters, and hardware. Measure metadata/FTS separately from binaries. The corpus evaluates quality; it does not limit supported size.
 
-### QA de producto instalado
+### Installed Product QA
 
-VM/máquina Windows 11 x64 sin Node/npm/Rust/Cargo/Git/Codex y sin WebView2; nunca retirar runtimes del ordenador de trabajo. Registrar OS/arquitectura, installer/version/checksum, WebView2, red, cwd y si existe source checkout. Instalar offline, iniciar desde menú, usar con código ausente/cwd distinto, recorrer import→lectura→página→cierre→reapertura→archivo/restauración sin red, comprobar segunda apertura, proceso finalizado al cerrar, actualizar sobre fixture, inyectar fallo migración/rechazar downgrade, desinstalar conservando datos y reinstalar reabriendo misma biblioteca. Un perfil nuevo en máquina de desarrollo no prueba ausencia de herramientas.
+Use a Windows 11 x64 VM/machine without Node/npm/Rust/Cargo/Git/Codex and without WebView2; never remove runtimes from the development computer. Record OS/architecture, installer/version/checksum, WebView2, network, working directory, and whether a source checkout exists. Install offline, launch from the Start menu, use it without development tools and from a different working directory, and exercise import→read→page→close→reopen→archive/restore offline. Check second launch, process termination after close, update using a fixture, inject migration failure/reject downgrade, uninstall while retaining data, then reinstall and reopen the same library. A new profile on a development machine does not prove absence of tools.
 
-## Fitness de arquitectura
+## Architecture Fitness
 
-- **Monolito modular hexagonal:** módulos de dominio (`library`, `workflow`, `knowledge`, `relations`, `provenance`, `search`, `export`, `backup`) dependen de puertos/interfaces; adaptadores SQLite/filesystem/Tauri quedan fuera del dominio. El dominio no importa React, Tauri, SQLite ni tipos UI.
-- **Dirección de dependencias:** `app/composition → adapters → application/domain`; UI invoca casos de uso por adaptador typed/versioned IPC; ningún componente importa repositorios ni llama SQL. Dominio no contiene `invoke` ni paths del SO.
-- **Canon y derivados:** SQLite + archivos administrados son autoridad; FTS, UI projections, JSONL/Markdown son reconstruibles/salidas. IDs UUID se mantienen estables entre adaptadores/export/recovery.
-- **Transacciones:** mutaciones multiobjeto exponen casos de uso atómicos; no repartir gates, merge, restore o switch library como secuencia de decisiones React.
-- **Verificación:** import boundaries/lints y contract tests verifican dependencias; prueba de composición crea adaptador SQLite temporal y evalúa el mismo dominio que IPC; no hay una segunda regla de negocio dentro del frontend.
+- **Hexagonal modular monolith:** domain modules (`library`, `workflow`, `knowledge`, `relations`, `provenance`, `search`, `export`, `backup`) depend on ports/interfaces; SQLite/filesystem/Tauri adapters remain outside the domain. The domain does not import React, Tauri, SQLite, or UI types.
+- **Dependency direction:** `app/composition → adapters → application/domain`; UI invokes use cases through typed/versioned IPC adapters; no component imports repositories or calls SQL. The domain contains no `invoke` or OS paths.
+- **Canonical data and derivatives:** SQLite + managed files are authoritative; FTS, UI projections, and JSONL/Markdown are rebuildable/outputs. UUIDs remain stable across adapters/export/recovery.
+- **Transactions:** multi-object mutations expose atomic use cases; do not split gates, merge, restore, or library switch into a sequence of React decisions.
+- **Verification:** import boundaries/lints and contract tests check dependencies; a composition test creates a temporary SQLite adapter and evaluates the same domain as IPC; frontend must not contain a second set of business rules.
 
-## Gates de aceptación
+## Acceptance Gates
 
-- **Pilot installed:** instalador real probado limpio/offline, runtime incluido, recorrido Library/Reader, continuidad, actualización y uninstall/reinstall. No implica PRE/P1/P2.
-- **v0.1:** PRE→P1→P2, conceptos/procedencia, gates e invalidación, búsqueda, export, backup/restore y cambio de biblioteca; cerrar y reabrir conserva estado. No implica P3/P4.
-- Bloquean aceptación: pérdida de cambio confirmado, UUID/enlaces rotos, acceso a path fuera de raíz, migración parcial escribible, restore sin validación, export que comparte paths por defecto, o indicador de guardado antes del commit.
-- NFR solo se marca alcanzado cuando se mida en hardware/corpus anotados. QA manual/nativa no se sustituye por tests web cuando estos no ejercitan el producto instalado.
-
+- **Installed pilot:** real installer tested on a clean/offline system, runtime included, Library/Reader journey, continuity, update, and uninstall/reinstall. Does not imply PRE/P1/P2.
+- **v0.1:** PRE→P1→P2, concepts/provenance, gates and invalidation, search, export, backup/restore, and library switch; closing and reopening preserves state. Does not imply P3/P4.
+- Acceptance blockers: loss of a confirmed change, broken UUID/links, access to paths outside the root, writable partial migration, restore without validation, export sharing paths by default, or a saved indicator before commit.
+- Mark an NFR achieved only when measured on recorded hardware/corpus. Web tests do not replace manual/native QA where they do not exercise the installed product.

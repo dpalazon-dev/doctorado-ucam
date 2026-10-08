@@ -1,64 +1,65 @@
-# Research Workbench — base de arquitectura previa a implementación
+# Research Workbench — Architecture Baseline Before Implementation
 
-Versión de diseño 0.2 · 1 de octubre de 2026 · **Baseline de ejecución aceptada por la instrucción del usuario del 1 de octubre de 2026.**
+Design version 0.2 · 1 October 2026 · **Execution baseline accepted by the user's instruction of 1 October 2026.**
 
-Este paquete define la arquitectura de la aplicación Windows instalable y el alcance funcional v0.1, antes de crear el repositorio de producto. No certifica código, rendimiento, instalación ni recuperación ya ejecutados. El método de desarrollo acordado sigue siendo Sol como coordinador y agentes Luna con responsabilidades acotadas.
+This package defines the architecture of the installable Windows application and the functional scope of v0.1, before creation of the product repository. It does not certify that code, performance, installation, or recovery have been implemented or tested. The agreed development method remains Sol as coordinator and Luna agents with bounded responsibilities.
 
-## Resultado que se diseña
+## Intended Outcome
 
-Una aplicación local para un investigador: instalar, abrir, importar un paper, leer su PDF, procesarlo de PRE a P2 y conservar conocimiento tipado con conceptos globales, procedencia, búsqueda, exportación y backup restaurable. Los agentes son herramientas de desarrollo; la aplicación inicial no ejecuta agentes ni LLMs.
+A local application for one researcher: install it, open it, import a paper, read its PDF, process it from PRE through P2, and retain typed knowledge with global concepts, provenance, search, export, and restorable backups. Agents are development tools; the initial application does not run agents or LLMs.
 
-El piloto 0.0.1 entrega biblioteca y lector **con instalador**. v0.1.0 añade el procesamiento PRE → P2 completo y las capacidades de seguridad de uso. P3/P4, IA, sincronización, fusión de conceptos y borrado definitivo se reservan para nuevas SPECs antes de implementarlos.
+The 0.0.1 pilot delivers a library and reader **with an installer**. v0.1.0 adds the complete PRE → P2 workflow and operational safety capabilities. P3/P4, AI, synchronization, concept merging, and permanent deletion are reserved for new SPECs before implementation.
 
-## Documentos normativos y orden de lectura
+## Normative Documents and Reading Order
 
-| Documento | Pregunta que resuelve |
+| Document | Question it answers |
 |---|---|
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Cómo se organiza el programa, qué frameworks se usan, dependencias, patrones y ejecución |
-| [DOMAIN.md](DOMAIN.md) | Qué significan las entidades, estados, límites e invariantes del conocimiento |
-| [CONTRACTS.md](CONTRACTS.md) | Cómo se comunican funcionalidades y servicios; entradas, salidas, errores y consistencia |
-| [DATA.md](DATA.md) | Modelo persistente, restricciones, transacciones, archivos, migraciones y recuperación |
-| [SPECS.md](SPECS.md) | Comportamientos funcionales y criterios de aceptación de cada capacidad |
-| [ADRS.md](ADRS.md) | Decisiones, alternativas, consecuencias y motivos para revisarlas |
-| [QUALITY.md](QUALITY.md) | Requisitos no funcionales, verificación, trazabilidad y condiciones previas a implementación |
+| [ARCHITECTURE.md](ARCHITECTURE.md) | How is the program organized, and which frameworks, dependencies, patterns, and execution model does it use? |
+| [DOMAIN.md](DOMAIN.md) | What do the entities, states, boundaries, and knowledge invariants mean? |
+| [CONTRACTS.md](CONTRACTS.md) | How do capabilities and services communicate, including inputs, outputs, errors, and consistency? |
+| [DATA.md](DATA.md) | What persistent model, constraints, transactions, files, migrations, and recovery mechanisms are used? |
+| [SPECS.md](SPECS.md) | What behavior and acceptance criteria apply to each capability? |
+| [ADRS.md](ADRS.md) | What decisions were made, what alternatives and consequences exist, and why might a decision be revisited? |
+| [QUALITY.md](QUALITY.md) | What non-functional requirements, verification, traceability, and pre-implementation conditions apply? |
 
-La especificación original de producto se conserva como [DOCX](../session/outputs/Research_Workbench_Arquitectura_y_Especificacion_v0.1.docx). El [plan multiagente](../plans/HISTORICAL_MULTIAGENT_PLAN.md) organiza ejecución; sus firmas abreviadas son antecedentes, no una segunda autoridad sobre los contratos.
+The original product specification is preserved as a [DOCX](../session/outputs/Research_Workbench_Arquitectura_y_Especificacion_v0.1.docx). The [historical multi-agent plan](https://github.com/dpalazon-dev/doctorado-ucam/blob/c985b079d39ee5915c017c38c1f50b7a94526843/prototypes/research-workbench/docs/plans/HISTORICAL_MULTIAGENT_PLAN.md) organizes execution; its abbreviated signatures are historical context, not a second authority for the contracts.
 
-## Autoridad y cambios respecto al diseño anterior
+The three `phase-definitions/*.v1.json` files are immutable, versioned source payloads. Their Spanish strings and definition hashes are preserved as historical data for compatibility, not as current documentation or UI copy. Current authored documentation and UI use English. The translation policy and compatibility boundary are described in [WORKFLOW_GATES.md](WORKFLOW_GATES.md).
 
-Cada asunto tiene una autoridad: semántica en DOMAIN, interfaz en CONTRACTS, almacenamiento en DATA, comportamiento observable en SPECS, decisiones en ADRS. ARCHITECTURE explica cómo encajan. Ante una discrepancia no se elige silenciosamente un documento: se corrigen los afectados antes de delegar implementación.
+## Authority and Changes from the Earlier Design
 
-Este paquete concreta y sustituye estas ambigüedades anteriores:
+Each topic has one authoritative document: semantics in DOMAIN, interfaces in CONTRACTS, storage in DATA, observable behavior in SPECS, and decisions in ADRS. ARCHITECTURE explains how they fit together. When documents disagree, none is silently preferred; the affected documents are corrected before implementation is delegated.
 
-- Instalador NSIS offline desde el primer piloto, identidad estable y datos fuera de los binarios.
-- Monolito modular con puertos y adaptadores donde existen límites de infraestructura; contratos IPC locales, sin servidor HTTP.
-- SQLite mediante rusqlite con una conexión propiedad de un hilo dedicado; transacciones de aplicación y concurrencia optimista.
-- Texto plano como formato de cuerpo inicial; editor enriquecido y caché avanzada quedan para decisiones posteriores.
-- Abrir un paper es una operación explícita que actualiza el último abierto; leer una ficha no produce ese efecto.
-- Captura y procedencia inicial se confirman atómicamente. Evaluar un gate para mostrarlo no autoriza avanzar sin reevaluarlo en el backend.
-- Archivar/restaurar es reversible; merge y borrado definitivo no forman parte de v0.1. El catálogo conceptual original conserva esas posibilidades para evolución futura.
+This package resolves and supersedes the following ambiguities in the earlier design:
 
-Los enums incluyen estados reservados para evolución, pero la existencia de una columna o un valor no habilita un botón ni un comando fuera de alcance. La aceptación de esta baseline habilita la ejecución; no certifica el producto implementado. Los originales conservan su estado histórico.
+- An offline NSIS installer is required from the first pilot, with stable application identity and data stored outside the binaries.
+- The application is a modular monolith, using ports and adapters at infrastructure boundaries; local IPC contracts are used, with no HTTP server.
+- SQLite is accessed through rusqlite using one connection owned by a dedicated thread; application transactions and optimistic concurrency are used.
+- Plain text is the initial body format; a rich-text editor and advanced caching are deferred to later decisions.
+- Opening a paper is an explicit operation that updates the last-opened timestamp; reading a record does not.
+- Initial capture and provenance are committed atomically. Evaluating a gate for display does not authorize advancing without reevaluating it in the backend.
+- Archive and restore are reversible; merge and permanent deletion are outside v0.1. The original concept catalog retains those possibilities for future evolution.
 
-## Condición para empezar a implementar
+Enums include states reserved for future evolution, but the existence of a column or value does not enable a button or command outside the approved scope. Acceptance of this baseline authorizes execution; it does not certify an implemented product. The originals retain their historical status.
 
-1. Aceptación registrada: la instrucción del usuario del 1 de octubre de 2026 autoriza entorno e implementación completa por fases sobre esta base.
-2. Coordinador comprueba que SPECs, contratos, dominio y datos no tienen contradicciones críticas; actualiza el plan detallado con las firmas normativas.
-3. Se fija el conjunto exacto de dependencias, toolchain y licencias mediante una revisión de compatibilidad; se registra antes de escribir funcionalidades. La selección de frameworks ya está definida; las versiones de parche se fijan en lockfiles y no se inventan en estos documentos.
-4. Se autoriza e instala el requisito Rust que falta y se verifica el entorno de construcción. No se necesita instalar herramientas en un equipo que solo vaya a usar el programa.
-5. Cada tarea recibe SPEC, ADRs, contrato, archivos propios, dependencias y pruebas de aceptación. Ningún worker redefine esos límites unilateralmente.
+## Conditions for Starting Implementation
 
-La revisión de este paquete es un hito de diseño. No se necesita cerrar ahora el comportamiento interno de P3/P4 o IA, que no se implementarán bajo estos contratos.
+1. Acceptance is recorded: the user's instruction of 1 October 2026 authorizes environment preparation and complete phased implementation on this baseline.
+2. The coordinator verifies that the SPECs, contracts, domain, and data model have no critical contradictions, then updates the detailed plan with the normative signatures.
+3. The exact dependencies, toolchain, and licenses are fixed through a compatibility review and recorded before feature work. Framework selection is already defined; patch versions are pinned in lockfiles and are not invented in these documents.
+4. The missing Rust requirement is authorized and installed, and the build environment is verified. A computer used only to run the program does not need development tools.
+5. Each task receives its SPEC, ADRs, contract, owned files, dependencies, and acceptance tests. No worker may redefine those boundaries unilaterally.
 
-## Paso al repositorio futuro
+Review of this package is a design milestone. The internal behavior of P3/P4 or AI does not need to be settled now because they will not be implemented under these contracts.
 
-Al iniciar el proyecto en C:\Users\david\Projects\Research-Workbench, copiar este paquete a docs/architecture/, la visión original a docs/PRODUCT.md y el plan a docs/plans/. El coordinador asignará un commit de baseline aceptada. ADRs cambian de Proposed a Accepted solo con aceptación registrada; una decisión reemplazada conserva su historial y enlaza el ADR sucesor.
+## Transition to the Future Repository
 
-Durante ejecución, docs/STATUS.md registra una sola lista de tareas y evidencia. El código debe generar o verificar los artefactos de contrato para evitar mantener tipos divergentes entre Rust y TypeScript. Todo cambio público de contrato actualiza su versión, las SPECs afectadas, las migraciones necesarias y los tests del consumidor.
+When the project starts at `C:\Users\david\Projects\Research-Workbench`, copy this package to `docs/architecture/`, the original vision to `docs/PRODUCT.md`, and the plan to `docs/plans/`. The coordinator assigns a commit for the accepted baseline. ADRs move from Proposed to Accepted only when acceptance is recorded; a superseded decision retains its history and links to its successor ADR.
 
-## Revisión documental realizada
+During execution, `docs/STATUS.md` records a single task list and its evidence. Code must generate or verify contract artifacts to prevent Rust and TypeScript types from diverging. Every public contract change updates its version, affected SPECs, required migrations, and consumer tests.
 
-Dominio/contratos, SPECs/calidad y ADRs se redactaron con responsabilidades separadas. El coordinador integró arquitectura y datos; una revisión independiente contrastó los límites entre documentos. Se cerraron cinco ambigüedades materiales: la rama archive de P1, la representación persistente de candidatos P3, la revisión de procedencia, los selectores para backups externos y la invalidación determinista de fases.
+## Documentation Review Performed
 
-La revisión final no encontró un bloqueo crítico adicional en esos cruces. Es evidencia de coherencia de la propuesta; los tests, medidas de rendimiento y comprobaciones del producto instalado siguen siendo requisitos de ejecución futura. Los ocho documentos y sus enlaces locales se comprueban antes de entregar el paquete.
+Domain/contracts, SPECs/quality, and ADRs were drafted with separate responsibilities. The coordinator integrated architecture and data, and an independent review compared the boundaries between documents. Five material ambiguities were resolved: the P1 archive branch, persistent representation of P3 candidates, provenance review, selectors for external backups, and deterministic phase invalidation.
 
+The final review found no further critical blockers at those boundaries. This is evidence that the proposal is coherent; tests, performance measurements, and checks of the installed product remain requirements for future execution. The eight documents and their local links are checked before the package is delivered.

@@ -1,4 +1,4 @@
-# ResearchOS y Research Workbench
+# ResearchOS and Research Workbench
 
 ## Document Contract
 
@@ -13,18 +13,18 @@
 
 > Scope and conflict rules are defined in `DOCUMENTATION_ARCHITECTURE.md`.
 
-Este repositorio reúne el diseño de **ResearchOS**, una visión futura de entorno personal de trabajo del conocimiento, y un **prototipo parcial** de Research Workbench que puede servir como referencia o base para forks. El desarrollo de estos proyectos está pausado y no tiene mantenimiento activo porque su autor no dispone actualmente de tiempo. La publicación no implica soporte ni respuesta a issues.
+This repository brings together the **ResearchOS design**, a vision for a personal knowledge-work environment, and a **partial Research Workbench prototype** that can serve as a reference or a starting point for forks. Development of both projects is paused because the author currently has no time to maintain them. Publication does not imply an ongoing support commitment.
 
-## Dos alcances
+## Two scopes
 
-- **ResearchOS**, en la raíz, contiene la arquitectura canónica y el catálogo de Specs de una aplicación futura multiplataforma. No hay aquí una implementación de producción de ResearchOS.
-- **Research Workbench**, en [`prototypes/research-workbench/`](prototypes/research-workbench/), es una aplicación local para Windows 11 x64 construida con Tauri, React/TypeScript, Rust y SQLite. Es una implementación independiente e incompleta: no implementa las Specs de ResearchOS, no comparte su modelo canónico y no incluye IA.
+- **ResearchOS**, at the repository root, contains the canonical architecture and specification catalog for a future cross-platform application. There is no production implementation of ResearchOS here.
+- **Research Workbench**, under [`prototypes/research-workbench/`](prototypes/research-workbench/), is a local Windows 11 x64 application built with Tauri, React/TypeScript, Rust and SQLite. It is an independent, incomplete implementation: it does not implement ResearchOS specifications, share its canonical model, or include AI integration.
 
-La visión futura de ResearchOS admite procesamiento cognitivo Python opcional. Esa capacidad no forma parte del prototipo Workbench. Consulta [`docs/publication/`](docs/publication/) para los límites y fuentes de la instantánea.
+The ResearchOS design includes optional Python cognitive processing. That capability is not part of the Workbench prototype. See [`docs/publication/`](docs/publication/) for the snapshot's sources and limits.
 
-## Prototipo Workbench
+## Workbench prototype
 
-Consulta [`prototypes/research-workbench/`](prototypes/research-workbench/) para el README, estado, intención histórica y arquitectura. El prototipo requiere Windows x64, Node.js/npm, Rust MSVC, Visual Studio C++ Build Tools con SDK de Windows y WebView2 Runtime. Desde PowerShell en el directorio del prototipo:
+Start at [`prototypes/research-workbench/`](prototypes/research-workbench/) for its README, status, historical intent and architecture. Development requires Windows x64, Node.js/npm, Rust MSVC, Visual Studio C++ Build Tools with the Windows SDK, and the WebView2 Runtime. From PowerShell in the prototype directory:
 
 ```powershell
 npm.cmd ci
@@ -33,12 +33,16 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/check.ps1
 npm.cmd run tauri:dev
 ```
 
-Los datos de prueba son sintéticos. Estos comandos de desarrollo no demuestran instalación en equipo limpio ni que v0.1 esté completa.
+Tests use synthetic data. These development commands do not establish clean-machine installation or completion of v0.1.
 
 ## ResearchOS
 
-La arquitectura y el estado de diseño se describen en [VISION.md](VISION.md), [DOCUMENTATION_ARCHITECTURE.md](DOCUMENTATION_ARCHITECTURE.md), [ROADMAP.md](ROADMAP.md) y [SPEC_CATALOG.md](SPEC_CATALOG.md). El README es una guía de navegación; esos documentos conservan sus ámbitos de autoridad.
+The architecture and design status are described in [VISION.md](VISION.md), [DOCUMENTATION_ARCHITECTURE.md](DOCUMENTATION_ARCHITECTURE.md), [ROADMAP.md](ROADMAP.md) and [SPEC_CATALOG.md](SPEC_CATALOG.md). This README provides navigation; those documents retain authority over their declared concerns.
 
-## Licencia
+## Repository language
 
-El material propio se distribuye bajo [MIT](LICENSE). Componentes de terceros conservan sus licencias y avisos en [`prototypes/research-workbench/`](prototypes/research-workbench/). Consulta también [`docs/publication/`](docs/publication/) para la procedencia del snapshot.
+Repository prose, source comments, help text and the prototype interface use English. Technical identifiers, paths, original bibliographic names and immutable serialized historical snapshots retain their original values. Translating presentation does not authorize changing persisted identities, definition hashes or recorded evidence.
+
+## License
+
+Original material is available under [MIT](LICENSE). Third-party components retain their own licenses and notices under [`prototypes/research-workbench/`](prototypes/research-workbench/). See [`docs/publication/`](docs/publication/) for snapshot provenance.

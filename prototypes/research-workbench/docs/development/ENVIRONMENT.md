@@ -54,7 +54,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/check.ps1
 npm.cmd run tauri:build -- --debug --no-bundle
 ```
 
-The helper supplies Cargo/MSVC/SDK to the current process and uses the repository cache at `C:\Users\david\Projects\Research-Workbench\work\cargo-target`. The project pins Rust1.99.0; package-lock.json and Cargo.lock fix the actual dependency graph. The full gate runs TypeScript checking, frontend tests/build, Rust formatting/Clippy/tests and generated-contract drift checking, preserving failure exit codes. Evidence and counts are in [T01 integration](../reviews/task-01/INTEGRATION.md).
+The helper supplies Cargo/MSVC/SDK to the current process and uses the repository cache at `C:\Users\david\Projects\Research-Workbench\work\cargo-target`. The project pins Rust1.99.0; package-lock.json and Cargo.lock fix the actual dependency graph. The full gate runs TypeScript checking, frontend tests/build, Rust formatting/Clippy/tests and generated-contract drift checking, preserving failure exit codes. Evidence and counts are in [T01 integration](https://github.com/dpalazon-dev/doctorado-ucam/blob/c985b079d39ee5915c017c38c1f50b7a94526843/prototypes/research-workbench/docs/reviews/task-01/INTEGRATION.md).
 
 For interactive development, load that same helper and set a separate synthetic library before `npm.cmd run tauri:dev`:
 
@@ -77,7 +77,7 @@ T02 dependencies and later feature checks are reported separately. Native picker
 
 `work/tools/tauri-driver/bin/tauri-driver.exe` is pinned to tauri-driver2.1.0 using a project-local Cargo install root/home/build cache. `work/tools/msedgedriver/msedgedriver.exe` is the official Microsoft-signed x64 driver154.0.4258.48, matching the observed Edge/WebView2 runtime. Recheck that match before a later native run because Evergreen can update. No global PATH or configuration was changed. tauri-driver supports `--help`, not `--version`; its pinned Cargo installation record supplies version evidence.
 
-Commands, hashes and primary sources are in [the setup report](../reviews/task-10/native-webdriver-setup.md). The executables are available; no driver server, native WebDriver session, app journey, picker or installer was exercised by that preparation. Use a fresh synthetic debug library for later app QA; this does not replace clean-machine installation acceptance.
+Commands, hashes and primary sources are in [the setup report](https://github.com/dpalazon-dev/doctorado-ucam/blob/c985b079d39ee5915c017c38c1f50b7a94526843/prototypes/research-workbench/docs/reviews/task-10/native-webdriver-setup.md). The executables are available; no driver server, native WebDriver session, app journey, picker or installer was exercised by that preparation. Use a fresh synthetic debug library for later app QA; this does not replace clean-machine installation acceptance.
 
 ## Official Rust references
 

@@ -52,7 +52,7 @@ export function LibraryHome({
       })
       .catch(() => {
         if (active)
-          setError("No se pudo recuperar el último documento abierto.");
+          setError("Could not retrieve the last opened document.");
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -74,44 +74,44 @@ export function LibraryHome({
       else setError(result.error.message);
     } catch {
       if (active.current && intent === openIntent.current)
-        setError("No se pudo reanudar la lectura.");
+        setError("Could not resume reading.");
     }
   }
   return (
     <section className="home-page">
-      <p className="eyebrow">Tu espacio de investigación</p>
-      <h1>Continúa donde lo dejaste</h1>
+      <p className="eyebrow">Your research workspace</p>
+      <h1>Pick up where you left off</h1>
       <p className="lead">
-        Tu biblioteca conserva las copias locales de tus papers y la página de
-        lectura confirmada.
+        Your library keeps local copies of your papers and your confirmed
+        reading position.
       </p>
       {loading ? (
-        <p role="status">Buscando el último documento…</p>
+        <p role="status">Looking for the last document…</p>
       ) : paper ? (
         <article className="card">
-          <p className="paper-state">Último documento abierto</p>
+          <p className="paper-state">Last opened document</p>
           <h2>{paper.title}</h2>
-          <p>{paper.authors.join(", ") || "Autores sin indicar"}</p>
+          <p>{paper.authors.join(", ") || "Authors not specified"}</p>
           <div className="actions">
             <button
               type="button"
               className="primary"
               onClick={() => void resume()}
             >
-              Reanudar lectura
+              Resume reading
             </button>
             <button type="button" onClick={onShowLibrary}>
-              Ver biblioteca
+              View library
             </button>
           </div>
         </article>
       ) : (
         <article className="card">
-          <h2>Empieza con un paper</h2>
-          <p>{error ?? "Todavía no has abierto ningún documento."}</p>
+          <h2>Start with a paper</h2>
+          <p>{error ?? "You have not opened a document yet."}</p>
           <div className="actions">
             <button type="button" className="primary" onClick={onShowLibrary}>
-              Abrir biblioteca
+              Open library
             </button>
           </div>
         </article>

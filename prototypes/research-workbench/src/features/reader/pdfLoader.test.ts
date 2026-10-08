@@ -27,7 +27,7 @@ it("load_failure_destroys_task_and_preserves_original_error_if_teardown_fails", 
   const failure = new Error("PDF protegido");
   const destroy = vi
     .fn()
-    .mockRejectedValue(new Error("falló el cierre del worker"));
+    .mockRejectedValue(new Error("Worker shutdown failed"));
   await expect(
     loadPdfFromTask(
       fakeTask(Promise.reject(failure), destroy),

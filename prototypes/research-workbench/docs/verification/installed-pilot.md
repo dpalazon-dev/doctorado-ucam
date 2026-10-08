@@ -1,47 +1,47 @@
-# Verificación instalada — piloto 0.0.1
+# Installed verification — pilot 0.0.1
 
-Fecha de preparación: 2026-10-03. Este documento distingue preparación del paquete de QA sobre una aplicación instalada.
+Preparation date: 2026-10-03. This historical record distinguishes package preparation from QA on an installed application. It is not a new English-interface test run; see the current [status](../STATUS.md).
 
-## Artefacto y entorno
+## Artifact and environment
 
-| Campo | Estado |
+| Field | State |
 | --- | --- |
-| Commit y SHA-256 del setup | Pendiente: Sol ejecutará el build tras revisión sobre el commit limpio que contiene el script. |
-| Windows 11 x64 limpio / VM disponible | Pendiente; la disponibilidad de VM/Sandbox no está demostrada. |
-| WebView2 previamente ausente | Pendiente. |
-| Red desconectada | Pendiente. |
-| Node/npm/Rust/Cargo/Git/Codex ausentes | Pendiente. |
-| Checkout de fuente ausente y cwd de ejecución registrado | Pendiente. |
-| Biblioteca sintética aislada | Pendiente; no se ha lanzado ni instalado el ejecutable release en el perfil de trabajo. |
+| Setup commit and SHA-256 | Pending at preparation: Sol would build after review of the clean commit containing the script. |
+| Clean Windows 11 x64 / VM available | Pending; VM/Sandbox availability was not established. |
+| WebView2 initially absent | Pending. |
+| Network disconnected | Pending. |
+| Node/npm/Rust/Cargo/Git/Codex absent | Pending. |
+| Source checkout absent and execution cwd recorded | Pending. |
+| Isolated synthetic library | Pending; the release executable had not been launched or installed in the working profile. |
 
-## Resultados por separado
+## Separate results
 
-| Gate | Estado | Evidencia actual |
+| Gate | State | Evidence at preparation |
 | --- | --- | --- |
-| Comprobaciones de comportamiento del script | Comprobado: exit 0 el 2026-10-03. | `powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/tests/build-release.tests.ps1`; salida `build-release behavior checks passed`. Cubre LF/CRLF, host incorrecto, probe del `rustc` instalado, app PE x64 y setup NSIS con stub i386. |
-| Bundle NSIS generado | Pendiente; reservado al build de Sol después de la revisión. | No se ha ejecutado el comando de release. |
-| Arquitectura del ejecutable de la aplicación | Pendiente hasta inspeccionar `research-workbench.exe` producido por Tauri. | El script exige PE `x64 (0x8664)` y registra su SHA-256/bytes por separado. |
-| Máquina PE del setup NSIS | Pendiente hasta inspeccionar el artefacto real. | El script acepta y registra la máquina real del stub compatible (`i386` o `x64`); no la usa como prueba de arquitectura de la aplicación. |
-| Payload WebView2 offline | Pendiente de inspección del NSIS generado y prueba limpia desconectada. | `offlineInstaller` es configuración, no evidencia del payload ni de instalación offline. |
-| Recursos PDF.js dentro del producto | Pendiente de inspección/lectura instalada. | T03 configura worker, cmaps, fuentes estándar, ICC y WASM locales en el frontend. |
-| Inicio desde menú / ejecución sin source ni servidor | Pendiente. | No se ha ejecutado la aplicación release. |
-| Importar, mover original, página 2, cerrar/reabrir, archive/restore | Pendiente de QA instalada. | No se ha usado instalador ni datos personales. |
-| Segunda instancia / escritor único | Pendiente de QA instalada. | No se ha comprobado el aviso de Busy en release. |
-| Upgrade con migración real | Pendiente; no hay versión anterior compatible demostrada para este piloto. | Reinstalar 0.0.1 no contará como migración. |
-| Desinstalar y reinstalar conservando biblioteca/backups | Pendiente de QA instalada. | No se ha ejecutado el instalador ni desinstalador. |
+| Script behavior checks | Verified: exit 0 on 2026-10-03. | `powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/tests/build-release.tests.ps1`; output `build-release behavior checks passed`. Covers LF/CRLF, wrong host, installed `rustc` probe, x64 app PE and NSIS setup with i386 stub. |
+| NSIS bundle generated | Pending; reserved for Sol's build after review. | The release command had not run. |
+| App executable architecture | Pending inspection of Tauri-produced `research-workbench.exe`. | The script requires PE `x64 (0x8664)` and records SHA-256/bytes separately. |
+| NSIS setup PE machine | Pending inspection of the actual artifact. | The script accepts/records the compatible stub's actual machine (`i386` or `x64`); this is not proof of app architecture. |
+| Offline WebView2 payload | Pending inspection of generated NSIS and clean disconnected testing. | `offlineInstaller` is configuration, not evidence of payload or offline installation. |
+| PDF.js resources inside the product | Pending inspection/installed reading. | T03 configures local worker, cmaps, standard fonts, ICC and WASM in the frontend. |
+| Start-menu launch / execution without source or server | Pending. | The release application had not run. |
+| Import, move original, page 2, close/reopen, archive/restore | Pending installed QA. | No installer or personal data had been used. |
+| Second instance / single writer | Pending installed QA. | Release Busy notification had not been checked. |
+| Upgrade with actual migration | Pending; no compatible earlier version was established for this pilot. | Reinstalling 0.0.1 does not count as migration. |
+| Uninstall/reinstall preserving library/backups | Pending installed QA. | Neither installer nor uninstaller had run. |
 
-## Comandos preparados
+## Prepared commands
 
-El script, una vez incluido en un commit limpio, fija la plataforma explícitamente y guarda el candidato bajo `dist-release/0.0.1/`:
+Once included in a clean commit, the script fixes the platform explicitly and saves the candidate under `dist-release/0.0.1/`:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/build-release.ps1
 ```
 
-Prueba focal del comportamiento del script:
+Focused script behavior test:
 
 ```powershell
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/tests/build-release.tests.ps1
 ```
 
-Este informe no declara aceptado el gate de instalación piloto. Solo la evidencia del setup exacto en un entorno limpio/offline puede cerrarlo.
+This report does not accept the pilot installation gate. Only evidence for the exact setup on a clean/offline system can close it.

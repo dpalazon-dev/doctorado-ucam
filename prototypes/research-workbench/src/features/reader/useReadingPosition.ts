@@ -31,7 +31,7 @@ const queues = new Map<string, QueueEntry>();
 function errorMessage(reason: unknown): string {
   return reason instanceof Error
     ? reason.message
-    : "No se pudo guardar la posición.";
+    : "Could not save the position.";
 }
 
 function entryFor(documentId: string, revision: number): QueueEntry {
@@ -214,7 +214,7 @@ export function useReadingPosition(
     const current = entry.recovery;
     if (current?.kind !== "uncertain")
       return Promise.reject(
-        new Error("No hay un guardado incierto que reintentar."),
+        new Error("There is no uncertain save to retry."),
       );
     const localAtStart = entry.local;
     setStatus("saving");
@@ -247,7 +247,7 @@ export function useReadingPosition(
           intent: current.intent,
           durable: result.data,
           message:
-            "El guardado anterior se confirmó, pero hay otra posición local pendiente.",
+            "The previous save was confirmed, but another local position is pending.",
         });
       } else {
         entry.local = null;
@@ -316,7 +316,7 @@ export function useReadingPosition(
         let durable = current.durable;
         if (!durable) durable = await readDurable(api, documentId);
         if (!durable)
-          throw new Error("No se pudo consultar la posición guardada.");
+          throw new Error("Could not retrieve the saved position.");
         entry.revision = durable.revision;
         if (choice === "keep-saved") {
           entry.local = null;

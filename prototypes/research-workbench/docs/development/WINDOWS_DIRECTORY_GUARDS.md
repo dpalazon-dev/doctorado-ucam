@@ -1,0 +1,37 @@
+# Guardas de directorio Windows — resolución F10
+
+Decisión del coordinador, 2026-10-02; precisión de ADR-016. Sustituye la suposición de que los flags de compartición impiden modificar atributos reparse. La implementación debe cumplir este protocolo antes de integrar T02. La investigación no equivale a validación del producto.
+
+## Alcance y mecanismo
+
+La biblioteca v0.1 reside en un volumen local NTFS de Windows x64. El adaptador comprueba el volumen desde el handle y rechaza de forma segura rutas remotas/UNC y otros filesystems; no intenta probar capacidades mediante escrituras en la biblioteca. Esta restricción afecta almacenamiento de la biblioteca, no el selector de un PDF de origen. No se promete resistencia a administradores, drivers ni filtros arbitrarios.
+
+Cada directorio de la cadena autorizada conserva un handle con FILE_LIST_DIRECTORY y sin FILE_SHARE_DELETE. Su siguiente hijo retenido impide vaciarlo. El último directorio conserva un archivo hijo abierto con FILE_READ_DATA | FILE_READ_ATTRIBUTES | SYNCHRONIZE, compartición READ | WRITE sin DELETE. Después de adquirir ese hijo se vuelve a comprobar el mismo handle de directorio: tipo, ausencia de reparse e identidad/ruta autorizada. Solo entonces se publica el binding para operaciones por ruta.
+
+El mecanismo no depende de impedir FILE_WRITE_ATTRIBUTES mediante sharing. El directorio permanece no vacío, condición que bloquea la conversión a reparse en el alcance adoptado. Un handle abierto únicamente para atributos no sirve como pin: la prueba mostró que todavía permitía borrar el hijo.
+
+## Adquisición y arranque
+
+1. Abrir y conservar el ancla de volumen local. Caminar cada componente mediante NtCreateFile relativo al handle padre, con un único componente validado, OBJ_CASE_INSENSITIVE | OBJ_DONT_REPARSE, FILE_OPEN_REPARSE_POINT y FILE_SYNCHRONOUS_IO_NONALERT. Mantener los handles anteriores. Verificar el objeto adquirido y, tras retener el hijo, revalidar el padre. No crear componentes mediante una ruta absoluta todavía desprotegida.
+2. Abrir `research.sqlite` relativo con FILE_OPEN y acceso de pin de lectura. La apertura nativa determina presencia/ausencia; path.exists no concede autoridad. Con DB existente, ese archivo regular no-reparse es el pin raíz: no crear sentinelas antes del probe de versión. Un error distinto de ausencia no significa biblioteca nueva.
+3. Sin DB, la inicialización puede crear o abrir relativamente el archivo reservado `.rw-directory-pin` dentro de la raíz. Revalidar la raíz después de adquirirlo, antes de permitir rutas absolutas. No crear DB como sustituto del pin antes del writer lock. Después de adquirir LibraryLock, crear research.sqlite mediante NtCreateFile FILE_CREATE atómico y retener el nuevo archivo regular con derechos de pin READ_DATA y sin DELETE sharing hasta cerrar la conexión. Solo el éxito de esa creación autoriza abrir la DB nueva con SQLite. Si aparece DB desde la clasificación de ausencia, FILE_CREATE debe devolver colisión: devolver Busy sin abrir SQLite, conservar sus bytes y reintentar mediante un nuevo arranque que la clasifique como existente. Una comprobación de ausencia seguida de Connection::open no satisface esta regla. No crear DB antes del writer lock. No se promete ausencia de todo artefacto de inicialización ante una creación externa simultánea de DB.
+4. Una raíz existente con DB de esquema futuro solo adquiere el pin de DB y las guardas de lectura: conserva exactamente el inventario y bytes de la biblioteca; no crea pin, lock de escritor, staging ni manifest. El constructor Store permanece sin I/O y recovery no se ejecuta.
+5. Un directorio administrado de Store se adquiere relativamente. Antes de I/O por ruta, crear/abrir relativamente `.rw-directory-pin`, retenerlo y revalidar ese mismo directorio. Si se convirtió en reparse antes de adquirir el pin, fallar sin fallback absoluto. Se conservan guardas/pin a través de clones y durante todos los trabajos admitidos. LibraryRoot::at sigue sin I/O; Store comparte el binding completo del actor.
+
+El pin raíz permanece vivo al menos hasta después de cerrar SQLite y terminar trabajos admitidos. Los pins no autorizan borrar archivos ni reemplazan comprobaciones de biblioteca, namespace, referencias y hash. Una promoción puede conservar FileRenameInfo con destino absoluto derivado de la cadena protegida y ReplaceIfExists=false; lectura/hash/eliminación siguen sobre el mismo handle verificado.
+
+## Archivo reservado y persistencia
+
+`.rw-directory-pin` es un detalle interno de protección, creado vacío. Si ya existe, se abre sin truncar y se comprueba que sea regular/no-reparse; su contenido nunca es autoridad, no se ejecuta ni se interpreta. No crearlo en ancestros externos a la raíz autorizada. No borrarlo para limpiar un import y no usar comodines para cleanup: solo los PDF/recursos propios declarados por la intención. Directorios de staging pueden conservar este archivo tras terminar una operación.
+
+Exportación y manifiesto de backup omiten estos pins; no contienen conocimiento ni estado necesario para recuperar una intención. Restore de formato soportado los regenera al adquirir directorios en la nueva raíz. El manifiesto no los exige ni concede autoridad a un pin copiado. Switch/restore debe esperar cierre de conexión y trabajos, liberar todas las guardas de la raíz anterior antes de operaciones que necesiten renombrarla y mantener la raíz anterior recuperable. No hay purga automática ni cambio de migración.
+
+## FFI y pruebas
+
+Se mantienen windows-sys=0.61.2 y Foundation/Storage_FileSystem. Se autorizan además Wdk_Foundation, Wdk_Storage_FileSystem, Win32_Security y Win32_System_IO para el binding de NtCreateFile/OBJECT_ATTRIBUTES/IO_STATUS_BLOCK. Win32_Security no autoriza editar ACL. No añadir NtSetInformationFile para promoción, VFS SQLite, executor genérico ni unsafe en parser.
+
+El wrapper privado usa tipos/disposiciones cerrados para directorio/pin/archivo, nunca una API de paths UI. Valida componente sin separadores, colon, NUL, punto/doble punto; longitud UTF-16 comprobada sin truncar. Mantiene buffers y parent handle vivos durante llamada síncrona; comprueba NTSTATUS antes de convertir handle a RAII. Cada bloque unsafe documenta invariantes. Un binding incompleto no sale como raíz lista.
+
+Regresiones obligatorias: FSCTL WRITE_ATTRIBUTES con control positivo sin guarda y rechazo145 bajo pin; DELETE con sharing violation y control tras cerrar; adquisición relativa atacada antes del pin sin escritura exterior; promoción normal/no-clobber; cleanup conserva pin; DB ausente/revalidación; SQLite/rusqlite real writable con WAL, commit/checkpoint, cierre y reapertura; futuro esquema con inventario/hashes idénticos. El test experimental C# no sustituye estas pruebas Rust, ni revisión independiente de seguridad/Rust, ni validación de instalación.
+
+Fuentes primarias: [CreateFileW](https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-createfilew), [FSCTL_SET_REPARSE_POINT](https://learn.microsoft.com/en-us/openspecs/windows_protocols/ms-fsa/4aeefef8-92c3-4abc-af7a-a610caf8a165), [NtCreateFile](https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntcreatefile), [OBJECT_ATTRIBUTES](https://learn.microsoft.com/en-us/windows/win32/api/ntdef/ns-ntdef-_object_attributes). Evidencia experimental y límites: informe task-02-windows-handle-ruling y probe-2.log archivados en docs/reviews/task-02/. Consultados y probados en Windows10.0.26200 x64 / C:NTFS; no certifican todos los drivers o equipos.

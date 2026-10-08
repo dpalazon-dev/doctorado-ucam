@@ -1,0 +1,13 @@
+# Resoluciones del orquestador sobre preflight T05
+
+2026-10-03. Preparación; T05 no está activada. La publicación normativa espera revisión independiente de task-05-ports-proposal.md y sincronización de CONTRACTS/DATA/DOMAIN/briefs. Las decisiones comunicadas por Sol y recogidas en la tabla del proposal son la intención para ese ADR; ningún worker debe implementar desde este scratch.
+
+Precisiones finales para la revisión documental:
+- paperIds/conceptIds/affectedConceptIds son sets de UUID válidos: ordenar y deduplicar exactamente IDs, sin fusionar entidades ni corregir identidades. Alias normalizados duplicados dentro de Concept se rechazan; entre Concepts se permiten.
+- CapturedHash distinto del registrado impide LOCATED; una actualización válida conserva hash/Document y deja STALE. STALE ya detectado permanece, aunque ambos hashes registrados coincidan. No revalidación física implícita ni rebind en v0.1.
+- updateItem/updateConcept/linkConcept sobre padre ARCHIVED requieren restore explícito y devuelven InvalidInput sin efectos. Nuevo enlace/captura hacia Concept ARCHIVED se rechaza; los enlaces existentes siguen resolviendo y permanecen exportables. Archive/restore de padres conserva enlaces y aplica CAS/no-op/replay comunes.
+- Aceptar como base de revisión la representación física con attrs JSON sólo para tipos generales, evidence/question details únicos, Concept body como definición y mirror atómico de nombre/title. Relations activas únicas por extremos normalizados, tipo y contexto canónico: creación/restauración en colisión devuelve Conflict, sin reemplazar ni fusionar. Contexto distinto admite relación distinta. El DDL exacto requiere revisión de consumidores antes de publicar0003.
+- Reserva validations(id) vacía sin handlers ni rows ficticias. P3 necesitará nueva migración; v0.1 no finge capacidad de validación.
+- Alcance P2: partir de items asociados al Paper, seguir enlaces item_concepts (incluidos Concepts usados como items) con cierre por IDs que termina también en ciclos, incorporar relaciones sólo si ambos extremos están alcanzados; relaciones no expanden alcance por sí mismas. Proyección incluye archivados y procedencia completa. La consulta inversa de affected_papers debe cubrir ese mismo cierre, no sólo un salto directo.
+
+Pendiente revisar el ABI propuesto: lifecycle helper necesita requestId para audit_change; no aceptar una firma que obligue a auditoría sin identidad de petición. Evitar modules/knowledge/capture.rs como mera delegación redundante si application ya posee el caso de uso. Normalización/límites deben alinearse con contratos existentes, sin inventar reglas por diferencias del borrador. Estas observaciones se resolverán antes de dar un brief ejecutable a T05a.

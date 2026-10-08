@@ -1,0 +1,118 @@
+{
+  "code": "P1",
+  "version": 1,
+  "name": "P1 — Orientación",
+  "objective": "Delimitar alcance, mensaje y utilidad para decidir el recorrido de lectura.",
+  "keyQuestions": [
+    "¿Qué cubre y qué deja fuera?",
+    "¿Qué tipo de revisión y horizonte de literatura presenta?",
+    "¿Cuál es su mensaje principal?",
+    "¿Qué relevancia tiene para mi propósito y qué lectura decido?"
+  ],
+  "doItems": [
+    "Distinguir lo declarado por la fuente de tu valoración.",
+    "Registrar por separado relevancia y decisión de lectura."
+  ],
+  "dontItems": [
+    "Inventar fechas o metodología ausentes.",
+    "Escribir una decisión en texto libre en lugar de elegir la opción correspondiente."
+  ],
+  "considerations": [
+    "Continuar, lectura ligera y archivar completan P1 cuando has procesado las salidas requeridas.",
+    "Guardar la decisión no la ejecuta.",
+    "La organización del campo es una salida opcional."
+  ],
+  "requiredOutputs": [
+    {
+      "key": "scope",
+      "label": "Alcance",
+      "prompt": "Resume qué aborda el paper; explica si no puede determinarse.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED",
+        "UNKNOWN"
+      ],
+      "ruleKey": "answerProcessed"
+    },
+    {
+      "key": "out_of_scope",
+      "label": "Fuera de alcance",
+      "prompt": "Describe qué deja fuera; explica si no lo declara o si no es aplicable.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "ruleKey": "answerProcessed"
+    },
+    {
+      "key": "review_type",
+      "label": "Enfoque de revisión según la fuente",
+      "prompt": "Describe cómo se presenta la revisión y qué metodología declara la fuente. Esta respuesta caracteriza el texto y no edita el tipo bibliográfico del paper; explica lo desconocido.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED",
+        "UNKNOWN"
+      ],
+      "ruleKey": "answerProcessed"
+    },
+    {
+      "key": "literature_cutoff",
+      "label": "Horizonte de literatura",
+      "prompt": "Registra el horizonte o fecha de corte; explica el desconocimiento o por qué no es aplicable.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "ruleKey": "answerProcessed"
+    },
+    {
+      "key": "core_message",
+      "label": "Mensaje principal",
+      "prompt": "Resume el mensaje principal; explica si todavía no puede determinarse.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED",
+        "UNKNOWN"
+      ],
+      "ruleKey": "answerProcessed"
+    },
+    {
+      "key": "relevance_decision",
+      "label": "Relevancia y decisión de lectura",
+      "prompt": "Elige una valoración de relevancia y una decisión: continuar, lectura ligera o archivar.",
+      "required": true,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED"
+      ],
+      "ruleKey": "p1DecisionProcessed"
+    },
+    {
+      "key": "field_organization",
+      "label": "Organización del campo",
+      "prompt": "Si te resulta útil, registra cómo organiza el campo; explica las ausencias que decidas registrar.",
+      "required": false,
+      "allowedResolutions": [
+        "PENDING",
+        "ANSWERED",
+        "UNKNOWN",
+        "NOT_APPLICABLE"
+      ],
+      "ruleKey": "answerProcessed"
+    }
+  ],
+  "completionRules": [
+    "answerProcessed",
+    "p1DecisionProcessed"
+  ],
+  "definitionHash": "8e2c71f5d3f8578ff940c9903086f982aedca69adbb704c8fa3afe6381359150"
+}

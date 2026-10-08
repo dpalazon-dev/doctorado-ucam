@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-workflow-touch-phase"
+description = "Enables the workflow_touch_phase command without any pre-configured scope."
+commands.allow = ["workflow_touch_phase"]
+
+[[permission]]
+identifier = "deny-workflow-touch-phase"
+description = "Denies the workflow_touch_phase command without any pre-configured scope."
+commands.deny = ["workflow_touch_phase"]

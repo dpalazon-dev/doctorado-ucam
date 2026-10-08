@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-knowledge-restore-item"
+description = "Enables the knowledge_restore_item command without any pre-configured scope."
+commands.allow = ["knowledge_restore_item"]
+
+[[permission]]
+identifier = "deny-knowledge-restore-item"
+description = "Denies the knowledge_restore_item command without any pre-configured scope."
+commands.deny = ["knowledge_restore_item"]

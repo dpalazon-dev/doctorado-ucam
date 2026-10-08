@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-settings-select-library"
+description = "Enables the settings_select_library command without any pre-configured scope."
+commands.allow = ["settings_select_library"]
+
+[[permission]]
+identifier = "deny-settings-select-library"
+description = "Denies the settings_select_library command without any pre-configured scope."
+commands.deny = ["settings_select_library"]

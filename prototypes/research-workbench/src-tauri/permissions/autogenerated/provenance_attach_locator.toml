@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-provenance-attach-locator"
+description = "Enables the provenance_attach_locator command without any pre-configured scope."
+commands.allow = ["provenance_attach_locator"]
+
+[[permission]]
+identifier = "deny-provenance-attach-locator"
+description = "Denies the provenance_attach_locator command without any pre-configured scope."
+commands.deny = ["provenance_attach_locator"]

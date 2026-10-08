@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-provenance-check-document-hash"
+description = "Enables the provenance_check_document_hash command without any pre-configured scope."
+commands.allow = ["provenance_check_document_hash"]
+
+[[permission]]
+identifier = "deny-provenance-check-document-hash"
+description = "Denies the provenance_check_document_hash command without any pre-configured scope."
+commands.deny = ["provenance_check_document_hash"]

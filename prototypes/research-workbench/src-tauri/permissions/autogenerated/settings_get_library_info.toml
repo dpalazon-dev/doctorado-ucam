@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-settings-get-library-info"
+description = "Enables the settings_get_library_info command without any pre-configured scope."
+commands.allow = ["settings_get_library_info"]
+
+[[permission]]
+identifier = "deny-settings-get-library-info"
+description = "Denies the settings_get_library_info command without any pre-configured scope."
+commands.deny = ["settings_get_library_info"]

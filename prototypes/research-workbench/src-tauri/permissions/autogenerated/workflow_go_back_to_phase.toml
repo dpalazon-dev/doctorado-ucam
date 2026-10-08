@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-workflow-go-back-to-phase"
+description = "Enables the workflow_go_back_to_phase command without any pre-configured scope."
+commands.allow = ["workflow_go_back_to_phase"]
+
+[[permission]]
+identifier = "deny-workflow-go-back-to-phase"
+description = "Denies the workflow_go_back_to_phase command without any pre-configured scope."
+commands.deny = ["workflow_go_back_to_phase"]

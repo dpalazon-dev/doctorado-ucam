@@ -1,0 +1,13 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main-local",
+  "description": "Local main window domain operations only",
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "research-read",
+    "research-write",
+    "research-maintenance"
+  ]
+}

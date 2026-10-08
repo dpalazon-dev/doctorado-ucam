@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-reader-get-last-opened-paper"
+description = "Enables the reader_get_last_opened_paper command without any pre-configured scope."
+commands.allow = ["reader_get_last_opened_paper"]
+
+[[permission]]
+identifier = "deny-reader-get-last-opened-paper"
+description = "Denies the reader_get_last_opened_paper command without any pre-configured scope."
+commands.deny = ["reader_get_last_opened_paper"]

@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-concept-restore"
+description = "Enables the concept_restore command without any pre-configured scope."
+commands.allow = ["concept_restore"]
+
+[[permission]]
+identifier = "deny-concept-restore"
+description = "Denies the concept_restore command without any pre-configured scope."
+commands.deny = ["concept_restore"]

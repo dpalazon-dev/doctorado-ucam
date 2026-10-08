@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-concept-link"
+description = "Enables the concept_link command without any pre-configured scope."
+commands.allow = ["concept_link"]
+
+[[permission]]
+identifier = "deny-concept-link"
+description = "Denies the concept_link command without any pre-configured scope."
+commands.deny = ["concept_link"]

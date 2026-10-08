@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-provenance-update-locator"
+description = "Enables the provenance_update_locator command without any pre-configured scope."
+commands.allow = ["provenance_update_locator"]
+
+[[permission]]
+identifier = "deny-provenance-update-locator"
+description = "Denies the provenance_update_locator command without any pre-configured scope."
+commands.deny = ["provenance_update_locator"]

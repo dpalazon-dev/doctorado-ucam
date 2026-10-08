@@ -17,6 +17,10 @@
 
 This file provides guidance to coding agents working in the ResearchOS repository.
 
+## Imported prototype namespace
+
+`prototypes/research-workbench/` is an imported, independent partial prototype with its own historical intent, status and contracts. Its documents apply within that namespace only. They are not ResearchOS Specs, do not implement the ResearchOS canonical model, and have no authority to redefine ResearchOS architecture or contracts. For work there, first read that namespace's agent instructions, historical intent and status, then only the relevant prototype architecture documents. Root-level Document Contracts and ResearchOS authority ownership remain in force for ResearchOS material.
+
 ## What this repository is
 
 ResearchOS is a local-first, single-user desktop operating environment for knowledge work, research and operational continuity. The canonical architecture is complete through `CANONICAL_DATA_MODEL.md`, `AGENT_RUNTIME.md` and the provisional `TECHNICAL_ARCHITECTURE.md` baseline.

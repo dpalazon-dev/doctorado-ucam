@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-workflow-get-p3-candidate-summary"
+description = "Enables the workflow_get_p3_candidate_summary command without any pre-configured scope."
+commands.allow = ["workflow_get_p3_candidate_summary"]
+
+[[permission]]
+identifier = "deny-workflow-get-p3-candidate-summary"
+description = "Denies the workflow_get_p3_candidate_summary command without any pre-configured scope."
+commands.deny = ["workflow_get_p3_candidate_summary"]

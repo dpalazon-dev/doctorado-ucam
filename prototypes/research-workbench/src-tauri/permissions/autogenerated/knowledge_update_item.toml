@@ -1,0 +1,11 @@
+# Automatically generated - DO NOT EDIT!
+
+[[permission]]
+identifier = "allow-knowledge-update-item"
+description = "Enables the knowledge_update_item command without any pre-configured scope."
+commands.allow = ["knowledge_update_item"]
+
+[[permission]]
+identifier = "deny-knowledge-update-item"
+description = "Denies the knowledge_update_item command without any pre-configured scope."
+commands.deny = ["knowledge_update_item"]

@@ -1,0 +1,17 @@
+{
+  "contractVersion": 1,
+  "requestId": "00000000-0000-4000-8000-000000000001",
+  "ok": true,
+  "data": {
+    "appVersion": "0.0.1",
+    "contractVersion": 1,
+    "schemaVersion": 1,
+    "libraryId": "00000000-0000-4000-8000-000000000001",
+    "libraryRootLabel": "Biblioteca local — investigación 水",
+    "state": "ready",
+    "capabilities": {
+      "settings": true,
+      "library": false
+    }
+  }
+}
